@@ -1,0 +1,299 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		EB1A2A6815AF08450085A39E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6715AF08450085A39E /* UIKit.framework */; };
+		EB1A2A6A15AF08450085A39E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6915AF08450085A39E /* Foundation.framework */; };
+		EB1A2A6C15AF08450085A39E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6B15AF08450085A39E /* CoreGraphics.framework */; };
+		EB1A2A7215AF08450085A39E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EB1A2A7015AF08450085A39E /* InfoPlist.strings */; };
+		EB1A2A7415AF08450085A39E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A7315AF08450085A39E /* main.m */; };
+		EB1A2A7815AF08450085A39E /* RSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A7715AF08450085A39E /* RSAppDelegate.m */; };
+		EB1A2A9115AF08CC0085A39E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A8C15AF08CC0085A39E /* NSObject+REObserver.m */; };
+		EB1A2A9215AF08CC0085A39E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A8E15AF08CC0085A39E /* NSObject+REResponder.m */; };
+		EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A9015AF08CC0085A39E /* REUtil.m */; };
+		EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		EB1A2A6315AF08450085A39E /* REKitSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = REKitSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB1A2A6715AF08450085A39E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		EB1A2A6915AF08450085A39E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		EB1A2A6B15AF08450085A39E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		EB1A2A6F15AF08450085A39E /* REKitSample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "REKitSample-Info.plist"; sourceTree = "<group>"; };
+		EB1A2A7115AF08450085A39E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EB1A2A7315AF08450085A39E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		EB1A2A7515AF08450085A39E /* REKitSample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "REKitSample-Prefix.pch"; sourceTree = "<group>"; };
+		EB1A2A7615AF08450085A39E /* RSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RSAppDelegate.h; sourceTree = "<group>"; };
+		EB1A2A7715AF08450085A39E /* RSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RSAppDelegate.m; sourceTree = "<group>"; };
+		EB1A2A8B15AF08CC0085A39E /* NSObject+REObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+REObserver.h"; path = "../REKit/NSObject+REObserver.h"; sourceTree = "<group>"; };
+		EB1A2A8C15AF08CC0085A39E /* NSObject+REObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+REObserver.m"; path = "../REKit/NSObject+REObserver.m"; sourceTree = "<group>"; };
+		EB1A2A8D15AF08CC0085A39E /* NSObject+REResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+REResponder.h"; path = "../REKit/NSObject+REResponder.h"; sourceTree = "<group>"; };
+		EB1A2A8E15AF08CC0085A39E /* NSObject+REResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+REResponder.m"; path = "../REKit/NSObject+REResponder.m"; sourceTree = "<group>"; };
+		EB1A2A8F15AF08CC0085A39E /* REUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REUtil.h; path = ../REKit/REUtil.h; sourceTree = "<group>"; };
+		EB1A2A9015AF08CC0085A39E /* REUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = REUtil.m; path = ../REKit/REUtil.m; sourceTree = "<group>"; };
+		EB1A2A9F15AF0A8E0085A39E /* REKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REKit.h; path = ../REKit/REKit.h; sourceTree = "<group>"; };
+		EB1A2AA015AF0B3B0085A39E /* RSMasterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMasterViewController.h; sourceTree = "<group>"; };
+		EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSMasterViewController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EB1A2A6015AF08450085A39E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB1A2A6815AF08450085A39E /* UIKit.framework in Frameworks */,
+				EB1A2A6A15AF08450085A39E /* Foundation.framework in Frameworks */,
+				EB1A2A6C15AF08450085A39E /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		EB1A2A5815AF08450085A39E = {
+			isa = PBXGroup;
+			children = (
+				EB1A2A9515AF08D30085A39E /* REKit */,
+				EB1A2A6D15AF08450085A39E /* REKitSample */,
+				EB1A2A6615AF08450085A39E /* Frameworks */,
+				EB1A2A6415AF08450085A39E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		EB1A2A6415AF08450085A39E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EB1A2A6315AF08450085A39E /* REKitSample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EB1A2A6615AF08450085A39E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EB1A2A6715AF08450085A39E /* UIKit.framework */,
+				EB1A2A6915AF08450085A39E /* Foundation.framework */,
+				EB1A2A6B15AF08450085A39E /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EB1A2A6D15AF08450085A39E /* REKitSample */ = {
+			isa = PBXGroup;
+			children = (
+				EB1A2A7615AF08450085A39E /* RSAppDelegate.h */,
+				EB1A2A7715AF08450085A39E /* RSAppDelegate.m */,
+				EB1A2AA015AF0B3B0085A39E /* RSMasterViewController.h */,
+				EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */,
+				EB1A2A6E15AF08450085A39E /* Supporting Files */,
+			);
+			path = REKitSample;
+			sourceTree = "<group>";
+		};
+		EB1A2A6E15AF08450085A39E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				EB1A2A7015AF08450085A39E /* InfoPlist.strings */,
+				EB1A2A7315AF08450085A39E /* main.m */,
+				EB1A2A6F15AF08450085A39E /* REKitSample-Info.plist */,
+				EB1A2A7515AF08450085A39E /* REKitSample-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EB1A2A9515AF08D30085A39E /* REKit */ = {
+			isa = PBXGroup;
+			children = (
+				EB1A2A9F15AF0A8E0085A39E /* REKit.h */,
+				EB1A2A8B15AF08CC0085A39E /* NSObject+REObserver.h */,
+				EB1A2A8C15AF08CC0085A39E /* NSObject+REObserver.m */,
+				EB1A2A8D15AF08CC0085A39E /* NSObject+REResponder.h */,
+				EB1A2A8E15AF08CC0085A39E /* NSObject+REResponder.m */,
+				EB1A2A8F15AF08CC0085A39E /* REUtil.h */,
+				EB1A2A9015AF08CC0085A39E /* REUtil.m */,
+			);
+			name = REKit;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EB1A2A6215AF08450085A39E /* REKitSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB1A2A8415AF08450085A39E /* Build configuration list for PBXNativeTarget "REKitSample" */;
+			buildPhases = (
+				EB1A2A5F15AF08450085A39E /* Sources */,
+				EB1A2A6015AF08450085A39E /* Frameworks */,
+				EB1A2A6115AF08450085A39E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = REKitSample;
+			productName = REKitSample;
+			productReference = EB1A2A6315AF08450085A39E /* REKitSample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EB1A2A5A15AF08450085A39E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = RS;
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = EB1A2A5D15AF08450085A39E /* Build configuration list for PBXProject "REKitSample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = EB1A2A5815AF08450085A39E;
+			productRefGroup = EB1A2A6415AF08450085A39E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EB1A2A6215AF08450085A39E /* REKitSample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EB1A2A6115AF08450085A39E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB1A2A7215AF08450085A39E /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EB1A2A5F15AF08450085A39E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB1A2A7415AF08450085A39E /* main.m in Sources */,
+				EB1A2A7815AF08450085A39E /* RSAppDelegate.m in Sources */,
+				EB1A2A9115AF08CC0085A39E /* NSObject+REObserver.m in Sources */,
+				EB1A2A9215AF08CC0085A39E /* NSObject+REResponder.m in Sources */,
+				EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */,
+				EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		EB1A2A7015AF08450085A39E /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EB1A2A7115AF08450085A39E /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		EB1A2A8215AF08450085A39E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EB1A2A8315AF08450085A39E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EB1A2A8515AF08450085A39E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "REKitSample/REKitSample-Prefix.pch";
+				INFOPLIST_FILE = "REKitSample/REKitSample-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		EB1A2A8615AF08450085A39E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "REKitSample/REKitSample-Prefix.pch";
+				INFOPLIST_FILE = "REKitSample/REKitSample-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EB1A2A5D15AF08450085A39E /* Build configuration list for PBXProject "REKitSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB1A2A8215AF08450085A39E /* Debug */,
+				EB1A2A8315AF08450085A39E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EB1A2A8415AF08450085A39E /* Build configuration list for PBXNativeTarget "REKitSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB1A2A8515AF08450085A39E /* Debug */,
+				EB1A2A8615AF08450085A39E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EB1A2A5A15AF08450085A39E /* Project object */;
+}

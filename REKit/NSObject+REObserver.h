@@ -7,6 +7,12 @@
 #import <Foundation/Foundation.h>
 
 
+// Keys for observingInfo
+extern NSString* const REObservingInfoObjectKey;
+extern NSString* const REObservingInfoKeyPathKey;
+extern NSString* const REObservingInfoOptionsKey;
+extern NSString* const REObservingInfoBlockKey;
+
 // Handler
 typedef void (^REObserverHandler)(NSDictionary *change);
 

@@ -83,6 +83,11 @@ static NSString* const kObservingInfoBlockKey = @"kObservingInfoBlockKey";
 	return [observer autorelease];
 }
 
+- (NSDictionary*)observingInfo
+{
+	return [self associatedValueForKey:kObservingInfoKey];
+}
+
 - (void)stopObserving
 {
 	// Get observingInfo

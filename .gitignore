@@ -1,1 +1,18 @@
-build .DS_Store Icon *~.nib *.o
+*/build
+
+*.DS_Store
+
+*/Icon
+
+*~.nib
+
+*.o
+
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/default.*
+
+
+**/*.xcodeproj/*
+!**/*.xcodeproj/default.*
+!**/*.xcodeproj/project.pbxproj

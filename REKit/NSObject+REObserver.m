@@ -115,12 +115,6 @@ static NSString* const kObservingInfosKey = @"REObserver_observingInfosKey";
 	return [observer autorelease];
 }
 
-- (id)addObserverToObjectsAtIndexes:(NSIndexSet*)indexes forKeyPath:(NSString*)keyPath options:(NSKeyValueObservingOptions)options usingBlock:(REObserverHandler)block
-{
-	// Not Implemented >>>
-	return nil;
-}
-
 - (void)stopObservingWithObservingInfo:(NSDictionary*)observingInfo
 {
 	id object;

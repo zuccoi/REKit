@@ -85,49 +85,59 @@ static NSString* const kObservingInfoBlockKey = @"kObservingInfoBlockKey";
 
 - (NSDictionary*)observingInfo
 {
-	return [self associatedValueForKey:kObservingInfoKey];
+	// Get observingInfo
+	NSDictionary *observingInfo;
+	@synchronized (self) {
+		observingInfo = [self associatedValueForKey:kObservingInfoKey];
+	}
+	
+	return [[observingInfo retain] autorelease];
 }
 
 - (void)stopObserving
 {
-	// Get observingInfo
-	NSDictionary *observingInfo;
-	observingInfo = [self associatedValueForKey:kObservingInfoKey];
-	if (!observingInfo) {
-		return;
+	@synchronized (self) {
+		// Get observingInfo
+		NSDictionary *observingInfo;
+		observingInfo = [self observingInfo];
+		if (!observingInfo) {
+			return;
+		}
+		
+		// Stop observing
+		id object;
+		NSString *keyPath;
+		object = [observingInfo objectForKey:kObservingInfoObjectKey];
+		keyPath = [observingInfo objectForKey:kObservingInfoKeyPathKey];
+		[object removeObserver:self forKeyPath:keyPath];
 	}
-	
-	// Stop observing
-	id object;
-	NSString *keyPath;
-	object = [observingInfo objectForKey:kObservingInfoObjectKey];
-	keyPath = [observingInfo objectForKey:kObservingInfoKeyPathKey];
-	[object removeObserver:self forKeyPath:keyPath];
 }
 
 - (void)OBSX_observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context
 {
-	// Get observingInfo
-	NSDictionary *observingInfo;
-	observingInfo = [self associatedValueForKey:kObservingInfoKey];
-	if (!observingInfo) {
-		return;
+	@synchronized (self) {
+		// Get observingInfo
+		NSDictionary *observingInfo;
+		observingInfo = [self observingInfo];
+		if (!observingInfo) {
+			return;
+		}
+		
+		// Check elements
+		if ([observingInfo objectForKey:kObservingInfoObjectKey] != object
+			|| ![[observingInfo objectForKey:kObservingInfoKeyPathKey] isEqualToString:keyPath]
+		){
+			return;
+		}
+		
+		// Execute block
+		REObserverHandler block;
+		block = [observingInfo objectForKey:kObservingInfoBlockKey];
+		if (!block) {
+			return;
+		}
+		block(change);
 	}
-	
-	// Check elements
-	if ([observingInfo objectForKey:kObservingInfoObjectKey] != object
-		|| ![[observingInfo objectForKey:kObservingInfoKeyPathKey] isEqualToString:keyPath]
-	){
-		return;
-	}
-	
-	// Execute block
-	REObserverHandler block;
-	block = [observingInfo objectForKey:kObservingInfoBlockKey];
-	if (!block) {
-		return;
-	}
-	block(change);
 }
 
 - (void)OBSX_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath
@@ -135,7 +145,7 @@ static NSString* const kObservingInfoBlockKey = @"kObservingInfoBlockKey";
 	@synchronized (self) {
 		// Get observingInfo
 		NSDictionary *observingInfo;
-		observingInfo = [self associatedValueForKey:kObservingInfoKey];
+		observingInfo = [observer observingInfo];
 		if (observingInfo
 			&& [observingInfo objectForKey:kObservingInfoObjectKey] == self
 			&& [[observingInfo objectForKey:kObservingInfoKeyPathKey] isEqualToString:keyPath]
@@ -161,7 +171,7 @@ static NSString* const kObservingInfoBlockKey = @"kObservingInfoBlockKey";
 	@synchronized (self) {
 		// Get observingInfo
 		NSDictionary *observingInfo;
-		observingInfo = [observer associatedValueForKey:kObservingInfoKey];
+		observingInfo = [observer observingInfo];
 		if (observingInfo
 			&& [observingInfo objectForKey:kObservingInfoObjectKey] == self
 			&& [[observingInfo objectForKey:kObservingInfoKeyPathKey] isEqualToString:keyPath]

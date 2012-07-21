@@ -9,7 +9,7 @@
 
 
 // Constants
-static NSString* const kObservingInfoKey = @"REObserver_observingInfoKey";
+static NSString* const kObservingInfoKey = @"REObserverObservingInfo";
 
 // Keys for observingInfo
 NSString* const REObservingInfoObjectKey = @"object";

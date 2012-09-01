@@ -164,7 +164,7 @@
 		// Make cell
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"] autorelease];
 		
-		// Add button
+		// Add button		// Don't use target >>>
 		UIButton *button;
 		SEL buttonAction;
 		id target;

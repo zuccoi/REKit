@@ -7,6 +7,10 @@
 #import "NSObject+REResponder.h"
 #import "REUtil.h"
 
+#if __has_feature(objc_arc)
+	#error This code needs compiler option -fno-objc-arc
+#endif
+
 
 // Constants
 static NSString* const kProtocolsKey = @"REResponder_protocols";
@@ -35,8 +39,11 @@ struct Block
 
 // Flags of Block
 enum {
-	BLOCK_HAS_COPY_DISPOSE = 1 << 25,
-	BLOCK_HAS_SIGNATURE = 1 << 30,
+	BLOCK_HAS_COPY_DISPOSE =	(1 << 25),
+	BLOCK_HAS_CTOR =			(1 << 26), // helpers have C++ code
+	BLOCK_IS_GLOBAL =			(1 << 28),
+	BLOCK_HAS_STRET =			(1 << 29), // IFF BLOCK_HAS_SIGNATURE
+	BLOCK_HAS_SIGNATURE =		(1 << 30), 
 };
 
 

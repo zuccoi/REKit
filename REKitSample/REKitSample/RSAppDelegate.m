@@ -7,6 +7,7 @@
 #import "REKit.h"
 #import "RSAppDelegate.h"
 #import "RSMasterViewController.h"
+#import "RSClassAA.h"
 
 
 @implementation RSAppDelegate
@@ -37,6 +38,21 @@
 #pragma mark -- ApplicationDelegate --
 //--------------------------------------------------------------//
 
+- (void)_test
+{
+	RSClassA *objA;
+	objA = [[RSClassA alloc] init];
+//	[objA log];
+//	[objA respondsToSelector:@selector(log) usingBlock:^{
+//		NSLog(@"%s - line %d", __PRETTY_FUNCTION__, __LINE__);
+//	}];
+	
+	RSClassAA *objAA;
+	objAA = [[RSClassAA alloc] init];
+	NSLog(@"responds = %@", [objAA respondsToSelector:@selector(log)] ? @"YES" : @"NO");
+	[objAA log];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Make masterViewController
@@ -51,6 +67,16 @@
 	
 	// Show window
 	[self.window makeKeyAndVisible];
+	
+	// Test
+	[self _test];
+	
+	id obj;
+	obj = [[NSObject alloc] init];
+	[obj respondsToSelector:@selector(say:) usingBlock:^ (NSString *string) {
+		NSLog(@"string = %@", string); // Hello
+	}];
+	[obj performSelector:@selector(say:) withObject:@"Hello"];
 	
 	return YES;
 }

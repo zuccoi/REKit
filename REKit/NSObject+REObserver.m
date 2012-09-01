@@ -7,6 +7,10 @@
 #import "NSObject+REObserver.h"
 #import "REUtil.h"
 
+#if __has_feature(objc_arc)
+	#error This code needs compiler option -fno-objc-arc
+#endif
+
 
 // Constants
 static NSString* const kObservingInfoKey = @"REObserverObservingInfo";

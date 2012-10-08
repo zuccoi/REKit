@@ -106,26 +106,26 @@ static void RESLogSignature(NSMethodSignature *signature)
 	// Exchange methods…
 	
 	// conformsToProtocol:
-	[self exchangeInstanceMethodForSelector:@selector(conformsToProtocol:) withForSelector:@selector(RESX_conformsToProtocol:)];
+	[self exchangeInstanceMethodForSelector:@selector(conformsToProtocol:) withForSelector:@selector(REResponder_X_conformsToProtocol:)];
 	
 	// respondsToSelector:
-	[self exchangeInstanceMethodForSelector:@selector(respondsToSelector:) withForSelector:@selector(RESX_respondsToSelector:)];
+	[self exchangeInstanceMethodForSelector:@selector(respondsToSelector:) withForSelector:@selector(REResponder_X_respondsToSelector:)];
 	
 	// methodSignatureForSelector:
-	[self exchangeInstanceMethodForSelector:@selector(methodSignatureForSelector:) withForSelector:@selector(RESX_methodSignatureForSelector:)];
+	[self exchangeInstanceMethodForSelector:@selector(methodSignatureForSelector:) withForSelector:@selector(REResponder_X_methodSignatureForSelector:)];
 	
 	// forwardInvocation:
-	[self exchangeInstanceMethodForSelector:@selector(forwardInvocation:) withForSelector:@selector(RESX_forwardInvocation:)];
+	[self exchangeInstanceMethodForSelector:@selector(forwardInvocation:) withForSelector:@selector(REResponder_X_forwardInvocation:)];
 	
 	// dealloc
-	[self exchangeInstanceMethodForSelector:@selector(dealloc) withForSelector:@selector(RESX_dealloc)];
+	[self exchangeInstanceMethodForSelector:@selector(dealloc) withForSelector:@selector(REResponder_X_dealloc)];
 }
 
 //--------------------------------------------------------------//
 #pragma mark -- Property --
 //--------------------------------------------------------------//
 
-- (NSMutableSet*)RES_protocols
+- (NSMutableSet*)REResponder_protocols
 {
 	// Get protocols
 	NSMutableSet *protocols;		// {(protocolName, ...)}
@@ -140,7 +140,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	return protocols;
 }
 
-- (NSMutableDictionary*)RES_blocks
+- (NSMutableDictionary*)REResponder_blocks
 {
 	// Get blocks
 	NSMutableDictionary *blocks;		// {selectorName : {"block":id, "signature":NSMethodSignature}}
@@ -159,7 +159,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 #pragma mark -- Object --
 //--------------------------------------------------------------//
 
-- (void)RESX_dealloc
+- (void)REResponder_X_dealloc
 {
 	// Release protocols
 	[self associateValue:nil forKey:kProtocolsKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -173,7 +173,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	[self associateValue:nil forKey:kBlocksKey policy:OBJC_ASSOCIATION_RETAIN];
 	
 	// original
-	[self RESX_dealloc];
+	[self REResponder_X_dealloc];
 }
 
 //--------------------------------------------------------------//
@@ -187,7 +187,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 		return;
 	}
 	
-	// Update RES_protocols
+	// Update REResponder_protocols
 	@synchronized (self) {
 		// Get name of protocol
 		NSString *name;
@@ -195,10 +195,10 @@ static void RESLogSignature(NSMethodSignature *signature)
 		
 		// Add or remove protocol
 		if (flag) {
-			[[self RES_protocols] addObject:name];
+			[[self REResponder_protocols] addObject:name];
 		}
 		else {
-			[[self RES_protocols] removeObject:name];
+			[[self REResponder_protocols] removeObject:name];
 		}
 	}
 }
@@ -241,13 +241,13 @@ static void RESLogSignature(NSMethodSignature *signature)
 		[self removeBlockForSelector:selector];
 		
 		// Set dict
-		[[self RES_blocks] setObject:dict forKey:selectorName];
+		[[self REResponder_blocks] setObject:dict forKey:selectorName];
 	}
 }
 
 - (id)blockForSelector:(SEL)selector
 {
-	return [[[self RES_blocks] objectForKey:NSStringFromSelector(selector)] objectForKey:kBlockKey];
+	return [[[self REResponder_blocks] objectForKey:NSStringFromSelector(selector)] objectForKey:kBlockKey];
 }
 
 - (void)removeBlockForSelector:(SEL)selector
@@ -264,7 +264,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	@synchronized (self) {
 		// Get blocks
 		NSMutableDictionary *blocks;
-		blocks = [self RES_blocks];
+		blocks = [self REResponder_blocks];
 		
 		// Get dict
 		NSDictionary *dict;
@@ -285,20 +285,20 @@ static void RESLogSignature(NSMethodSignature *signature)
 #pragma mark -- Messaging --
 //--------------------------------------------------------------//
 
-- (BOOL)RESX_conformsToProtocol:(Protocol*)aProtocol
+- (BOOL)REResponder_X_conformsToProtocol:(Protocol*)aProtocol
 {
 	// Handle registered protocol
 	@synchronized (self) {
-		if ([[self RES_protocols] containsObject:NSStringFromProtocol(aProtocol)]) {
+		if ([[self REResponder_protocols] containsObject:NSStringFromProtocol(aProtocol)]) {
 			return YES;
 		}
 	}
 	
 	// original
-	return [self RESX_conformsToProtocol:aProtocol];
+	return [self REResponder_X_conformsToProtocol:aProtocol];
 }
 
-- (BOOL)RESX_respondsToSelector:(SEL)aSelector
+- (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
 	// Get selectorName
 	NSString *selectorName;
@@ -306,16 +306,16 @@ static void RESLogSignature(NSMethodSignature *signature)
 	
 	// Hadle registered selector
 	@synchronized (self) {
-		if ([[self RES_blocks] objectForKey:selectorName]) {
+		if ([[self REResponder_blocks] objectForKey:selectorName]) {
 			return YES;
 		}
 	}
 	
 	// original
-	return [self RESX_respondsToSelector:aSelector];
+	return [self REResponder_X_respondsToSelector:aSelector];
 }
 
-- (NSMethodSignature*)RESX_methodSignatureForSelector:(SEL)aSelector
+- (NSMethodSignature*)REResponder_X_methodSignatureForSelector:(SEL)aSelector
 {
 	// Get selectorName
 	NSString *selectorName;
@@ -324,17 +324,17 @@ static void RESLogSignature(NSMethodSignature *signature)
 	// Handle registered selector
 	@synchronized (self) {
 		NSDictionary *dict;
-		dict = [[self RES_blocks] objectForKey:selectorName];
+		dict = [[self REResponder_blocks] objectForKey:selectorName];
 		if (dict) {
 			return [dict objectForKey:kSignatureKey];
 		}
 	}
 	
 	// original
-	return [self RESX_methodSignatureForSelector:aSelector];
+	return [self REResponder_X_methodSignatureForSelector:aSelector];
 }
 
-- (void)RESX_forwardInvocation:(NSInvocation*)invocation
+- (void)REResponder_X_forwardInvocation:(NSInvocation*)invocation
 {
 	// Get selectorName
 	NSString *selectorName;
@@ -344,7 +344,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	@synchronized (self) {
 		// Get dict
 		NSDictionary *dict;
-		dict = [[self RES_blocks] objectForKey:selectorName];
+		dict = [[self REResponder_blocks] objectForKey:selectorName];
 		if (!dict) {
 			goto ORIGINAL;
 		}
@@ -407,7 +407,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	
 	// original
 	ORIGINAL: {}
-	[self RESX_forwardInvocation:invocation];
+	[self REResponder_X_forwardInvocation:invocation];
 }
 
 @end

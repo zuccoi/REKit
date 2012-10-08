@@ -13,7 +13,7 @@ extern NSString* const REObservingInfoKeyPathKey;
 extern NSString* const REObservingInfoOptionsKey;
 extern NSString* const REObservingInfoBlockKey;
 
-// Handler
+// REObserverHandler
 typedef void (^REObserverHandler)(NSDictionary *change);
 
 

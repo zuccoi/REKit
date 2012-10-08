@@ -33,29 +33,29 @@ NSString* const REObservingInfoBlockKey = @"block";
 	// Exchange methods…
 	
 	// observeValueForKeyPath:ofObject:change:context:
-	[self exchangeInstanceMethodForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withForSelector:@selector(OBSX_observeValueForKeyPath:ofObject:change:context:)];
+	[self exchangeInstanceMethodForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withForSelector:@selector(REObserver_X_observeValueForKeyPath:ofObject:change:context:)];
 	
 	// removeObserver:forKeyPath:
-	[self exchangeInstanceMethodForSelector:@selector(removeObserver:forKeyPath:) withForSelector:@selector(OBSX_removeObserver:forKeyPath:)];
+	[self exchangeInstanceMethodForSelector:@selector(removeObserver:forKeyPath:) withForSelector:@selector(REObserver_X_removeObserver:forKeyPath:)];
 	
 	// removeObserver:forKeyPath:context:
-	[self exchangeInstanceMethodForSelector:@selector(removeObserver:forKeyPath:context:) withForSelector:@selector(OBSX_removeObserver:forKeyPath:context:)];
+	[self exchangeInstanceMethodForSelector:@selector(removeObserver:forKeyPath:context:) withForSelector:@selector(REObserver_X_removeObserver:forKeyPath:context:)];
 	
 	// dealloc
-	[self exchangeInstanceMethodForSelector:@selector(dealloc) withForSelector:@selector(OBSX_dealloc)];
+	[self exchangeInstanceMethodForSelector:@selector(dealloc) withForSelector:@selector(REObserver_X_dealloc)];
 }
 
 //--------------------------------------------------------------//
 #pragma mark -- Object --
 //--------------------------------------------------------------//
 
-- (void)OBSX_dealloc
+- (void)REObserver_X_dealloc
 {
 	// Stop observing
 	[self stopObserving];
 	
 	// original
-	[self OBSX_dealloc];
+	[self REObserver_X_dealloc];
 }
 
 //--------------------------------------------------------------//
@@ -117,7 +117,7 @@ NSString* const REObservingInfoBlockKey = @"block";
 	}
 }
 
-- (void)OBSX_observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context
+- (void)REObserver_X_observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context
 {
 	@synchronized (self) {
 		// Get observingInfo
@@ -144,7 +144,7 @@ NSString* const REObservingInfoBlockKey = @"block";
 	}
 }
 
-- (void)OBSX_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath
+- (void)REObserver_X_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath
 {
 	@synchronized (self) {
 		// Get observingInfo
@@ -167,10 +167,10 @@ NSString* const REObservingInfoBlockKey = @"block";
 	}
 	
 	// original
-	[self OBSX_removeObserver:observer forKeyPath:keyPath];
+	[self REObserver_X_removeObserver:observer forKeyPath:keyPath];
 }
 
-- (void)OBSX_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath context:(void*)context
+- (void)REObserver_X_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath context:(void*)context
 {
 	@synchronized (self) {
 		// Get observingInfo
@@ -194,7 +194,7 @@ NSString* const REObservingInfoBlockKey = @"block";
 	}
 	
 	// original
-	[self OBSX_removeObserver:observer forKeyPath:keyPath context:context];
+	[self REObserver_X_removeObserver:observer forKeyPath:keyPath context:context];
 }
 
 @end

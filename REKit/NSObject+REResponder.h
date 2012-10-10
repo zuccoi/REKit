@@ -17,7 +17,7 @@ extern NSString* const REResponderOriginalImplementationBlockName;
 - (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
 
 // Block
-- (BOOL)respondsToSelector:(SEL)selector usingBlock:(id)block blockName:(NSString**)blockName;
+- (BOOL)respondsToSelector:(SEL)selector withBlockName:(NSString**)blockName usingBlock:(id)block;
 - (id)blockNamed:(NSString*)blockName;
 - (id)superBlockOfBlockNamed:(NSString*)blockName;
 - (void)removeBlockNamed:(NSString*)blockName;

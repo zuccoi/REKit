@@ -102,28 +102,30 @@
 	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"Clear", nil];
 	
 	// Make alertView delegate of the alertView
-	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) usingBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-		switch (buttonIndex) {
-		case 0: {
-			// Cancelled
-			break;
-		}
-		case 1: {
-			// Make indexPaths to delete
-			NSMutableArray *indexPaths;
-			indexPaths = [NSMutableArray array];
-			for (NSInteger i = 0; i < [_items count]; i++) {
-				[indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withBlockName:nil
+		usingBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+			switch (buttonIndex) {
+			case 0: {
+				// Cancelled
+				break;
 			}
-			
-			// Clear items
-			[self willChangeValueForKey:@"items"];
-			[_items removeAllObjects];
-			[self didChangeValueForKey:@"items"];
-			[self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+			case 1: {
+				// Make indexPaths to delete
+				NSMutableArray *indexPaths;
+				indexPaths = [NSMutableArray array];
+				for (NSInteger i = 0; i < [_items count]; i++) {
+					[indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+				}
+				
+				// Clear items
+				[self willChangeValueForKey:@"items"];
+				[_items removeAllObjects];
+				[self didChangeValueForKey:@"items"];
+				[self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+			}
+			}
 		}
-		}
-	} blockName:nil];
+	];
 	alertView.delegate = alertView;
 	
 	// Show alertView
@@ -173,7 +175,7 @@
 		button = [UIButton buttonWithType:UIButtonTypeInfoDark];
 		buttonAction = @selector(buttonAction);
 		target = [[[NSObject alloc] init] autorelease];
-		[target respondsToSelector:buttonAction usingBlock:^{
+		[target respondsToSelector:buttonAction withBlockName:nil usingBlock:^{
 			// Show cellNo
 			UIAlertView *alertView;
 			NSString *title;
@@ -181,7 +183,7 @@
 			alertView = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
 			[alertView show];
 			[alertView release];
-		} blockName:nil];
+		}];
 		[button addTarget:target action:buttonAction forControlEvents:UIControlEventTouchUpInside];
 		[button associateValue:target forKey:@"target" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
 		cell.accessoryView = button;

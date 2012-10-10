@@ -230,7 +230,7 @@ static void RELogSignature(NSMethodSignature *signature)
 #pragma mark -- Block --
 //--------------------------------------------------------------//
 
-- (BOOL)respondsToSelector:(SEL)selector usingBlock:(id)block blockName:(NSString**)name
+- (BOOL)respondsToSelector:(SEL)selector withBlockName:(NSString**)name usingBlock:(id)block
 {
 	// Filter
 	if (!selector || !block) {

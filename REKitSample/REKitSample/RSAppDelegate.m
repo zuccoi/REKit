@@ -71,26 +71,128 @@
 	// Test
 	[self _test];
 	
-#if 1
+//	id obj;
+//	__block NSString *blockName;
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string) {
+//		NSLog(@"string = %@", string);
+//	} blockName:&blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	
+//	id obj;
+//	NSString *blockName;
+//	blockName = @"blockName";
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string){
+//		NSLog(@"blockName = %@", blockName);
+//		NSLog(@"string = %@", string);
+//	} blockName:&blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	
+//	id obj;
+//	__block NSString *blockName;
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string){
+//		NSLog(@"blockName = %@", blockName);
+//		NSLog(@"string = %@", string);
+//	} blockName:&blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	
+//	id obj;
+//	NSString *blockName;
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string){
+//		NSLog(@"string = %@", string);
+//	} blockName:nil];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string){
+//		NSLog(@"string = %@", [string stringByAppendingString:@" World!"]);
+//	} blockName:&blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+//	[obj removeBlockNamed:blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	
+//	id obj;
+//	__block NSString *blockName;
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^BOOL(NSString *string){
+//		static BOOL _flag = YES;
+//		if (_flag) {
+//			NSLog(@"%@", string);
+//		}
+//		_flag = !_flag;
+//		return !_flag;
+//	} blockName:nil];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^BOOL(NSString *string){
+//		BOOL said = NO;
+//		BOOL (^superBlock)(NSString *string);
+//		superBlock = [obj superBlockOfBlockNamed:blockName];
+//		if (superBlock) {
+//			said = superBlock(string);
+//		}
+//		if (said) {
+//			NSLog(@"%@", [string stringByAppendingString:@" World!"]);
+//		}
+//		else {
+//			NSLog(@"Hello?");
+//		}
+//		
+//		return YES;
+//	} blockName:&blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello!"];
+//	[obj performSelector:@selector(say:) withObject:@"Hello!"];
+//	[obj performSelector:@selector(say:) withObject:@"Hello!"];
+	
+//	id obj;
+//	NSString *blockName = @"blockName";
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string){
+//		NSLog(@"%@", string);
+//	} blockName:&blockName];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string){
+//		NSLog(@"Overridden %@", string);
+//	} blockName:&blockName];
+//	[obj performSelector:@selector(say:) withObject:@"Hello!"];
+//	[obj removeBlockNamed:blockName];
+//	if ([obj respondsToSelector:@selector(say:)]) {
+//		[obj performSelector:@selector(say:) withObject:@"Hello!"];
+//	}
+	
+//	id obj;
+//	NSString *blockName1 = @"blockName1";
+//	NSString *blockName2 = @"blockname2";
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string) {
+//		NSLog(@"%@", [string stringByAppendingString:@" World!"]);
+//	} blockName:&blockName1];
+//	[obj respondsToSelector:@selector(say:) usingBlock:^BOOL(NSString *string) {
+//		// super
+//		void (^superBlock)(NSString *string);
+//		superBlock = [obj superBlockOfBlockNamed:blockName2];
+//		if (superBlock) {
+//			superBlock(string);
+//		}
+//		
+//		// Say
+//		NSLog(@"%@", [string stringByAppendingString:@" REResponder!"]);
+//		
+//		return YES;
+//	} blockName:&blockName2];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+//	[obj removeBlockNamed:blockName1];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	
 	id obj;
-	__block NSString *blockName;
+	BOOL res;
+	NSString *blockName = @"blockName";
 	obj = [[[NSObject alloc] init] autorelease];
-	[obj respondsToSelector:@selector(say:) usingBlock:^{
-		NSLog(@"blockName = %@", blockName);
+	res = [obj respondsToSelector:@selector(say:) usingBlock:^(NSString *string) {
+		NSLog(@"%@", [string stringByAppendingString:@" World!"]);
 	} blockName:&blockName];
-	[obj performSelector:@selector(say:) withObject:@"Hello"];
-	NSLog(@"blockNamed: = %@", [obj blockNamed:blockName]);
-#else
-	id obj;
-	NSString *blockName;
-	blockName = @"blockName";
-	obj = [[[NSObject alloc] init] autorelease];
-	[obj respondsToSelector:@selector(say:) usingBlock:^{
-		NSLog(@"blockName = %@", blockName);
+	NSAssert(res, @"");
+	res = [obj respondsToSelector:@selector(log:) usingBlock:^(NSString *string) {
+		NSLog(@"%@", string);
 	} blockName:&blockName];
-	[obj performSelector:@selector(say:) withObject:@"Hello"];
-	NSLog(@"blockNamed: = %@", [obj blockNamed:blockName]);
-#endif
+	NSAssert(!res, @"");
 	
 	return YES;
 }

@@ -129,27 +129,36 @@ static void RELogSignature(NSMethodSignature *signature)
 #pragma mark -- Property --
 //--------------------------------------------------------------//
 
-- (NSDictionary*)REResponder_blockInfoWithName:(NSString*)blockName blockInfos:(NSMutableArray**)blockInfos
+- (NSDictionary*)REResponder_blockInfoWithBlockName:(NSString*)blockName blockInfos:(NSMutableArray**)blockInfos selectorName:(NSString**)selectorName
 {
 	// Get blockInfo
 	__block NSDictionary *blockInfo = nil;
 	@synchronized (self) {
-		[[[self associatedValueForKey:kBlocksKey] allValues] enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSMutableArray *infos, NSUInteger idx, BOOL *stop) {
-			NSUInteger index;
-			NSArray *names;
-			names = [infos valueForKey:kNameKey];
-			index = [names indexOfObject:blockName];
-			if (index != NSNotFound) {
-				blockInfo = [infos objectAtIndex:index];
-				if (blockInfos) {
-					*blockInfos = infos;
+		[[self associatedValueForKey:kBlocksKey] enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *aStop) {
+			[aBlockInfos enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSDictionary *bBlockInfo, NSUInteger bIdx, BOOL *bStop) {
+				if ([[bBlockInfo objectForKey:kNameKey] isEqualToString:blockName]) {
+					blockInfo = bBlockInfo;
+					if (blockInfos) {
+						*blockInfos = aBlockInfos;
+					}
+					if (selectorName) {
+						*selectorName = aSelectorName;
+					}
+					*aStop = YES;
+					*bStop = YES;
 				}
-				*stop = YES;
-			}
+			}];
 		}];
 	}
-	if (!blockInfo && blockInfos) {
-		*blockInfos = nil;
+	
+	// Nullify inout arguments
+	if (!blockInfo) {
+		if (blockInfos) {
+			*blockInfos = nil;
+		}
+		if (selectorName) {
+			*selectorName = nil;
+		}
 	}
 	
 	return blockInfo;
@@ -221,11 +230,11 @@ static void RELogSignature(NSMethodSignature *signature)
 #pragma mark -- Block --
 //--------------------------------------------------------------//
 
-- (void)respondsToSelector:(SEL)selector usingBlock:(id)block blockName:(NSString**)name
+- (BOOL)respondsToSelector:(SEL)selector usingBlock:(id)block blockName:(NSString**)name
 {
 	// Filter
 	if (!selector || !block) {
-		return;
+		return NO;
 	}
 	
 	// Get blockName
@@ -261,7 +270,8 @@ static void RELogSignature(NSMethodSignature *signature)
 	}
 	signature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
 	if (!signature) {
-		return;
+		NSLog(@"Failed to get signature for block named %@", blockName);
+		return NO;
 	}
 	
 	// Make blockInfo
@@ -272,21 +282,26 @@ static void RELogSignature(NSMethodSignature *signature)
 		kSignatureKey : signature
 	};
 	
-	// Set blockInfo to blocks
+	// Update blocks
 	@synchronized (self) {
+		// Avoid adding block with existing blockName
+		NSDictionary *oldBlockInfo;
+		NSMutableArray *oldBlockInfos;
+		NSString *oldSelectorName;
+		oldBlockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&oldBlockInfos selectorName:&oldSelectorName];
+		if (oldBlockInfo && ![oldSelectorName isEqualToString:selectorName]) {
+			NSLog(@"Could not add block named '%@' because it exists", blockName);
+			return NO;
+		}
+		if (oldBlockInfos) {
+			[self removeBlockNamed:blockName];
+		}
+		
 		// Get blocks
 		NSMutableDictionary *blocks;
 		blocks = [self associatedValueForKey:kBlocksKey];
 		
-		// Check blockName
-		NSArray *blockNames;
-		blockNames = [[blocks allValues] valueForKey:kNameKey];
-		if ([blockNames containsObject:blockName]) {
-			NSLog(@"Could not add block with name %@ 'cos it exists", blockName);
-			return;
-		}
-		
-		// Add blockInfo
+		// Get blockInfos
 		NSMutableArray *blockInfos;
 		blockInfos = [blocks objectForKey:selectorName];
 		if (!blockInfos) {
@@ -300,8 +315,12 @@ static void RELogSignature(NSMethodSignature *signature)
 			blockInfos = [NSMutableArray array];
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
+		
+		// Add blockInfo to blockInfos
 		[blockInfos addObject:blockInfo];
 	}
+	
+	return YES;
 }
 
 - (id)blockNamed:(NSString*)blockName
@@ -311,7 +330,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoWithName:blockName blockInfos:nil];
+		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:nil selectorName:nil];
 		block = [blockInfo objectForKey:kBlockKey];
 	}
 	
@@ -331,7 +350,7 @@ static void RELogSignature(NSMethodSignature *signature)
 		// Get blockInfo and blockInfos
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoWithName:blockName blockInfos:&blockInfos];
+		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:nil];
 		if (blockInfo && blockInfos) {
 			NSUInteger index;
 			index = [blockInfos indexOfObject:blockInfo];
@@ -350,7 +369,7 @@ static void RELogSignature(NSMethodSignature *signature)
 		// Get blockInfo and blockInfos
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoWithName:blockName blockInfos:&blockInfos];
+		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:nil];
 		if (blockInfo && blockInfos) {
 			// Release block
 			id block;

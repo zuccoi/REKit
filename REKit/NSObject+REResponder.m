@@ -390,7 +390,7 @@ static void RELogSignature(NSMethodSignature *signature)
 
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)aProtocol
 {
-	// Handle registered protocol
+	// Check registered protocol
 	@synchronized (self) {
 		if ([[self associatedValueForKey:kProtocolsKey] containsObject:NSStringFromProtocol(aProtocol)]) {
 			return YES;
@@ -407,7 +407,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	NSString *selectorName;
 	selectorName = NSStringFromSelector(aSelector);
 	
-	// Hadle registered selector
+	// Check registered selector
 	@synchronized (self) {
 		if ([[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] count]) {
 			return YES;
@@ -424,7 +424,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	NSString *selectorName;
 	selectorName = NSStringFromSelector(aSelector);
 	
-	// Handle registered selector
+	// Check registered selector
 	@synchronized (self) {
 		NSDictionary *blockInfo;
 		blockInfo = [[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] lastObject];

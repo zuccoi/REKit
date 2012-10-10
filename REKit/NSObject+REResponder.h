@@ -13,7 +13,7 @@ extern NSString* const REResponderOriginalImplementationBlockName;
 
 @interface NSObject (REResponder)
 
-// Setup
+// Conformance
 - (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
 
 // Block

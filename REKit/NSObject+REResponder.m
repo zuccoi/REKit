@@ -191,7 +191,7 @@ static void RELogSignature(NSMethodSignature *signature)
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Setup --
+#pragma mark -- Conformance --
 //--------------------------------------------------------------//
 
 - (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol

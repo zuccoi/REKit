@@ -48,7 +48,7 @@
 //	}];
 	
 	RSClassAA *objAA;
-	objAA = [[RSClassAA alloc] init];
+	objAA = [[[RSClassAA alloc] init] autorelease];
 	NSLog(@"responds = %@", [objAA respondsToSelector:@selector(log)] ? @"YES" : @"NO");
 	[objAA log];
 }
@@ -71,12 +71,26 @@
 	// Test
 	[self _test];
 	
+#if 1
 	id obj;
-	obj = [[NSObject alloc] init];
-	[obj respondsToSelector:@selector(say:) usingBlock:^ (NSString *string) {
-		NSLog(@"string = %@", string); // Hello
-	}];
+	__block NSString *blockName;
+	obj = [[[NSObject alloc] init] autorelease];
+	[obj respondsToSelector:@selector(say:) usingBlock:^{
+		NSLog(@"blockName = %@", blockName);
+	} blockName:&blockName];
 	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	NSLog(@"blockNamed: = %@", [obj blockNamed:blockName]);
+#else
+	id obj;
+	NSString *blockName;
+	blockName = @"blockName";
+	obj = [[[NSObject alloc] init] autorelease];
+	[obj respondsToSelector:@selector(say:) usingBlock:^{
+		NSLog(@"blockName = %@", blockName);
+	} blockName:&blockName];
+	[obj performSelector:@selector(say:) withObject:@"Hello"];
+	NSLog(@"blockNamed: = %@", [obj blockNamed:blockName]);
+#endif
 	
 	return YES;
 }

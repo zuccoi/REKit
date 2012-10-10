@@ -7,12 +7,19 @@
 #import <Foundation/Foundation.h>
 
 
+// Constants
+extern NSString *const REResponderOriginalImplementationBlockName;
+
+
 @interface NSObject (REResponder)
 
-// Responds
-- (void)respondsToSelector:(SEL)selector usingBlock:(id)block;
+// Setup
 - (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
-- (id)blockForSelector:(SEL)selector;
-- (void)removeBlockForSelector:(SEL)selector;
+
+// Block
+- (void)respondsToSelector:(SEL)selector usingBlock:(id)block blockName:(NSString**)blockName;
+- (id)blockNamed:(NSString*)blockName;
+- (id)superBlockOfBlockNamed:(NSString*)blockName;
+- (void)removeBlockNamed:(NSString*)blockName;
 
 @end

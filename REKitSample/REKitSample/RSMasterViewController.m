@@ -123,7 +123,7 @@
 			[self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
 		}
 		}
-	}];
+	} blockName:NULL];
 	alertView.delegate = alertView;
 	
 	// Show alertView
@@ -181,7 +181,7 @@
 			alertView = [[UIAlertView alloc] initWithTitle:title message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
 			[alertView show];
 			[alertView release];
-		}];
+		} blockName:NULL];
 		[button addTarget:target action:buttonAction forControlEvents:UIControlEventTouchUpInside];
 		[button associateValue:target forKey:@"target" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
 		cell.accessoryView = button;

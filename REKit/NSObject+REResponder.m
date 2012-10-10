@@ -13,9 +13,11 @@
 
 
 // Constants
+NSString *const REResponderOriginalImplementationBlockName = @"REResponderOriginalImplementationBlockName";
 static NSString* const kProtocolsKey = @"REResponder_protocols";
 static NSString* const kBlocksKey = @"REResponder_blocks";
 static NSString* const kBlockKey = @"block";
+static NSString* const kNameKey = @"name";
 static NSString* const kSignatureKey = @"signature";
 
 
@@ -51,7 +53,7 @@ enum {
 #pragma mark -- Functions --
 //--------------------------------------------------------------//
 
-static const char* RESBlockGetSignature(id _block)
+static const char* REBlockGetObjCTypes(id _block)
 {
 	// Get descriptor of block
 	struct BlockDescriptor *descriptor;
@@ -68,13 +70,14 @@ static const char* RESBlockGetSignature(id _block)
 	return descriptor->rest[index];
 }
 
-static void* RESBlockGetImplementation(id block)
+static void* REBlockGetImplementation(id block)
 {
 	return ((struct Block*)block)->invoke;
 }
 
-static void RESLogSignature(NSMethodSignature *signature)
+static void RELogSignature(NSMethodSignature *signature)
 {
+	// Make log
 	NSMutableString *log;
 	log = [NSMutableString string];
 	[log appendString:[NSString stringWithCString:[signature methodReturnType] encoding:NSUTF8StringEncoding]];
@@ -82,6 +85,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 		[log appendString:[NSString stringWithCString:[signature getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
 	}
 	
+	// Log
 	NSLog(@"signature = %@", log);
 }
 
@@ -125,7 +129,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 #pragma mark -- Property --
 //--------------------------------------------------------------//
 
-- (NSMutableSet*)REResponder_protocols
+- (NSMutableSet*)REResponder_protocols // Don't make extra blocks >>>
 {
 	// Get protocols
 	NSMutableSet *protocols;		// {(protocolName, ...)}
@@ -140,10 +144,10 @@ static void RESLogSignature(NSMethodSignature *signature)
 	return protocols;
 }
 
-- (NSMutableDictionary*)REResponder_blocks
+- (NSMutableDictionary*)REResponder_blocks // Don't make extra blocks >>>
 {
 	// Get blocks
-	NSMutableDictionary *blocks;		// {selectorName : {"block":id, "signature":NSMethodSignature}}
+	NSMutableDictionary *blocks; // {selectorName : ({"block":id, "name" : NSString, "signature":NSMethodSignature})}
 	@synchronized (self) {
 		blocks = [self associatedValueForKey:kBlocksKey];
 		if (!blocks) {
@@ -153,6 +157,32 @@ static void RESLogSignature(NSMethodSignature *signature)
 	}
 	
 	return blocks;
+}
+
+- (NSDictionary*)REResponder_blockInfoWithName:(NSString*)blockName blockInfos:(NSMutableArray**)blockInfos
+{
+	// Get blockInfo
+	__block NSDictionary *blockInfo = nil;
+	@synchronized (self) {
+		[[[self REResponder_blocks] allValues] enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSMutableArray *infos, NSUInteger idx, BOOL *stop) {
+			NSUInteger index;
+			NSArray *names;
+			names = [infos valueForKey:kNameKey];
+			index = [names indexOfObject:blockName];
+			if (index != NSNotFound) {
+				blockInfo = [infos objectAtIndex:index];
+				if (blockInfos) {
+					*blockInfos = infos;
+				}
+				*stop = YES;
+			}
+		}];
+	}
+	if (!blockInfo && blockInfos) {
+		*blockInfos = nil;
+	}
+	
+	return blockInfo;
 }
 
 //--------------------------------------------------------------//
@@ -165,19 +195,24 @@ static void RESLogSignature(NSMethodSignature *signature)
 	[self associateValue:nil forKey:kProtocolsKey policy:OBJC_ASSOCIATION_RETAIN];
 	
 	// Release blocks
+	NSArray *blockNames;
 	NSMutableDictionary *blocks;
 	blocks = [self associatedValueForKey:kBlocksKey];
-	while ([blocks count]) {
-		[self removeBlockForSelector:NSSelectorFromString([[blocks allKeys] lastObject])];
+	if ([blocks count]) {
+		blockNames = [[blocks allValues] valueForKey:kNameKey];
+		blockNames = [blockNames valueForKeyPath:@"@unionOfArrays.self"];
+		[blockNames enumerateObjectsUsingBlock:^(NSString *blockName, NSUInteger idx, BOOL *stop) {
+			[self removeBlockNamed:blockName];
+		}];
+		[self associateValue:nil forKey:kBlocksKey policy:OBJC_ASSOCIATION_RETAIN];
 	}
-	[self associateValue:nil forKey:kBlocksKey policy:OBJC_ASSOCIATION_RETAIN];
 	
 	// original
 	[self REResponder_X_dealloc];
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Responds --
+#pragma mark -- Setup --
 //--------------------------------------------------------------//
 
 - (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol
@@ -203,11 +238,33 @@ static void RESLogSignature(NSMethodSignature *signature)
 	}
 }
 
-- (void)respondsToSelector:(SEL)selector usingBlock:(id)block
+//--------------------------------------------------------------//
+#pragma mark -- Block --
+//--------------------------------------------------------------//
+
+- (void)respondsToSelector:(SEL)selector usingBlock:(id)block blockName:(NSString**)name
 {
 	// Filter
 	if (!selector || !block) {
 		return;
+	}
+	
+	// Get blockName
+	NSString *blockName;
+	if (!name || ![*name length]) {
+		// Make blockName
+		CFUUIDRef uuid;
+		NSString* uuidString;
+		uuid = CFUUIDCreate(NULL);
+		uuidString = (NSString*)CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+		CFRelease(uuid);
+		blockName = uuidString;
+		if (name) {
+			*name = blockName;
+		}
+	}
+	else {
+		blockName = *name;
 	}
 	
 	// Get selectorName
@@ -218,7 +275,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	NSMethodSignature *signature;
 	NSMutableString *objCTypes;
 	NSMethodSignature *blockSignature;
-	blockSignature = [NSMethodSignature signatureWithObjCTypes:RESBlockGetSignature(block)];
+	blockSignature = [NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)];
 	objCTypes = [NSMutableString stringWithFormat:@"%@@:", [NSString stringWithCString:[blockSignature methodReturnType] encoding:NSUTF8StringEncoding]];
 	for (NSInteger i = 1; i < [blockSignature numberOfArguments]; i++) {
 		[objCTypes appendString:[NSString stringWithCString:[blockSignature getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
@@ -228,56 +285,98 @@ static void RESLogSignature(NSMethodSignature *signature)
 		return;
 	}
 	
-	// Make dict
-	NSDictionary *dict;
-	dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		Block_copy(block), kBlockKey,
-		signature, kSignatureKey,
-		nil];
+	// Make blockInfo
+	NSDictionary *blockInfo;
+	blockInfo = @{
+		kBlockKey : Block_copy(block),
+		kNameKey : blockName,
+		kSignatureKey : signature
+	};
 	
-	// Set dict to blocks
-	@synchronized (self) {
-		// Remove old one
-		[self removeBlockForSelector:selector];
-		
-		// Set dict
-		[[self REResponder_blocks] setObject:dict forKey:selectorName];
-	}
-}
-
-- (id)blockForSelector:(SEL)selector
-{
-	return [[[self REResponder_blocks] objectForKey:NSStringFromSelector(selector)] objectForKey:kBlockKey];
-}
-
-- (void)removeBlockForSelector:(SEL)selector
-{
-	// Filter
-	if (!selector) {
-		return;
-	}
-	
-	// Get selectorName
-	NSString *selectorName;
-	selectorName = NSStringFromSelector(selector);
-	
+	// Set blockInfo to blocks
 	@synchronized (self) {
 		// Get blocks
 		NSMutableDictionary *blocks;
 		blocks = [self REResponder_blocks];
 		
-		// Get dict
-		NSDictionary *dict;
-		dict = [blocks objectForKey:selectorName];
-		if (!dict) {
+		// Check blockName
+		NSArray *blockNames;
+		blockNames = [[blocks allValues] valueForKey:kNameKey];
+		if ([blockNames containsObject:blockName]) {
+			NSLog(@"Could not add block with name %@ 'cos it exists", blockName);
 			return;
 		}
 		
-		// Release block
-		Block_release([dict objectForKey:kBlockKey]);
-		
-		// Remove dict
-		[blocks removeObjectForKey:selectorName];
+		// Add blockInfo
+		NSMutableArray *blockInfos;
+		blockInfos = [[self REResponder_blocks] objectForKey:selectorName];
+		if (!blockInfos) {
+			// Make blockInfos
+			blockInfos = [NSMutableArray array];
+			[[self REResponder_blocks] setObject:blockInfos forKey:selectorName];
+		}
+		[blockInfos addObject:blockInfo];
+	}
+}
+
+- (id)blockNamed:(NSString*)blockName
+{
+	// Get block
+	id block;
+	@synchronized (self) {
+		// Get blockInfo
+		NSDictionary *blockInfo;
+		blockInfo = [self REResponder_blockInfoWithName:blockName blockInfos:nil];
+		block = [blockInfo objectForKey:kBlockKey];
+	}
+	
+	return block;
+}
+
+- (id)superBlockOfBlockNamed:(NSString*)blockName
+{
+	// Filter
+	if (![blockName length]) {
+		return nil;
+	}
+	
+	// Get superBlock
+	id superBlock = nil;
+	@synchronized (self) {
+		// Get blockInfo and blockInfos
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		blockInfo = [self REResponder_blockInfoWithName:blockName blockInfos:&blockInfos];
+		if (blockInfo && blockInfos) {
+			NSUInteger index;
+			index = [blockInfos indexOfObject:blockInfo];
+			if (index > 0) {
+				superBlock = [[blockInfos objectAtIndex:(index - 1)] objectForKey:kBlockKey];
+			}
+		}
+	}
+	
+	return superBlock;
+}
+
+- (void)removeBlockNamed:(NSString*)blockName
+{
+	@synchronized (self) {
+		// Get blockInfo and blockInfos
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		blockInfo = [self REResponder_blockInfoWithName:blockName blockInfos:&blockInfos];
+		if (blockInfo && blockInfos) {
+			// Release block
+			id block;
+			block = [blockInfo objectForKey:kBlockKey];
+			if (block) {
+				Block_release(block);
+			}
+			
+			// Remove blockInfo
+			[blockInfos removeObject:blockInfo];
+		}
 	}
 }
 
@@ -306,7 +405,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 	
 	// Hadle registered selector
 	@synchronized (self) {
-		if ([[self REResponder_blocks] objectForKey:selectorName]) {
+		if ([[[self REResponder_blocks] objectForKey:selectorName] count]) {
 			return YES;
 		}
 	}
@@ -323,10 +422,10 @@ static void RESLogSignature(NSMethodSignature *signature)
 	
 	// Handle registered selector
 	@synchronized (self) {
-		NSDictionary *dict;
-		dict = [[self REResponder_blocks] objectForKey:selectorName];
-		if (dict) {
-			return [dict objectForKey:kSignatureKey];
+		NSDictionary *blockInfo;
+		blockInfo = [[[self REResponder_blocks] objectForKey:selectorName] lastObject];
+		if (blockInfo) {
+			return [blockInfo objectForKey:kSignatureKey];
 		}
 	}
 	
@@ -343,9 +442,9 @@ static void RESLogSignature(NSMethodSignature *signature)
 	// Handle registered selector
 	@synchronized (self) {
 		// Get dict
-		NSDictionary *dict;
-		dict = [[self REResponder_blocks] objectForKey:selectorName];
-		if (!dict) {
+		NSDictionary *blockInfo;
+		blockInfo = [[[self REResponder_blocks] objectForKey:selectorName] lastObject];
+		if (!blockInfo) {
 			goto ORIGINAL;
 		}
 		
@@ -353,7 +452,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 		id block;
 		NSMethodSignature *signature;
 		NSUInteger argc;
-		block = [dict objectForKey:kBlockKey];
+		block = [blockInfo objectForKey:kBlockKey];
 		if (!block) {
 			goto ORIGINAL;
 		}
@@ -366,7 +465,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 		NSUInteger length;
 		void *argBuffer;
 		NSData *argument;
-		blockInvocation = [NSInvocation invocationWithMethodSignature:[NSMethodSignature signatureWithObjCTypes:RESBlockGetSignature(block)]];
+		blockInvocation = [NSInvocation invocationWithMethodSignature:[NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)]];
 		[blockInvocation setTarget:block];
 		for (NSInteger i = 2; i < argc; i++) {
 			// Get argType and length
@@ -383,7 +482,7 @@ static void RESLogSignature(NSMethodSignature *signature)
 		}
 		
 		// Invoke blockInvocation
-		[blockInvocation invokeUsingIMP:RESBlockGetImplementation(block)];
+		[blockInvocation invokeUsingIMP:REBlockGetImplementation(block)];
 		
 		// Set return value to invocation
 		NSUInteger returnLength;

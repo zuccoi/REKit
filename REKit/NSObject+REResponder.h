@@ -8,7 +8,7 @@
 
 
 // Constants
-extern NSString *const REResponderOriginalImplementationBlockName;
+extern NSString* const REResponderOriginalImplementationBlockName;
 
 
 @interface NSObject (REResponder)

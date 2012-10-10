@@ -13,7 +13,7 @@
 
 
 // Constants
-NSString *const REResponderOriginalImplementationBlockName = @"REResponderOriginalImplementationBlockName";
+NSString* const REResponderOriginalImplementationBlockName = @"REResponderOriginalImplementationBlockName";
 static NSString* const kProtocolsKey = @"REResponder_protocols";
 static NSString* const kBlocksKey = @"REResponder_blocks";
 static NSString* const kBlockKey = @"block";
@@ -129,42 +129,12 @@ static void RELogSignature(NSMethodSignature *signature)
 #pragma mark -- Property --
 //--------------------------------------------------------------//
 
-- (NSMutableSet*)REResponder_protocols // Don't make extra blocks >>>
-{
-	// Get protocols
-	NSMutableSet *protocols;		// {(protocolName, ...)}
-	@synchronized (self) {
-		protocols = [self associatedValueForKey:kProtocolsKey];
-		if (!protocols) {
-			protocols = [NSMutableSet set];
-			[self associateValue:protocols forKey:kProtocolsKey policy:OBJC_ASSOCIATION_RETAIN];
-		}
-	}
-	
-	return protocols;
-}
-
-- (NSMutableDictionary*)REResponder_blocks // Don't make extra blocks >>>
-{
-	// Get blocks
-	NSMutableDictionary *blocks; // {selectorName : ({"block":id, "name" : NSString, "signature":NSMethodSignature})}
-	@synchronized (self) {
-		blocks = [self associatedValueForKey:kBlocksKey];
-		if (!blocks) {
-			blocks = [NSMutableDictionary dictionary];
-			[self associateValue:blocks forKey:kBlocksKey policy:OBJC_ASSOCIATION_RETAIN];
-		}
-	}
-	
-	return blocks;
-}
-
 - (NSDictionary*)REResponder_blockInfoWithName:(NSString*)blockName blockInfos:(NSMutableArray**)blockInfos
 {
 	// Get blockInfo
 	__block NSDictionary *blockInfo = nil;
 	@synchronized (self) {
-		[[[self REResponder_blocks] allValues] enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSMutableArray *infos, NSUInteger idx, BOOL *stop) {
+		[[[self associatedValueForKey:kBlocksKey] allValues] enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSMutableArray *infos, NSUInteger idx, BOOL *stop) {
 			NSUInteger index;
 			NSArray *names;
 			names = [infos valueForKey:kNameKey];
@@ -224,16 +194,25 @@ static void RELogSignature(NSMethodSignature *signature)
 	
 	// Update REResponder_protocols
 	@synchronized (self) {
-		// Get name of protocol
-		NSString *name;
-		name = NSStringFromProtocol(protocol);
+		// Get protocolName
+		NSString *protocolName;
+		protocolName = NSStringFromProtocol(protocol);
 		
-		// Add or remove protocol
+		// Get protocols
+		NSMutableSet *protocols;
+		protocols = [self associatedValueForKey:kProtocolsKey];
+		
+		// Add protocol
 		if (flag) {
-			[[self REResponder_protocols] addObject:name];
+			if (!protocols) {
+				protocols = [NSMutableSet set];
+				[self associateValue:protocols forKey:kProtocolsKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
+			[protocols addObject:protocolName];
 		}
+		// Remove protocol
 		else {
-			[[self REResponder_protocols] removeObject:name];
+			[protocols removeObject:protocolName];
 		}
 	}
 }
@@ -297,7 +276,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	@synchronized (self) {
 		// Get blocks
 		NSMutableDictionary *blocks;
-		blocks = [self REResponder_blocks];
+		blocks = [self associatedValueForKey:kBlocksKey];
 		
 		// Check blockName
 		NSArray *blockNames;
@@ -309,11 +288,17 @@ static void RELogSignature(NSMethodSignature *signature)
 		
 		// Add blockInfo
 		NSMutableArray *blockInfos;
-		blockInfos = [[self REResponder_blocks] objectForKey:selectorName];
+		blockInfos = [blocks objectForKey:selectorName];
 		if (!blockInfos) {
+			// Make blocks
+			if (!blocks) {
+				blocks = [NSMutableDictionary dictionary];
+				[self associateValue:blocks forKey:kBlocksKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
+			
 			// Make blockInfos
 			blockInfos = [NSMutableArray array];
-			[[self REResponder_blocks] setObject:blockInfos forKey:selectorName];
+			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		[blockInfos addObject:blockInfo];
 	}
@@ -388,7 +373,7 @@ static void RELogSignature(NSMethodSignature *signature)
 {
 	// Handle registered protocol
 	@synchronized (self) {
-		if ([[self REResponder_protocols] containsObject:NSStringFromProtocol(aProtocol)]) {
+		if ([[self associatedValueForKey:kProtocolsKey] containsObject:NSStringFromProtocol(aProtocol)]) {
 			return YES;
 		}
 	}
@@ -405,7 +390,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	
 	// Hadle registered selector
 	@synchronized (self) {
-		if ([[[self REResponder_blocks] objectForKey:selectorName] count]) {
+		if ([[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] count]) {
 			return YES;
 		}
 	}
@@ -423,7 +408,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	// Handle registered selector
 	@synchronized (self) {
 		NSDictionary *blockInfo;
-		blockInfo = [[[self REResponder_blocks] objectForKey:selectorName] lastObject];
+		blockInfo = [[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] lastObject];
 		if (blockInfo) {
 			return [blockInfo objectForKey:kSignatureKey];
 		}
@@ -441,9 +426,9 @@ static void RELogSignature(NSMethodSignature *signature)
 	
 	// Handle registered selector
 	@synchronized (self) {
-		// Get dict
+		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [[[self REResponder_blocks] objectForKey:selectorName] lastObject];
+		blockInfo = [[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] lastObject];
 		if (!blockInfo) {
 			goto ORIGINAL;
 		}

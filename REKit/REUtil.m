@@ -13,7 +13,7 @@
 #pragma mark -- Method Exchange --
 //--------------------------------------------------------------//
 
-+ (void)exchangeClassMethodForSelector:(SEL)originalSelector withForSelector:(SEL)newSelector
++ (void)exchangeClassMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
 {
 	// Exchange
 	Method originalMethod;
@@ -23,7 +23,28 @@
 	method_exchangeImplementations(originalMethod, newMethod);
 }
 
-+ (void)exchangeInstanceMethodForSelector:(SEL)originalSelector withForSelector:(SEL)newSelector
++ (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION
+{
+	// Enumerate selectors
+	SEL aSelector;
+	va_list args;
+	va_start(args, selector);
+	aSelector = selector;
+	while (aSelector) {
+		// Exchange
+		Method originalMethod;
+		Method newMethod;
+		originalMethod = class_getClassMethod(self, aSelector);
+		newMethod = class_getClassMethod(self, NSSelectorFromString([prefix stringByAppendingString:NSStringFromSelector(aSelector)]));
+		method_exchangeImplementations(originalMethod, newMethod);
+		
+		// Get next selector
+		aSelector = va_arg(args, SEL);
+	}
+	va_end(args);
+}
+
++ (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
 {
 	// Exchange
 	Method originalMethod;
@@ -31,6 +52,27 @@
 	originalMethod = class_getInstanceMethod(self, originalSelector);
 	newMethod = class_getInstanceMethod(self, newSelector);
 	method_exchangeImplementations(originalMethod, newMethod);
+}
+
++ (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION
+{
+	// Enumerate selectors
+	SEL aSelector;
+	va_list args;
+	va_start(args, selector);
+	aSelector = selector;
+	while (aSelector) {
+		// Exchange
+		Method originalMethod;
+		Method newMethod;
+		originalMethod = class_getInstanceMethod(self, aSelector);
+		newMethod = class_getInstanceMethod(self, NSSelectorFromString([prefix stringByAppendingString:NSStringFromSelector(aSelector)]));
+		method_exchangeImplementations(originalMethod, newMethod);
+		
+		// Get next selector
+		aSelector = va_arg(args, SEL);
+	}
+	va_end(args);
 }
 
 //--------------------------------------------------------------//

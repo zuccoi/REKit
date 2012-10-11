@@ -30,19 +30,16 @@ NSString* const REObservingInfoBlockKey = @"block";
 
 + (void)load
 {
-	// Exchange methods…
-	
-	// observeValueForKeyPath:ofObject:change:context:
-	[self exchangeInstanceMethodForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withForSelector:@selector(REObserver_X_observeValueForKeyPath:ofObject:change:context:)];
-	
-	// removeObserver:forKeyPath:
-	[self exchangeInstanceMethodForSelector:@selector(removeObserver:forKeyPath:) withForSelector:@selector(REObserver_X_removeObserver:forKeyPath:)];
-	
-	// removeObserver:forKeyPath:context:
-	[self exchangeInstanceMethodForSelector:@selector(removeObserver:forKeyPath:context:) withForSelector:@selector(REObserver_X_removeObserver:forKeyPath:context:)];
-	
-	// dealloc
-	[self exchangeInstanceMethodForSelector:@selector(dealloc) withForSelector:@selector(REObserver_X_dealloc)];
+	@autoreleasepool {
+		// Exchange methods…
+		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REObserver_X_" selectors:
+			@selector(observeValueForKeyPath:ofObject:change:context:),
+			@selector(removeObserver:forKeyPath:),
+			@selector(removeObserver:forKeyPath:context:),
+			@selector(dealloc),
+			nil
+		];
+	}
 }
 
 //--------------------------------------------------------------//

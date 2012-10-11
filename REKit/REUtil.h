@@ -11,8 +11,10 @@
 @interface NSObject (REUtil)
 
 // Method Exchange
-+ (void)exchangeClassMethodForSelector:(SEL)originalSelector withForSelector:(SEL)newSelector;
-+ (void)exchangeInstanceMethodForSelector:(SEL)originalSelector withForSelector:(SEL)newSelector;
++ (void)exchangeClassMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector;
++ (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector;
++ (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
++ (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
 
 // Associated Value
 - (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;

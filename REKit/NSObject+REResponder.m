@@ -106,22 +106,17 @@ static void RELogSignature(NSMethodSignature *signature)
 
 + (void)load
 {
-	// Exchange methods…
-	
-	// conformsToProtocol:
-	[self exchangeInstanceMethodForSelector:@selector(conformsToProtocol:) withForSelector:@selector(REResponder_X_conformsToProtocol:)];
-	
-	// respondsToSelector:
-	[self exchangeInstanceMethodForSelector:@selector(respondsToSelector:) withForSelector:@selector(REResponder_X_respondsToSelector:)];
-	
-	// methodSignatureForSelector:
-	[self exchangeInstanceMethodForSelector:@selector(methodSignatureForSelector:) withForSelector:@selector(REResponder_X_methodSignatureForSelector:)];
-	
-	// forwardInvocation:
-	[self exchangeInstanceMethodForSelector:@selector(forwardInvocation:) withForSelector:@selector(REResponder_X_forwardInvocation:)];
-	
-	// dealloc
-	[self exchangeInstanceMethodForSelector:@selector(dealloc) withForSelector:@selector(REResponder_X_dealloc)];
+	@autoreleasepool {
+		// Exchange methods
+		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
+			@selector(conformsToProtocol:),
+			@selector(respondsToSelector:),
+			@selector(methodSignatureForSelector:),
+			@selector(forwardInvocation:),
+			@selector(dealloc),
+			nil
+		];
+	}
 }
 
 //--------------------------------------------------------------//

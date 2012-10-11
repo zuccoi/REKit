@@ -13,7 +13,6 @@
 
 
 // Constants
-NSString* const REResponderOriginalImplementationBlockName = @"REResponderOriginalImplementationBlockName";
 static NSString* const kProtocolsKey = @"REResponder_protocols";
 static NSString* const kBlocksKey = @"REResponder_blocks";
 static NSString* const kBlockKey = @"block";
@@ -274,14 +273,6 @@ static void RELogSignature(NSMethodSignature *signature)
 		return NO;
 	}
 	
-	// Make blockInfo
-	NSDictionary *blockInfo;
-	blockInfo = @{
-		kBlockKey : Block_copy(block),
-		kNameKey : blockName,
-		kSignatureKey : signature
-	};
-	
 	// Update blocks
 	@synchronized (self) {
 		// Avoid adding block with existing blockName
@@ -317,6 +308,12 @@ static void RELogSignature(NSMethodSignature *signature)
 		}
 		
 		// Add blockInfo to blockInfos
+		NSDictionary *blockInfo;
+		blockInfo = @{
+			kBlockKey : Block_copy(block),
+			kNameKey : blockName,
+			kSignatureKey : signature,
+		};
 		[blockInfos addObject:blockInfo];
 	}
 	
@@ -403,19 +400,15 @@ static void RELogSignature(NSMethodSignature *signature)
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
-	// Get selectorName
-	NSString *selectorName;
-	selectorName = NSStringFromSelector(aSelector);
-	
-	// Check registered selector
-	@synchronized (self) {
-		if ([[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] count]) {
-			return YES;
-		}
+	// original
+	if ([self REResponder_X_respondsToSelector:aSelector]) {
+		return YES;
 	}
 	
-	// original
-	return [self REResponder_X_respondsToSelector:aSelector];
+	// Check registered selector
+	NSString *selectorName;
+	selectorName = NSStringFromSelector(aSelector);
+	return ([[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] count] > 0);
 }
 
 - (NSMethodSignature*)REResponder_X_methodSignatureForSelector:(SEL)aSelector

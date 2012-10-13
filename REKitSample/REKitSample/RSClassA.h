@@ -8,5 +8,8 @@
 
 
 @interface RSClassA : NSObject
+
 - (void)log;
+- (void)say:(NSString*)string;
+
 @end

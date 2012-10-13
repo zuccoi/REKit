@@ -15,4 +15,19 @@
 	NSLog(@"%s - line %d", __PRETTY_FUNCTION__, __LINE__);
 }
 
+- (void)say:(NSString*)string
+{
+	// Say
+	NSLog(@"%@", string);
+}
+
+- (void)dealloc
+{
+	// ?????
+	NSLog(@"%s", __PRETTY_FUNCTION__);
+	
+	// super
+	[super dealloc];
+}
+
 @end

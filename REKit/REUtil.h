@@ -8,6 +8,63 @@
 #import <objc/runtime.h>
 
 
+//--------------------------------------------------------------//
+#pragma mark -- Block --
+//--------------------------------------------------------------//
+
+// BlockDescriptor
+struct BlockDescriptor
+{
+	unsigned long reserved;
+	unsigned long size;
+	void *rest[1];
+};
+
+// Block
+struct Block
+{
+	void *isa;
+	int flags;
+	int reserved;
+	void *invoke;
+	struct BlockDescriptor *descriptor;
+};
+
+// Flags of Block
+enum {
+	BLOCK_HAS_COPY_DISPOSE =	(1 << 25),
+	BLOCK_HAS_CTOR =			(1 << 26), // helpers have C++ code
+	BLOCK_IS_GLOBAL =			(1 << 28),
+	BLOCK_HAS_STRET =			(1 << 29), // IFF BLOCK_HAS_SIGNATURE
+	BLOCK_HAS_SIGNATURE =		(1 << 30), 
+};
+
+extern const char* REBlockGetObjCTypes(id block);
+extern void* REBlockGetImplementation(id block);
+
+
+//--------------------------------------------------------------//
+#pragma mark -- NSInvocation --
+//--------------------------------------------------------------//
+
+@interface NSInvocation (REUtil)
+- (void)invokeUsingIMP:(IMP)imp;
+@end
+
+
+//--------------------------------------------------------------//
+#pragma mark -- NSMethodSignature --
+//--------------------------------------------------------------//
+
+@interface NSMethodSignature (REUtil)
+- (NSString*)description;
+@end
+
+
+//--------------------------------------------------------------//
+#pragma mark -- NSObject --
+//--------------------------------------------------------------//
+
 @interface NSObject (REUtil)
 
 // Method Exchange

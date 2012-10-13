@@ -4,6 +4,7 @@
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
+#import <dlfcn.h>
 #import "NSObject+REResponder.h"
 #import "REUtil.h"
 
@@ -17,85 +18,8 @@ static NSString* const kProtocolsKey = @"REResponder_protocols";
 static NSString* const kBlocksKey = @"REResponder_blocks";
 static NSString* const kBlockKey = @"block";
 static NSString* const kNameKey = @"name";
-static NSString* const kSignatureKey = @"signature";
-
-
-// BlockDescriptor
-struct BlockDescriptor
-{
-	unsigned long reserved;
-	unsigned long size;
-	void *rest[1];
-};
-
-// Block
-struct Block
-{
-	void *isa;
-	int flags;
-	int reserved;
-	void *invoke;
-	struct BlockDescriptor *descriptor;
-};
-
-// Flags of Block
-enum {
-	BLOCK_HAS_COPY_DISPOSE =	(1 << 25),
-	BLOCK_HAS_CTOR =			(1 << 26), // helpers have C++ code
-	BLOCK_IS_GLOBAL =			(1 << 28),
-	BLOCK_HAS_STRET =			(1 << 29), // IFF BLOCK_HAS_SIGNATURE
-	BLOCK_HAS_SIGNATURE =		(1 << 30), 
-};
-
-
-//--------------------------------------------------------------//
-#pragma mark -- Functions --
-//--------------------------------------------------------------//
-
-static const char* REBlockGetObjCTypes(id _block)
-{
-	// Get descriptor of block
-	struct BlockDescriptor *descriptor;
-	struct Block *block;
-	block = (void*)_block;
-	descriptor = block->descriptor;
-	
-	// Get index of rest
-	int index = 0;
-	if (block->flags & BLOCK_HAS_COPY_DISPOSE) {
-		index += 2;
-	}
-	
-	return descriptor->rest[index];
-}
-
-static void* REBlockGetImplementation(id block)
-{
-	return ((struct Block*)block)->invoke;
-}
-
-static void RELogSignature(NSMethodSignature *signature)
-{
-	// Make log
-	NSMutableString *log;
-	log = [NSMutableString string];
-	[log appendString:[NSString stringWithCString:[signature methodReturnType] encoding:NSUTF8StringEncoding]];
-	for (int i = 0; i < [signature numberOfArguments]; i++) {
-		[log appendString:[NSString stringWithCString:[signature getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
-	}
-	
-	// Log
-	NSLog(@"signature = %@", log);
-}
-
-#pragma mark -
-
-
-@interface NSInvocation ()
-- (void)invokeUsingIMP:(IMP)imp;
-@end
-
-#pragma mark -
+static NSString* const kMethodSignatureKey = @"methodSignature";
+static NSString* const kOriginalIMPKey = @"originalIMP";
 
 
 @implementation NSObject (REResponder)
@@ -107,9 +31,10 @@ static void RELogSignature(NSMethodSignature *signature)
 + (void)load
 {
 	@autoreleasepool {
-		// Exchange methods
+		// Exchange instance methods
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
 			@selector(conformsToProtocol:),
+			@selector(methodForSelector:),
 			@selector(respondsToSelector:),
 			@selector(methodSignatureForSelector:),
 			@selector(forwardInvocation:),
@@ -185,6 +110,56 @@ static void RELogSignature(NSMethodSignature *signature)
 }
 
 //--------------------------------------------------------------//
+#pragma mark -- Method Replacement --
+//--------------------------------------------------------------//
+
++ (BOOL)replaceClassMethodForSelector:(SEL)selector withOriginalIMP:(IMP*)originalIMP usingBlock:(id)block
+{
+	// Get originalMethod
+	Method originalMethod;
+	originalMethod = class_getClassMethod(self, selector);
+	if (!originalMethod) {
+		if (originalIMP) {
+			*originalIMP = NULL;
+		}
+		return NO;
+	}
+	
+	// Update originalIMP
+	if (originalIMP) {
+		*originalIMP = [self instanceMethodForSelector:selector];
+	}
+	
+	// Exchange implementation
+	method_setImplementation(originalMethod, imp_implementationWithBlock(block));
+	
+	return YES;
+}
+
++ (BOOL)replaceInstanceMethodForSelector:(SEL)selector withOriginalIMP:(IMP*)originalIMP usingBlock:(id)block
+{
+	// Get originalMethod
+	Method originalMethod;
+	originalMethod = class_getInstanceMethod(self, selector);
+	if (!originalMethod) {
+		if (originalIMP) {
+			*originalIMP = NULL;
+		}
+		return NO;
+	}
+	
+	// Update originalIMP
+	if (originalIMP) {
+		*originalIMP = [self instanceMethodForSelector:selector];
+	}
+	
+	// Exchange implementation
+	method_setImplementation(originalMethod, imp_implementationWithBlock(block));
+	
+	return YES;
+}
+
+//--------------------------------------------------------------//
 #pragma mark -- Conformance --
 //--------------------------------------------------------------//
 
@@ -241,9 +216,6 @@ static void RELogSignature(NSMethodSignature *signature)
 		uuidString = (NSString*)CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
 		CFRelease(uuid);
 		blockName = uuidString;
-		if (name) {
-			*name = blockName;
-		}
 	}
 	else {
 		blockName = *name;
@@ -253,17 +225,17 @@ static void RELogSignature(NSMethodSignature *signature)
 	NSString *selectorName;
 	selectorName = NSStringFromSelector(selector);
 	
-	// Make signature
-	NSMethodSignature *signature;
+	// Make signatures
+	NSMethodSignature *methodSignature;
 	NSMutableString *objCTypes;
 	NSMethodSignature *blockSignature;
 	blockSignature = [NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)];
 	objCTypes = [NSMutableString stringWithFormat:@"%@@:", [NSString stringWithCString:[blockSignature methodReturnType] encoding:NSUTF8StringEncoding]];
-	for (NSInteger i = 1; i < [blockSignature numberOfArguments]; i++) {
+	for (NSInteger i = 2; i < [blockSignature numberOfArguments]; i++) {
 		[objCTypes appendString:[NSString stringWithCString:[blockSignature getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
 	}
-	signature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
-	if (!signature) {
+	methodSignature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
+	if (!methodSignature) {
 		NSLog(@"Failed to get signature for block named %@", blockName);
 		return NO;
 	}
@@ -276,7 +248,7 @@ static void RELogSignature(NSMethodSignature *signature)
 		NSString *oldSelectorName;
 		oldBlockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&oldBlockInfos selectorName:&oldSelectorName];
 		if (oldBlockInfo && ![oldSelectorName isEqualToString:selectorName]) {
-			NSLog(@"Could not add block named '%@' because it exists", blockName);
+			NSLog(@"Could not add block named '%@' because it already exists", blockName);
 			return NO;
 		}
 		if (oldBlockInfos) {
@@ -304,12 +276,33 @@ static void RELogSignature(NSMethodSignature *signature)
 		
 		// Add blockInfo to blockInfos
 		NSDictionary *blockInfo;
+		IMP originalIMP = nil;
+		if ([self REResponder_X_respondsToSelector:selector] && ![blockInfos count]) {
+			Class subclass;
+			NSString *className;
+			className = [@"Re_" stringByAppendingString:NSStringFromClass([self class])];
+			subclass = objc_allocateClassPair([self class], [className UTF8String], 0);
+			objc_registerClassPair(subclass);
+			object_setClass(self, subclass);
+			class_addMethod(subclass, selector, nil, [objCTypes UTF8String]);
+			[[self class] replaceInstanceMethodForSelector:selector withOriginalIMP:NULL usingBlock:block];
+			
+			// Should add blockInfo ?????
+			// What should I do when the block will be removed ?????
+			// Don't make subclass many times >>>
+		}
 		blockInfo = @{
 			kBlockKey : Block_copy(block),
 			kNameKey : blockName,
-			kSignatureKey : signature,
+			kMethodSignatureKey : methodSignature,
+			kOriginalIMPKey : [NSValue valueWithPointer:originalIMP]
 		};
 		[blockInfos addObject:blockInfo];
+	}
+	
+	// Update name
+	if (name) {
+		*name = blockName;
 	}
 	
 	return YES;
@@ -395,6 +388,10 @@ static void RELogSignature(NSMethodSignature *signature)
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
+// ?????
+if ([NSStringFromSelector(aSelector) isEqualToString:@"say:"]) {
+NSLog(@"%s %@", __PRETTY_FUNCTION__, NSStringFromSelector(aSelector));
+}
 	// original
 	if ([self REResponder_X_respondsToSelector:aSelector]) {
 		return YES;
@@ -408,6 +405,10 @@ static void RELogSignature(NSMethodSignature *signature)
 
 - (NSMethodSignature*)REResponder_X_methodSignatureForSelector:(SEL)aSelector
 {
+// ?????
+if ([NSStringFromSelector(aSelector) isEqualToString:@"say:"]) {
+NSLog(@"%s %@", __PRETTY_FUNCTION__, NSStringFromSelector(aSelector));
+}
 	// Get selectorName
 	NSString *selectorName;
 	selectorName = NSStringFromSelector(aSelector);
@@ -417,7 +418,7 @@ static void RELogSignature(NSMethodSignature *signature)
 		NSDictionary *blockInfo;
 		blockInfo = [[[self associatedValueForKey:kBlocksKey] objectForKey:selectorName] lastObject];
 		if (blockInfo) {
-			return [blockInfo objectForKey:kSignatureKey];
+			return [blockInfo objectForKey:kMethodSignatureKey];
 		}
 	}
 	
@@ -427,6 +428,8 @@ static void RELogSignature(NSMethodSignature *signature)
 
 - (void)REResponder_X_forwardInvocation:(NSInvocation*)invocation
 {
+// ?????
+NSLog(@"%s", __PRETTY_FUNCTION__);
 	// Get selectorName
 	NSString *selectorName;
 	selectorName = NSStringFromSelector([invocation selector]);
@@ -442,14 +445,14 @@ static void RELogSignature(NSMethodSignature *signature)
 		
 		// Get elements
 		id block;
-		NSMethodSignature *signature;
+		NSMethodSignature *methodSignature;
 		NSUInteger argc;
 		block = [blockInfo objectForKey:kBlockKey];
 		if (!block) {
 			goto ORIGINAL;
 		}
-		signature = [invocation methodSignature];
-		argc = [signature numberOfArguments];
+		methodSignature = [invocation methodSignature];
+		argc = [methodSignature numberOfArguments];
 		
 		// Make blockInvocation
 		NSInvocation *blockInvocation;
@@ -459,9 +462,19 @@ static void RELogSignature(NSMethodSignature *signature)
 		NSData *argument;
 		blockInvocation = [NSInvocation invocationWithMethodSignature:[NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)]];
 		[blockInvocation setTarget:block];
+		{
+			argType = [methodSignature getArgumentTypeAtIndex:0];
+			NSGetSizeAndAlignment(argType, &length, NULL);
+			
+			argBuffer = malloc(length);
+			[invocation getArgument:argBuffer atIndex:0];
+			
+			argument = [NSData dataWithBytesNoCopy:argBuffer length:length];
+			[blockInvocation setArgument:(void*)[argument bytes] atIndex:1];
+		}
 		for (NSInteger i = 2; i < argc; i++) {
 			// Get argType and length
-			argType = [signature getArgumentTypeAtIndex:i];
+			argType = [methodSignature getArgumentTypeAtIndex:i];
 			NSGetSizeAndAlignment(argType, &length, NULL);
 			
 			// Prepare argBuffer
@@ -470,7 +483,7 @@ static void RELogSignature(NSMethodSignature *signature)
 			
 			// Add argument
 			argument = [NSData dataWithBytesNoCopy:argBuffer length:length];
-			[blockInvocation setArgument:(void*)[argument bytes] atIndex:(i - 1)];
+			[blockInvocation setArgument:(void*)[argument bytes] atIndex:i];
 		}
 		
 		// Invoke blockInvocation
@@ -478,7 +491,7 @@ static void RELogSignature(NSMethodSignature *signature)
 		
 		// Set return value to invocation
 		NSUInteger returnLength;
-		returnLength = [signature methodReturnLength];
+		returnLength = [methodSignature methodReturnLength];
 		if (returnLength > 0) {
 			// Get return value
 			void *returnBuffer;
@@ -497,7 +510,7 @@ static void RELogSignature(NSMethodSignature *signature)
 	}
 	
 	// original
-	ORIGINAL: {}
+	ORIGINAL:
 	[self REResponder_X_forwardInvocation:invocation];
 }
 

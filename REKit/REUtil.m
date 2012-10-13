@@ -7,6 +7,52 @@
 #import "REUtil.h"
 
 
+const char* REBlockGetObjCTypes(id _block)
+{
+	// Get descriptor of block
+	struct BlockDescriptor *descriptor;
+	struct Block *block;
+	block = (void*)_block;
+	descriptor = block->descriptor;
+	
+	// Get index of rest
+	int index = 0;
+	if (block->flags & BLOCK_HAS_COPY_DISPOSE) {
+		index += 2;
+	}
+	
+	return descriptor->rest[index];
+}
+
+void* REBlockGetImplementation(id block)
+{
+	return ((struct Block*)block)->invoke;
+}
+
+#pragma mark -
+
+
+@implementation NSMethodSignature (REUtil)
+
+- (NSString*)description
+{
+	NSMutableString *description;
+	description = [NSMutableString string];
+	[description appendFormat:@"<%@: %p> ", NSStringFromClass([self class]), self];
+	[description appendString:[NSString stringWithCString:[self methodReturnType] encoding:NSUTF8StringEncoding]];
+	for (NSInteger i = 0; i < [self numberOfArguments]; i++) {
+		[description appendString:[NSString stringWithCString:[self getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
+	}
+	
+	return description;
+}
+
+@end
+
+#pragma mark -
+
+
+
 @implementation NSObject (REUtil)
 
 //--------------------------------------------------------------//

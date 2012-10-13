@@ -53,67 +53,6 @@
 
 //{
 //	RSClassA *obj;
-////	__block IMP originalMethod;
-////	[RSClassA REResponder_replaceInstanceMethodForSelector:@selector(say:) withOriginalMethod:&originalMethod usingBlock:^(id receiver, NSString *string) {
-////		id block;
-////		block = [[[[receiver associatedValueForKey:@"REResponder_blocks"] objectForKey:@"say:"] lastObject] objectForKey:@"block"];
-////		if (block) {
-////			imp_implementationWithBlock(block)(receiver, NULL, string);
-////		}
-////		else {
-////			originalMethod(receiver, @selector(say:), string);
-////		}
-////	}];
-//	obj = [[[RSClassA alloc] init] autorelease];
-//	[obj respondsToSelector:@selector(say:) withBlockName:&(NSString*){@"block1"} usingBlock:^(id receiver, NSString *string) {
-//		NSLog(@"receiver = %@", receiver);
-//		NSLog(@"Overridden %@", string);
-//	}];
-//	[obj say:@"Hello obj"];
-////	[obj removeBlockNamed:@"block1"];
-////	[obj say:@"Hello"];
-////	//
-//	id obj2;
-////	NSString *blockName2 = @"blockName2";
-//	obj2 = [[[RSClassA alloc] init] autorelease];
-//	[obj2 say:@"Hello obj2"];
-////	[obj2 respondsToSelector:@selector(say:) withBlockName:&blockName2 usingBlock:^(id receiver, NSString *string) {
-////		NSLog(@"receiver = %@", receiver);
-////		NSLog(@"Overridden2 %@", string);
-////	}];
-////	[obj2 say:@"Hello obj2"];
-////	[obj2 removeBlockNamed:blockName2];
-////	[obj2 say:@"Hello obj2"];
-////	[obj respondsToSelector:@selector(message:) withBlockName:&(NSString*){@"messageBlock"} usingBlock:^(id receiver, NSString *message) {
-//////		NSLog(@"receiver = %@", receiver);
-////		NSLog(@"receiver (%@) = %@", NSStringFromClass([receiver class]), receiver);
-////		NSLog(@"message = %@", message);
-////		[receiver log];
-////	}];
-////	[obj performSelector:@selector(message:) withObject:@"Message"];
-//}
-
-//{
-//	RSClassA *obj;
-//	NSString *blockName1 = nil;
-//	NSString *blockName2 = nil;
-//	obj = [[[RSClassA alloc] init] autorelease];
-//	[obj respondsToSelector:@selector(say:) withBlockName:&blockName1 usingBlock:^(id me, NSString *string) {
-//		NSLog(@"O1 %@", string);
-//	}];
-//	[obj performSelector:@selector(say:) withObject:@"O1"];
-//	[obj respondsToSelector:@selector(say:) withBlockName:&blockName2 usingBlock:^(id me, NSString *string) {
-//		NSLog(@"O2 %@", string);
-//	}];
-//	[obj performSelector:@selector(say:) withObject:@"O2"];
-//	[obj removeBlockNamed:blockName1];
-//	[obj performSelector:@selector(say:) withObject:@"O2"];
-//	[obj removeBlockNamed:blockName2];
-//	[obj performSelector:@selector(say:) withObject:@"Bye"];
-//}
-
-//{
-//	RSClassA *obj;
 //	obj = [[[RSClassA alloc] init] autorelease];
 //	[obj respondsToSelector:@selector(say:) withBlockName:@"blockName1" usingBlock:^(id me, NSString *string) {
 //		NSLog(@"O1 %@", string);
@@ -127,7 +66,7 @@
 //	[obj say:@"O1"];
 //	[obj removeBlockNamed:@"blockName1"];
 //	[obj say:@"Bye"];
-//	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^{
+//	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id me) {
 //		NSLog(@"Overridden Log");
 //	}];
 //	[obj log];

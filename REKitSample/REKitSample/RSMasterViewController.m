@@ -103,7 +103,7 @@
 	
 	// Make alertView delegate of the alertView
 	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withBlockName:nil
-		usingBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+		usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
 			switch (buttonIndex) {
 			case 0: {
 				// Cancelled
@@ -175,7 +175,7 @@
 		button = [UIButton buttonWithType:UIButtonTypeInfoDark];
 		buttonAction = @selector(buttonAction);
 		target = [[[NSObject alloc] init] autorelease];
-		[target respondsToSelector:buttonAction withBlockName:nil usingBlock:^{
+		[target respondsToSelector:buttonAction withBlockName:nil usingBlock:^(id receiver) {
 			// Show cellNo
 			UIAlertView *alertView;
 			NSString *title;

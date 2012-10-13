@@ -50,17 +50,18 @@
 //	}];
 //	[obj performSelector:@selector(say:) withObject:@"Hello"];
 //}
+
 //{
 //	RSClassA *obj;
-////	__block IMP originalIMP;
-////	[RSClassA REResponder_replaceInstanceMethodForSelector:@selector(say:) withOriginalIMP:&originalIMP usingBlock:^(id receiver, NSString *string) {
+////	__block IMP originalMethod;
+////	[RSClassA REResponder_replaceInstanceMethodForSelector:@selector(say:) withOriginalMethod:&originalMethod usingBlock:^(id receiver, NSString *string) {
 ////		id block;
 ////		block = [[[[receiver associatedValueForKey:@"REResponder_blocks"] objectForKey:@"say:"] lastObject] objectForKey:@"block"];
 ////		if (block) {
 ////			imp_implementationWithBlock(block)(receiver, NULL, string);
 ////		}
 ////		else {
-////			originalIMP(receiver, @selector(say:), string);
+////			originalMethod(receiver, @selector(say:), string);
 ////		}
 ////	}];
 //	obj = [[[RSClassA alloc] init] autorelease];
@@ -91,6 +92,7 @@
 ////	}];
 ////	[obj performSelector:@selector(message:) withObject:@"Message"];
 //}
+
 //{
 //	RSClassA *obj;
 //	NSString *blockName1 = nil;
@@ -109,37 +111,102 @@
 //	[obj removeBlockNamed:blockName2];
 //	[obj performSelector:@selector(say:) withObject:@"Bye"];
 //}
-{
-	RSClassA *obj;
-	obj = [[[RSClassA alloc] init] autorelease];
-	[obj respondsToSelector:@selector(say:) withBlockName:@"blockName1" usingBlock:^(id me, NSString *string) {
-		NSLog(@"O1 %@", string);
-	}];
-	[obj say:@"O1"];
-	[obj respondsToSelector:@selector(say:) withBlockName:@"blockName2" usingBlock:^(id me, NSString *string) {
-		NSLog(@"O2 %@", string);
-	}];
-	[obj say:@"O2"];
-	[obj removeBlockNamed:@"blockName2"];
-	[obj say:@"O1"];
-	[obj removeBlockNamed:@"blockName1"];
-	[obj say:@"Bye"];
-	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^{
-		NSLog(@"Overridden Log");
-	}];
-	[obj log];
-	[obj respondsToSelector:@selector(message:) withBlockName:nil usingBlock:^(id me, NSString *message) {
-		NSLog(@"message is \"%@\"", message);
-	}];
-	[obj performSelector:@selector(message:) withObject:@"Message"];
-	
-	RSClassA *obj2;
-	obj2 = [[[RSClassA alloc] init] autorelease];
-	[obj2 respondsToSelector:@selector(say:) withBlockName:@"blockName3" usingBlock:^(id me, NSString *string) {
-		NSLog(@"O3 %@", string);
-	}];
-	[obj2 performSelector:@selector(say:) withObject:@"O3"];
-}
+
+//{
+//	RSClassA *obj;
+//	obj = [[[RSClassA alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) withBlockName:@"blockName1" usingBlock:^(id me, NSString *string) {
+//		NSLog(@"O1 %@", string);
+//	}];
+//	[obj say:@"O1"];
+//	[obj respondsToSelector:@selector(say:) withBlockName:@"blockName2" usingBlock:^(id me, NSString *string) {
+//		NSLog(@"O2 %@", string);
+//	}];
+//	[obj say:@"O2"];
+//	[obj removeBlockNamed:@"blockName2"];
+//	[obj say:@"O1"];
+//	[obj removeBlockNamed:@"blockName1"];
+//	[obj say:@"Bye"];
+//	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^{
+//		NSLog(@"Overridden Log");
+//	}];
+//	[obj log];
+//	[obj respondsToSelector:@selector(message:) withBlockName:nil usingBlock:^(id me, NSString *message) {
+//		NSLog(@"message is \"%@\"", message);
+//	}];
+//	[obj performSelector:@selector(message:) withObject:@"Message"];
+//	
+//	RSClassA *obj2;
+//	obj2 = [[[RSClassA alloc] init] autorelease];
+//	[obj2 respondsToSelector:@selector(say:) withBlockName:@"blockName3" usingBlock:^(id me, NSString *string) {
+//		NSLog(@"O3 %@", string);
+//	}];
+//	[obj2 performSelector:@selector(say:) withObject:@"O3"];
+//}
+
+//{
+//	RSClassA *obj;
+//	obj = [[[RSClassA alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) withBlockName:@"block1" usingBlock:^(id me, NSString *string) {
+//		// Call supermethod
+//		IMP supermethod;
+//		supermethod = [me supermethodOfBlockNamed:@"block1"];
+//		if (supermethod) {
+//			supermethod(me, @selector(say:), string);
+//		}
+//		
+//		// Say customized string
+//		NSLog(@"block1 %@", string);
+//	}];
+////	[obj say:@"Hello"];
+//	[obj respondsToSelector:@selector(say:) withBlockName:@"block2" usingBlock:^(id me, NSString *string) {
+//		// Call supermethod
+//		IMP supermethod;
+//		supermethod = [me supermethodOfBlockNamed:@"block2"];
+//		if (supermethod) {
+//			supermethod(me, @selector(say:), string);
+//		}
+//		
+//		// Say customized string
+//		NSLog(@"block2 %@", string);
+//	}];
+////	[obj say:@"Hello"];
+//	[obj removeBlockNamed:@"block1"];
+////	[obj say:@"Hello"];
+//	[obj removeBlockNamed:@"block2"];
+//	[obj say:@"Hello"];
+//}
+
+//{
+//	id obj;
+//	obj = [[[NSObject alloc] init] autorelease];
+//	[obj respondsToSelector:@selector(say:) withBlockName:@"block1" usingBlock:^(id me, NSString *string) {
+//		// Call supermethod
+//		IMP supermethod;
+//		supermethod = [me supermethodOfBlockNamed:@"block1"];
+//		if (supermethod) {
+//			supermethod(me, @selector(say:), string);
+//		}
+//		
+//		// Say customized string
+//		NSLog(@"block1 %@", string);
+//	}];
+////	[obj performSelector:@selector(say:) withObject:@"Hello"];
+//	[obj respondsToSelector:@selector(say:) withBlockName:@"block2" usingBlock:^(id me, NSString *string) {
+//		// Call supermethod
+//		IMP supermethod;
+//		supermethod = [me supermethodOfBlockNamed:@"block2"];
+//		if (supermethod) {
+//			supermethod(me, @selector(say:), string);
+//		}
+//		
+//		// Say customized string
+//		NSLog(@"block2 %@", string);
+//	}];
+////	[obj performSelector:@selector(say:) withObject:@"Hello"];
+//	[obj removeBlockNamed:@"block1"];
+//	[obj performSelector:@selector(say:) withObject:@"Hello"];
+//}
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -160,7 +227,7 @@
 	// Test
 	[self _test];
 	
-	// Remove superBlock >>>
+	// Remove superblock >>>
 	return YES;
 }
 

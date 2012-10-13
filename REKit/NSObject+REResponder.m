@@ -20,7 +20,7 @@ static NSString* const kBlocksAssociationKey = @"REResponder_blocks";
 static NSString* const kBlockInfoBlockKey = @"block";
 static NSString* const kBlockInfoBlockNameKey = @"blockName";
 static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
-static NSString* const kBlockInfosOriginalIMPAssociationKey = @"originalIMP";
+static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
 
 @implementation NSObject (REResponder)
@@ -312,6 +312,12 @@ static NSString* const kBlockInfosOriginalIMPAssociationKey = @"originalIMP";
 		return NO;
 	}
 	
+	// Check if block has id argument at first
+	NSString *blockObjCTypes;
+	blockObjCTypes = [blockSignature objCTypes];
+	NSAssert([blockObjCTypes length] >= 4, @"block for REResponder must have 'id receiver' argument at first");
+	NSAssert([[blockObjCTypes substringWithRange:NSMakeRange(3, 1)] isEqualToString:@"@"], @"block for REResponder must have 'id receiver' argument at first");
+	
 	// Update blocks
 	@synchronized (self) {
 		// Avoid adding block with existing blockName
@@ -348,11 +354,11 @@ static NSString* const kBlockInfosOriginalIMPAssociationKey = @"originalIMP";
 		
 		// Replace method
 		if ([self REResponder_X_respondsToSelector:selector]) {
-			// Associate originalIMP with blockInfos
-			if (![blockInfos associatedValueForKey:kBlockInfosOriginalIMPAssociationKey]) {
-				IMP originalIMP;
-				originalIMP = [self methodForSelector:selector];
-				[blockInfos associateValue:[NSValue valueWithPointer:originalIMP] forKey:kBlockInfosOriginalIMPAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			// Associate originalMethod with blockInfos
+			if (![blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey]) {
+				IMP originalMethod;
+				originalMethod = [self methodForSelector:selector];
+				[blockInfos associateValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
 			// Become subclass
@@ -398,30 +404,41 @@ static NSString* const kBlockInfosOriginalIMPAssociationKey = @"originalIMP";
 	return block;
 }
 
-- (id)superBlockOfBlockNamed:(NSString*)blockName
+- (IMP)supermethodOfBlockNamed:(NSString *)blockName
 {
 	// Filter
 	if (![blockName length]) {
-		return nil;
+		return NULL;
 	}
 	
-	// Get superBlock
-	id superBlock = nil;
+	// Get supermethod
+	IMP supermethod = NULL;
 	@synchronized (self) {
-		// Get blockInfo and blockInfos
+		// Get blockInfo
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:nil];
-		if (blockInfo && blockInfos) {
+		NSString *selectorName;
+		SEL selector;
+		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
+		selector = NSSelectorFromString(selectorName);
+		if (blockInfo) {
+			// Check index of blockInfo
 			NSUInteger index;
 			index = [blockInfos indexOfObject:blockInfo];
-			if (index > 0) {
-				superBlock = [[blockInfos objectAtIndex:(index - 1)] objectForKey:kBlockInfoBlockKey];
+			if (index == 0) {
+				// supermethod is superclass's instance method
+				supermethod = [[[self class] superclass] instanceMethodForSelector:selector];
+			}
+			else {
+				// supermethod is superblock's IMP
+				id superblock;
+				superblock = [[blockInfos objectAtIndex:(index - 1)] objectForKey:kBlockInfoBlockKey];
+				supermethod = imp_implementationWithBlock(superblock);
 			}
 		}
 	}
 	
-	return superBlock;
+	return supermethod;
 }
 
 - (void)removeBlockNamed:(NSString*)blockName
@@ -435,21 +452,15 @@ static NSString* const kBlockInfosOriginalIMPAssociationKey = @"originalIMP";
 		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
 		selector = NSSelectorFromString(selectorName);
 		if (blockInfo && blockInfos) {
-			// Check existance of originalIMP
-			IMP originalIMP;
-			originalIMP = [[blockInfos associatedValueForKey:kBlockInfosOriginalIMPAssociationKey] pointerValue];
-			if (originalIMP) {
+			// Check existance of originalMethod
+			IMP originalMethod;
+			originalMethod = [[blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey] pointerValue];
+			if (originalMethod) {
 				if (blockInfo == [blockInfos lastObject]) {
-					// Get superIMP
-					IMP superIMP = originalIMP;
-					id superBlock;
-					superBlock = [self superBlockOfBlockNamed:[blockInfo objectForKey:kBlockInfoBlockNameKey]];
-					if (superBlock) {
-						superIMP = REBlockGetImplementation(superBlock);
-					}
-					
-					// Replace implementation
-					class_replaceMethod([self class], selector, superIMP, [[[blockInfo objectForKey:kBlockInfoMethodSignatureKey] objCTypes] UTF8String]);
+					// Replace method
+					IMP supermethod;
+					supermethod = [self supermethodOfBlockNamed:[blockInfo objectForKey:kBlockInfoBlockNameKey]];
+					class_replaceMethod([self class], selector, supermethod, [[[blockInfo objectForKey:kBlockInfoMethodSignatureKey] objCTypes] UTF8String]);
 				}
 			}
 			

@@ -10,12 +10,12 @@
 @interface NSObject (REResponder)
 
 // Conformance
-- (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
+- (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol; // Work ?????
 
 // Block
 - (BOOL)respondsToSelector:(SEL)selector withBlockName:(NSString*)nameOrNil usingBlock:(id)block;
 - (id)blockNamed:(NSString*)blockName;
-- (id)superBlockOfBlockNamed:(NSString*)blockName; // Needed ?????
+- (IMP)supermethodOfBlockNamed:(NSString*)blockName;
 - (void)removeBlockNamed:(NSString*)blockName;
 
 @end

@@ -42,28 +42,28 @@ enum {
 extern const char* REBlockGetObjCTypes(id block);
 extern void* REBlockGetImplementation(id block);
 
+#pragma mark -
 
-//--------------------------------------------------------------//
-#pragma mark -- NSInvocation --
-//--------------------------------------------------------------//
+
+extern NSString* REUUIDString();
+
+#pragma mark -
+
 
 @interface NSInvocation (REUtil)
 - (void)invokeUsingIMP:(IMP)imp;
 @end
 
+#pragma mark -
 
-//--------------------------------------------------------------//
-#pragma mark -- NSMethodSignature --
-//--------------------------------------------------------------//
 
 @interface NSMethodSignature (REUtil)
+- (NSString*)objCTypes;
 - (NSString*)description;
 @end
 
+#pragma mark -
 
-//--------------------------------------------------------------//
-#pragma mark -- NSObject --
-//--------------------------------------------------------------//
 
 @interface NSObject (REUtil)
 

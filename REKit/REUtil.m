@@ -32,17 +32,39 @@ void* REBlockGetImplementation(id block)
 #pragma mark -
 
 
+NSString* REUUIDString()
+{
+	CFUUIDRef uuid;
+	NSString* uuidString;
+	uuid = CFUUIDCreate(NULL);
+	uuidString = (NSString*)CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+	CFRelease(uuid);
+	
+	return uuidString;
+}
+
+#pragma mark -
+
+
 @implementation NSMethodSignature (REUtil)
+
+- (NSString*)objCTypes
+{
+	NSMutableString *objCTypes;
+	objCTypes = [NSMutableString string];
+	[objCTypes appendString:[NSString stringWithCString:[self methodReturnType] encoding:NSUTF8StringEncoding]];
+	for (NSInteger i = 0; i < [self numberOfArguments]; i++) {
+		[objCTypes appendString:[NSString stringWithCString:[self getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
+	}
+	
+	return objCTypes;
+}
 
 - (NSString*)description
 {
 	NSMutableString *description;
 	description = [NSMutableString string];
-	[description appendFormat:@"<%@: %p> ", NSStringFromClass([self class]), self];
-	[description appendString:[NSString stringWithCString:[self methodReturnType] encoding:NSUTF8StringEncoding]];
-	for (NSInteger i = 0; i < [self numberOfArguments]; i++) {
-		[description appendString:[NSString stringWithCString:[self getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
-	}
+	[description appendFormat:@"<%@: %p> %@", NSStringFromClass([self class]), self, [self objCTypes]];
 	
 	return description;
 }
@@ -50,7 +72,6 @@ void* REBlockGetImplementation(id block)
 @end
 
 #pragma mark -
-
 
 
 @implementation NSObject (REUtil)

@@ -28,92 +28,6 @@ NSString* const REObservingInfoBlockKey = @"block";
 #pragma mark -- Setup --
 //--------------------------------------------------------------//
 
-+ (void)load
-{
-	@autoreleasepool {
-		// Exchange methods…
-		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REObserver_X_" selectors:
-			@selector(observeValueForKeyPath:ofObject:change:context:),
-			@selector(removeObserver:forKeyPath:),
-			@selector(removeObserver:forKeyPath:context:),
-			@selector(dealloc),
-			nil
-		];
-	}
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Object --
-//--------------------------------------------------------------//
-
-- (void)REObserver_X_dealloc
-{
-	// Stop observing
-	[self stopObserving];
-	
-	// original
-	[self REObserver_X_dealloc];
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Observer --
-//--------------------------------------------------------------//
-
-- (id)addObserverForKeyPath:(NSString*)keyPath options:(NSKeyValueObservingOptions)options usingBlock:(REObserverHandler)block
-{
-	// Filter
-	if (![keyPath length] || !block) {
-		return nil;
-	}
-	
-	// Make observer
-	id observer;
-	NSDictionary *observingInfo;
-	observer = [[NSObject alloc] init];
-	observingInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-		self, REObservingInfoObjectKey,
-		keyPath, REObservingInfoKeyPathKey,
-		[NSNumber numberWithInteger:options], REObservingInfoOptionsKey,
-		Block_copy(block), REObservingInfoBlockKey,
-		nil];
-	[observer associateValue:observingInfo forKey:kObservingInfoKey policy:OBJC_ASSOCIATION_RETAIN];
-	
-	// Add observer to self
-	[self addObserver:observer forKeyPath:keyPath options:options context:NULL];
-	
-	return [observer autorelease];
-}
-
-- (NSDictionary*)observingInfo
-{
-	// Get observingInfo
-	NSDictionary *observingInfo;
-	@synchronized (self) {
-		observingInfo = [[[self associatedValueForKey:kObservingInfoKey] retain] autorelease];
-	}
-	
-	return observingInfo;
-}
-
-- (void)stopObserving
-{
-	@synchronized (self) {
-		// Get observingInfo
-		NSDictionary *observingInfo;
-		observingInfo = [self observingInfo];
-		if (!observingInfo) {
-			return;
-		}
-		
-		// Stop observing
-		id object;
-		NSString *keyPath;
-		object = [observingInfo objectForKey:REObservingInfoObjectKey];
-		keyPath = [observingInfo objectForKey:REObservingInfoKeyPathKey];
-		[object removeObserver:self forKeyPath:keyPath];
-	}
-}
-
 - (void)REObserver_X_observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context
 {
 	@synchronized (self) {
@@ -192,6 +106,88 @@ NSString* const REObservingInfoBlockKey = @"block";
 	
 	// original
 	[self REObserver_X_removeObserver:observer forKeyPath:keyPath context:context];
+}
+
+- (void)REObserver_X_dealloc
+{
+	// Stop observing
+	[self stopObserving];
+	
+	// original
+	[self REObserver_X_dealloc];
+}
+
++ (void)load
+{
+	@autoreleasepool {
+		// Exchange methods…
+		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REObserver_X_" selectors:
+			@selector(observeValueForKeyPath:ofObject:change:context:),
+			@selector(removeObserver:forKeyPath:),
+			@selector(removeObserver:forKeyPath:context:),
+			@selector(dealloc),
+			nil
+		];
+	}
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- Observer --
+//--------------------------------------------------------------//
+
+- (id)addObserverForKeyPath:(NSString*)keyPath options:(NSKeyValueObservingOptions)options usingBlock:(REObserverHandler)block
+{
+	// Filter
+	if (![keyPath length] || !block) {
+		return nil;
+	}
+	
+	// Make observer
+	id observer;
+	NSDictionary *observingInfo;
+	observer = [[NSObject alloc] init];
+	observingInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+		self, REObservingInfoObjectKey,
+		keyPath, REObservingInfoKeyPathKey,
+		[NSNumber numberWithInteger:options], REObservingInfoOptionsKey,
+		Block_copy(block), REObservingInfoBlockKey,
+		nil];
+	[observer associateValue:observingInfo forKey:kObservingInfoKey policy:OBJC_ASSOCIATION_RETAIN];
+	
+	// Add observer to self
+	[self addObserver:observer forKeyPath:keyPath options:options context:NULL];
+	
+	return [observer autorelease];
+}
+
+- (NSDictionary*)observingInfo
+{
+	// Get observingInfo
+	NSDictionary *observingInfo;
+	@synchronized (self) {
+		observingInfo = [[[self associatedValueForKey:kObservingInfoKey] retain] autorelease];
+	}
+	
+	return observingInfo;
+}
+
+- (void)stopObserving
+{
+	@synchronized (self) {
+		// Get observingInfo
+		NSDictionary *observingInfo;
+		observingInfo = [self observingInfo];
+		if (!observingInfo) {
+			return;
+		}
+		
+		// Stop observing
+		id object;
+		NSString *keyPath;
+		object = [observingInfo objectForKey:REObservingInfoObjectKey];
+		keyPath = [observingInfo objectForKey:REObservingInfoKeyPathKey];
+		[object removeObserver:self forKeyPath:keyPath];
+	}
 }
 
 @end

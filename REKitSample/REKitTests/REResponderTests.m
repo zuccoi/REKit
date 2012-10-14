@@ -29,7 +29,7 @@
 	__block BOOL deallocated = NO;
 	
 	@autoreleasepool {
-		// You can override hardcoded method using RESB method
+		// You can override hardcoded method
 		NSString *log;
 		Logger *obj;
 		obj = [[[Logger alloc] init] autorelease];
@@ -51,8 +51,7 @@
 		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
 			// super
 			IMP supermethod;
-			supermethod = [me supermethodOfBlockNamed:@"dealloc"];
-			if (supermethod) {
+			if ((supermethod = [me supermethodOfBlockNamed:@"dealloc"])) {
 				supermethod(me, @selector(dealloc));
 			}
 			
@@ -87,8 +86,7 @@
 		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
 			// super
 			IMP supermethod;
-			supermethod = [me supermethodOfBlockNamed:@"dealloc"];
-			if (supermethod) {
+			if ((supermethod = [me supermethodOfBlockNamed:@"dealloc"])) {
 				supermethod(me, @selector(dealloc));
 			}
 			
@@ -474,8 +472,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		supermethod = [me supermethodOfBlockNamed:@"block1"];
-		if (supermethod) {
+		if ((supermethod = [me supermethodOfBlockNamed:@"block1"])) {
 			[log appendString:supermethod(me, sel)];
 		}
 		
@@ -497,8 +494,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		supermethod = [me supermethodOfBlockNamed:@"block2"];
-		if (supermethod) {
+		if ((supermethod = [me supermethodOfBlockNamed:@"block2"])) {
 			[log appendString:supermethod(me, sel)];
 		}
 		
@@ -520,8 +516,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		supermethod = [me supermethodOfBlockNamed:@"block3"];
-		if (supermethod) {
+		if ((supermethod = [me supermethodOfBlockNamed:@"block3"])) {
 			[log appendString:supermethod(me, sel)];
 		}
 		
@@ -571,8 +566,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		supermethod = [me supermethodOfBlockNamed:@"block1"];
-		if (supermethod) {
+		if ((supermethod = [me supermethodOfBlockNamed:@"block1"])) {
 			[log appendString:supermethod(me, sel)];
 		}
 		
@@ -594,8 +588,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		supermethod = [me supermethodOfBlockNamed:@"block2"];
-		if (supermethod) {
+		if ((supermethod = [me supermethodOfBlockNamed:@"block2"])) {
 			[log appendString:supermethod(me, sel)];
 		}
 		
@@ -617,8 +610,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		supermethod = [me supermethodOfBlockNamed:@"block3"];
-		if (supermethod) {
+		if ((supermethod = [me supermethodOfBlockNamed:@"block3"])) {
 			[log appendString:supermethod(me, sel)];
 		}
 		

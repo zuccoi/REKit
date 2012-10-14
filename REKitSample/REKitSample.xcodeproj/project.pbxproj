@@ -11,8 +11,8 @@
 		EB0F904C162A5DE7003EB0E8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6715AF08450085A39E /* UIKit.framework */; };
 		EB0F904D162A5DE7003EB0E8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6915AF08450085A39E /* Foundation.framework */; };
 		EB0F9053162A5DE8003EB0E8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EB0F9051162A5DE8003EB0E8 /* InfoPlist.strings */; };
-		EB0F905D162A5E49003EB0E8 /* REObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB0F905C162A5E49003EB0E8 /* REObserverTests.m */; };
 		EB0F9060162A5E5A003EB0E8 /* REResponderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */; };
+		EB0F9067162ACD7D003EB0E8 /* REObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB0F9066162ACD7D003EB0E8 /* REObserverTests.m */; };
 		EB1A2A6815AF08450085A39E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6715AF08450085A39E /* UIKit.framework */; };
 		EB1A2A6A15AF08450085A39E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6915AF08450085A39E /* Foundation.framework */; };
 		EB1A2A6C15AF08450085A39E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6B15AF08450085A39E /* CoreGraphics.framework */; };
@@ -30,10 +30,10 @@
 		EB0F9050162A5DE8003EB0E8 /* REKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "REKitTests-Info.plist"; sourceTree = "<group>"; };
 		EB0F9052162A5DE8003EB0E8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EB0F9057162A5DE8003EB0E8 /* REKitTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "REKitTests-Prefix.pch"; sourceTree = "<group>"; };
-		EB0F905B162A5E49003EB0E8 /* REObserverTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REObserverTests.h; sourceTree = "<group>"; };
-		EB0F905C162A5E49003EB0E8 /* REObserverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REObserverTests.m; sourceTree = "<group>"; };
 		EB0F905E162A5E5A003EB0E8 /* REResponderTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REResponderTests.h; sourceTree = "<group>"; };
 		EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REResponderTests.m; sourceTree = "<group>"; };
+		EB0F9065162ACD7D003EB0E8 /* REObserverTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REObserverTests.h; sourceTree = "<group>"; };
+		EB0F9066162ACD7D003EB0E8 /* REObserverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REObserverTests.m; sourceTree = "<group>"; };
 		EB1A2A6315AF08450085A39E /* REKitSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = REKitSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB1A2A6715AF08450085A39E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EB1A2A6915AF08450085A39E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -83,8 +83,8 @@
 		EB0F904E162A5DE7003EB0E8 /* REKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				EB0F905B162A5E49003EB0E8 /* REObserverTests.h */,
-				EB0F905C162A5E49003EB0E8 /* REObserverTests.m */,
+				EB0F9065162ACD7D003EB0E8 /* REObserverTests.h */,
+				EB0F9066162ACD7D003EB0E8 /* REObserverTests.m */,
 				EB0F905E162A5E5A003EB0E8 /* REResponderTests.h */,
 				EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */,
 				EB0F904F162A5DE8003EB0E8 /* Supporting Files */,
@@ -275,8 +275,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EB0F905D162A5E49003EB0E8 /* REObserverTests.m in Sources */,
 				EB0F9060162A5E5A003EB0E8 /* REResponderTests.m in Sources */,
+				EB0F9067162ACD7D003EB0E8 /* REObserverTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,7 +330,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "REKitTests/REKitTests-Prefix.pch";
 				INFOPLIST_FILE = "REKitTests/REKitTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -352,7 +352,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "REKitTests/REKitTests-Prefix.pch";
 				INFOPLIST_FILE = "REKitTests/REKitTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -410,6 +410,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "REKitSample/REKitSample-Prefix.pch";
 				INFOPLIST_FILE = "REKitSample/REKitSample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -421,6 +422,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "REKitSample/REKitSample-Prefix.pch";
 				INFOPLIST_FILE = "REKitSample/REKitSample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

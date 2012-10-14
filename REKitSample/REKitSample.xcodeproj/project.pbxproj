@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB0F904B162A5DE7003EB0E8 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBE31A6815F1DC9700CCC7EC /* SenTestingKit.framework */; };
+		EB0F904C162A5DE7003EB0E8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6715AF08450085A39E /* UIKit.framework */; };
+		EB0F904D162A5DE7003EB0E8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6915AF08450085A39E /* Foundation.framework */; };
+		EB0F9053162A5DE8003EB0E8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EB0F9051162A5DE8003EB0E8 /* InfoPlist.strings */; };
+		EB0F905D162A5E49003EB0E8 /* REObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB0F905C162A5E49003EB0E8 /* REObserverTests.m */; };
+		EB0F9060162A5E5A003EB0E8 /* REResponderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */; };
 		EB1A2A6815AF08450085A39E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6715AF08450085A39E /* UIKit.framework */; };
 		EB1A2A6A15AF08450085A39E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6915AF08450085A39E /* Foundation.framework */; };
 		EB1A2A6C15AF08450085A39E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6B15AF08450085A39E /* CoreGraphics.framework */; };
@@ -17,17 +23,19 @@
 		EB1A2A9215AF08CC0085A39E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A8E15AF08CC0085A39E /* NSObject+REResponder.m */; };
 		EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A9015AF08CC0085A39E /* REUtil.m */; };
 		EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */; };
-		EB326A1815F1E25B00659918 /* REObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB326A1715F1E25B00659918 /* REObserverTests.m */; };
-		EB326A1C15F1E27900659918 /* REResponderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB326A1B15F1E27900659918 /* REResponderTests.m */; };
 		EBB731FB15D016DB00340A0B /* RSClassA.m in Sources */ = {isa = PBXBuildFile; fileRef = EBB731FA15D016DB00340A0B /* RSClassA.m */; };
 		EBB731FF15D0171A00340A0B /* RSClassAA.m in Sources */ = {isa = PBXBuildFile; fileRef = EBB731FE15D0171A00340A0B /* RSClassAA.m */; };
-		EBE31A6915F1DC9700CCC7EC /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBE31A6815F1DC9700CCC7EC /* SenTestingKit.framework */; };
-		EBE31A6A15F1DC9700CCC7EC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6715AF08450085A39E /* UIKit.framework */; };
-		EBE31A6B15F1DC9700CCC7EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB1A2A6915AF08450085A39E /* Foundation.framework */; };
-		EBE31A7115F1DC9700CCC7EC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EBE31A6F15F1DC9700CCC7EC /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EB0F904A162A5DE7003EB0E8 /* REKitTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = REKitTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB0F9050162A5DE8003EB0E8 /* REKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "REKitTests-Info.plist"; sourceTree = "<group>"; };
+		EB0F9052162A5DE8003EB0E8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EB0F9057162A5DE8003EB0E8 /* REKitTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "REKitTests-Prefix.pch"; sourceTree = "<group>"; };
+		EB0F905B162A5E49003EB0E8 /* REObserverTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REObserverTests.h; sourceTree = "<group>"; };
+		EB0F905C162A5E49003EB0E8 /* REObserverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REObserverTests.m; sourceTree = "<group>"; };
+		EB0F905E162A5E5A003EB0E8 /* REResponderTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REResponderTests.h; sourceTree = "<group>"; };
+		EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REResponderTests.m; sourceTree = "<group>"; };
 		EB1A2A6315AF08450085A39E /* REKitSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = REKitSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB1A2A6715AF08450085A39E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EB1A2A6915AF08450085A39E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -47,22 +55,24 @@
 		EB1A2A9F15AF0A8E0085A39E /* REKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REKit.h; path = ../REKit/REKit.h; sourceTree = "<group>"; };
 		EB1A2AA015AF0B3B0085A39E /* RSMasterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMasterViewController.h; sourceTree = "<group>"; };
 		EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSMasterViewController.m; sourceTree = "<group>"; };
-		EB326A1615F1E25B00659918 /* REObserverTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REObserverTests.h; sourceTree = "<group>"; };
-		EB326A1715F1E25B00659918 /* REObserverTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REObserverTests.m; sourceTree = "<group>"; };
-		EB326A1A15F1E27900659918 /* REResponderTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REResponderTests.h; sourceTree = "<group>"; };
-		EB326A1B15F1E27900659918 /* REResponderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REResponderTests.m; sourceTree = "<group>"; };
 		EBB731F915D016DB00340A0B /* RSClassA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSClassA.h; sourceTree = "<group>"; };
 		EBB731FA15D016DB00340A0B /* RSClassA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSClassA.m; sourceTree = "<group>"; };
 		EBB731FD15D0171A00340A0B /* RSClassAA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSClassAA.h; sourceTree = "<group>"; };
 		EBB731FE15D0171A00340A0B /* RSClassAA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSClassAA.m; sourceTree = "<group>"; };
-		EBE31A6715F1DC9700CCC7EC /* REKitLogicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = REKitLogicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBE31A6815F1DC9700CCC7EC /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		EBE31A6E15F1DC9700CCC7EC /* REKitLogicTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "REKitLogicTests-Info.plist"; sourceTree = "<group>"; };
-		EBE31A7015F1DC9700CCC7EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		EBE31A7515F1DC9700CCC7EC /* REKitLogicTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "REKitLogicTests-Prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		EB0F9046162A5DE7003EB0E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB0F904B162A5DE7003EB0E8 /* SenTestingKit.framework in Frameworks */,
+				EB0F904C162A5DE7003EB0E8 /* UIKit.framework in Frameworks */,
+				EB0F904D162A5DE7003EB0E8 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EB1A2A6015AF08450085A39E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -73,25 +83,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EBE31A6315F1DC9700CCC7EC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EBE31A6915F1DC9700CCC7EC /* SenTestingKit.framework in Frameworks */,
-				EBE31A6A15F1DC9700CCC7EC /* UIKit.framework in Frameworks */,
-				EBE31A6B15F1DC9700CCC7EC /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EB0F904E162A5DE7003EB0E8 /* REKitTests */ = {
+			isa = PBXGroup;
+			children = (
+				EB0F905B162A5E49003EB0E8 /* REObserverTests.h */,
+				EB0F905C162A5E49003EB0E8 /* REObserverTests.m */,
+				EB0F905E162A5E5A003EB0E8 /* REResponderTests.h */,
+				EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */,
+				EB0F904F162A5DE8003EB0E8 /* Supporting Files */,
+			);
+			path = REKitTests;
+			sourceTree = "<group>";
+		};
+		EB0F904F162A5DE8003EB0E8 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				EB0F9050162A5DE8003EB0E8 /* REKitTests-Info.plist */,
+				EB0F9051162A5DE8003EB0E8 /* InfoPlist.strings */,
+				EB0F9057162A5DE8003EB0E8 /* REKitTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		EB1A2A5815AF08450085A39E = {
 			isa = PBXGroup;
 			children = (
 				EB1A2A9515AF08D30085A39E /* REKit */,
 				EB1A2A6D15AF08450085A39E /* REKitSample */,
-				EBE31A6C15F1DC9700CCC7EC /* REKitLogicTests */,
+				EB0F904E162A5DE7003EB0E8 /* REKitTests */,
 				EB1A2A6615AF08450085A39E /* Frameworks */,
 				EB1A2A6415AF08450085A39E /* Products */,
 			);
@@ -101,7 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				EB1A2A6315AF08450085A39E /* REKitSample.app */,
-				EBE31A6715F1DC9700CCC7EC /* REKitLogicTests.octest */,
+				EB0F904A162A5DE7003EB0E8 /* REKitTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -158,31 +180,27 @@
 			name = REKit;
 			sourceTree = "<group>";
 		};
-		EBE31A6C15F1DC9700CCC7EC /* REKitLogicTests */ = {
-			isa = PBXGroup;
-			children = (
-				EB326A1615F1E25B00659918 /* REObserverTests.h */,
-				EB326A1715F1E25B00659918 /* REObserverTests.m */,
-				EB326A1A15F1E27900659918 /* REResponderTests.h */,
-				EB326A1B15F1E27900659918 /* REResponderTests.m */,
-				EBE31A6D15F1DC9700CCC7EC /* Supporting Files */,
-			);
-			path = REKitLogicTests;
-			sourceTree = "<group>";
-		};
-		EBE31A6D15F1DC9700CCC7EC /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				EBE31A6E15F1DC9700CCC7EC /* REKitLogicTests-Info.plist */,
-				EBE31A6F15F1DC9700CCC7EC /* InfoPlist.strings */,
-				EBE31A7515F1DC9700CCC7EC /* REKitLogicTests-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		EB0F9049162A5DE7003EB0E8 /* REKitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB0F9058162A5DE8003EB0E8 /* Build configuration list for PBXNativeTarget "REKitTests" */;
+			buildPhases = (
+				EB0F9045162A5DE7003EB0E8 /* Sources */,
+				EB0F9046162A5DE7003EB0E8 /* Frameworks */,
+				EB0F9047162A5DE7003EB0E8 /* Resources */,
+				EB0F9048162A5DE7003EB0E8 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = REKitTests;
+			productName = REKitTests;
+			productReference = EB0F904A162A5DE7003EB0E8 /* REKitTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
 		EB1A2A6215AF08450085A39E /* REKitSample */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EB1A2A8415AF08450085A39E /* Build configuration list for PBXNativeTarget "REKitSample" */;
@@ -199,24 +217,6 @@
 			productName = REKitSample;
 			productReference = EB1A2A6315AF08450085A39E /* REKitSample.app */;
 			productType = "com.apple.product-type.application";
-		};
-		EBE31A6615F1DC9700CCC7EC /* REKitLogicTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = EBE31A7815F1DC9700CCC7EC /* Build configuration list for PBXNativeTarget "REKitLogicTests" */;
-			buildPhases = (
-				EBE31A6215F1DC9700CCC7EC /* Sources */,
-				EBE31A6315F1DC9700CCC7EC /* Frameworks */,
-				EBE31A6415F1DC9700CCC7EC /* Resources */,
-				EBE31A6515F1DC9700CCC7EC /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = REKitLogicTests;
-			productName = REKitLogicTests;
-			productReference = EBE31A6715F1DC9700CCC7EC /* REKitLogicTests.octest */;
-			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
 
@@ -240,12 +240,20 @@
 			projectRoot = "";
 			targets = (
 				EB1A2A6215AF08450085A39E /* REKitSample */,
-				EBE31A6615F1DC9700CCC7EC /* REKitLogicTests */,
+				EB0F9049162A5DE7003EB0E8 /* REKitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		EB0F9047162A5DE7003EB0E8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB0F9053162A5DE8003EB0E8 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EB1A2A6115AF08450085A39E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -254,18 +262,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EBE31A6415F1DC9700CCC7EC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EBE31A7115F1DC9700CCC7EC /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		EBE31A6515F1DC9700CCC7EC /* ShellScript */ = {
+		EB0F9048162A5DE7003EB0E8 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -281,6 +281,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		EB0F9045162A5DE7003EB0E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB0F905D162A5E49003EB0E8 /* REObserverTests.m in Sources */,
+				EB0F9060162A5E5A003EB0E8 /* REResponderTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EB1A2A5F15AF08450085A39E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -296,18 +305,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EBE31A6215F1DC9700CCC7EC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EB326A1815F1E25B00659918 /* REObserverTests.m in Sources */,
-				EB326A1C15F1E27900659918 /* REResponderTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		EB0F9051162A5DE8003EB0E8 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EB0F9052162A5DE8003EB0E8 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		EB1A2A7015AF08450085A39E /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -316,17 +324,53 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		EBE31A6F15F1DC9700CCC7EC /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				EBE31A7015F1DC9700CCC7EC /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		EB0F9059162A5DE8003EB0E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/REKitSample.app/REKitSample";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "REKitTests/REKitTests-Prefix.pch";
+				INFOPLIST_FILE = "REKitTests/REKitTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		EB0F905A162A5DE8003EB0E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/REKitSample.app/REKitSample";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "REKitTests/REKitTests-Prefix.pch";
+				INFOPLIST_FILE = "REKitTests/REKitTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
 		EB1A2A8215AF08450085A39E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -394,49 +438,17 @@
 			};
 			name = Release;
 		};
-		EBE31A7615F1DC9700CCC7EC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
-					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "REKitLogicTests/REKitLogicTests-Prefix.pch";
-				INFOPLIST_FILE = "REKitLogicTests/REKitLogicTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Debug;
-		};
-		EBE31A7715F1DC9700CCC7EC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
-					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "REKitLogicTests/REKitLogicTests-Prefix.pch";
-				INFOPLIST_FILE = "REKitLogicTests/REKitLogicTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EB0F9058162A5DE8003EB0E8 /* Build configuration list for PBXNativeTarget "REKitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB0F9059162A5DE8003EB0E8 /* Debug */,
+				EB0F905A162A5DE8003EB0E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		EB1A2A5D15AF08450085A39E /* Build configuration list for PBXProject "REKitSample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -451,15 +463,6 @@
 			buildConfigurations = (
 				EB1A2A8515AF08450085A39E /* Debug */,
 				EB1A2A8615AF08450085A39E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		EBE31A7815F1DC9700CCC7EC /* Build configuration list for PBXNativeTarget "REKitLogicTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EBE31A7615F1DC9700CCC7EC /* Debug */,
-				EBE31A7715F1DC9700CCC7EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

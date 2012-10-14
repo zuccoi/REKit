@@ -4,7 +4,6 @@
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
-#import <dlfcn.h>
 #import "NSObject+REResponder.h"
 #import "REUtil.h"
 
@@ -185,8 +184,6 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 + (void)load
 {
 	@autoreleasepool {
-// ?????
-NSLog(@"%s - line %d", __PRETTY_FUNCTION__, __LINE__);
 		// Exchange instance methods
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
 			@selector(conformsToProtocol:),

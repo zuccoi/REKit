@@ -23,8 +23,6 @@
 		EB1A2A9215AF08CC0085A39E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A8E15AF08CC0085A39E /* NSObject+REResponder.m */; };
 		EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A9015AF08CC0085A39E /* REUtil.m */; };
 		EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */; };
-		EBB731FB15D016DB00340A0B /* RSClassA.m in Sources */ = {isa = PBXBuildFile; fileRef = EBB731FA15D016DB00340A0B /* RSClassA.m */; };
-		EBB731FF15D0171A00340A0B /* RSClassAA.m in Sources */ = {isa = PBXBuildFile; fileRef = EBB731FE15D0171A00340A0B /* RSClassAA.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,10 +53,6 @@
 		EB1A2A9F15AF0A8E0085A39E /* REKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REKit.h; path = ../REKit/REKit.h; sourceTree = "<group>"; };
 		EB1A2AA015AF0B3B0085A39E /* RSMasterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMasterViewController.h; sourceTree = "<group>"; };
 		EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSMasterViewController.m; sourceTree = "<group>"; };
-		EBB731F915D016DB00340A0B /* RSClassA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSClassA.h; sourceTree = "<group>"; };
-		EBB731FA15D016DB00340A0B /* RSClassA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSClassA.m; sourceTree = "<group>"; };
-		EBB731FD15D0171A00340A0B /* RSClassAA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSClassAA.h; sourceTree = "<group>"; };
-		EBB731FE15D0171A00340A0B /* RSClassAA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSClassAA.m; sourceTree = "<group>"; };
 		EBE31A6815F1DC9700CCC7EC /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
@@ -146,10 +140,6 @@
 				EB1A2A7715AF08450085A39E /* RSAppDelegate.m */,
 				EB1A2AA015AF0B3B0085A39E /* RSMasterViewController.h */,
 				EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */,
-				EBB731F915D016DB00340A0B /* RSClassA.h */,
-				EBB731FA15D016DB00340A0B /* RSClassA.m */,
-				EBB731FD15D0171A00340A0B /* RSClassAA.h */,
-				EBB731FE15D0171A00340A0B /* RSClassAA.m */,
 				EB1A2A6E15AF08450085A39E /* Supporting Files */,
 			);
 			path = REKitSample;
@@ -300,8 +290,6 @@
 				EB1A2A9215AF08CC0085A39E /* NSObject+REResponder.m in Sources */,
 				EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */,
 				EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */,
-				EBB731FB15D016DB00340A0B /* RSClassA.m in Sources */,
-				EBB731FF15D0171A00340A0B /* RSClassAA.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

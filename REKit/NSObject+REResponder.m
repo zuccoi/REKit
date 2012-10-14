@@ -311,12 +311,6 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 		return NO;
 	}
 	
-	// Check if block has id argument at first
-	NSString *blockObjCTypes;
-	blockObjCTypes = [blockSignature objCTypes];
-	NSAssert([blockObjCTypes length] >= 4, @"block for REResponder must have 'id receiver' argument at first");
-	NSAssert([[blockObjCTypes substringWithRange:NSMakeRange(3, 1)] isEqualToString:@"@"], @"block for REResponder must have 'id receiver' argument at first");
-	
 	// Update blocks
 	@synchronized (self) {
 		// Avoid adding block with existing blockName

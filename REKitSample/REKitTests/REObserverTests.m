@@ -38,14 +38,6 @@
 	return [[[Person alloc] init] autorelease];
 }
 
-- (void)dealloc
-{
-	NSLog(@"%s", __PRETTY_FUNCTION__);
-	
-	// super
-	[super dealloc];
-}
-
 @end
 
 #pragma mark -
@@ -53,57 +45,65 @@
 
 @implementation REObserverTests
 
-- (void)test_addObserver
+- (void)test_addObserverUsingBlock
 {
-	__block BOOL deallocatedP = NO;
-	__block BOOL deallocatedObserver = NO;
+	// Make person
+	Person *p;
+	p = [Person person];
 	
-	@autoreleasepool {
-		// Make person
-		Person *p;
-		p = [Person person];
-		
-		// Add observer
-		id observer;
-		observer = [p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
-			NSLog(@"change = %@", change);
-		}];
-		
-		// Change name
-		p.name = @"name";
-		
-		// Override dealloc method of p
-		[p respondsToSelector:@selector(dealloc) withBlockName:@"block1" usingBlock:^(id me) {
-			// super
-			IMP supermethod;
-			supermethod = [p supermethodOfBlockNamed:@"block1"];
-			if (supermethod) {
-				supermethod(me, @selector(dealloc));
-			}
-			
-			// Raise deallocatedP
-			deallocatedP = YES;
-		}];
-		
-		// Override dealloc method of observer
-		[observer respondsToSelector:@selector(dealloc) withBlockName:@"block2" usingBlock:^(id me) {
-			// super
-			IMP supermethod;
-			supermethod = [p supermethodOfBlockNamed:@"block2"];
-			if (supermethod) {
-				supermethod(me, @selector(dealloc));
-			}
-			
-			// Raise deallocatedObserver
-			deallocatedObserver = YES;
-		}];
-		
-		// Change name
-		p.name = @"newName";
-	}
+	// Add observer
+	__block BOOL observed = NO;
+	__block NSDictionary *dict = nil;
+	[p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+		observed = YES;
+		dict = change;
+	}];
 	
-	STAssertTrue(deallocatedP, @"");
-	STAssertTrue(deallocatedObserver, @"");
+	// Change name
+	p.name = @"name";
+	//
+	STAssertTrue(observed, @"");
+	STAssertNotNil(dict, @"");
+}
+
+- (void)test_removeObserver
+{
+	// Make person
+	Person *p;
+	p = [Person person];
+	
+	// Add observer then remove it
+	id observer;
+	__block BOOL observed = NO;
+	observer = [p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+		observed = YES;
+	}];
+	[p removeObserver:observer forKeyPath:@"name"];
+	
+	// Change name
+	p.name = @"name";
+	//
+	STAssertFalse(observed, @"");
+}
+
+- (void)test_stopObserving
+{
+	// Make person
+	Person *p;
+	p = [Person person];
+	
+	// Add observer then remove it
+	id observer;
+	__block BOOL observed = NO;
+	observer = [p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+		observed = YES;
+	}];
+	[observer stopObserving];
+	
+	// Change name
+	p.name = @"name";
+	//
+	STAssertFalse(observed, @"");
 }
 
 @end

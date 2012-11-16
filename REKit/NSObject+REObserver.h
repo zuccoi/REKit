@@ -8,10 +8,12 @@
 
 
 // Keys for observingInfo
-extern NSString* const REObservingInfoObjectKey;
-extern NSString* const REObservingInfoKeyPathKey;
-extern NSString* const REObservingInfoOptionsKey;
-extern NSString* const REObservingInfoBlockKey;
+extern NSString* const REObserverObservedObjectKey; // observed object is observed
+extern NSString* const REObserverObservingObjectKey; // observing object is observing
+extern NSString* const REObserverKeyPathKey;
+extern NSString* const REObserverOptionsKey;
+extern NSString* const REObserverContextKey;
+extern NSString* const REObserverBlockKey;
 
 // REObserverHandler
 typedef void (^REObserverHandler)(NSDictionary *change);
@@ -19,8 +21,9 @@ typedef void (^REObserverHandler)(NSDictionary *change);
 
 @interface NSObject (REObserver)
 
-- (id)addObserverForKeyPath:(NSString*)keyPath options:(NSKeyValueObservingOptions)options usingBlock:(REObserverHandler)block; // Don't pass returned object to addObserver:forKeyPath:options:context: and addObserver:toObjectsAtIndexes:forKeyPath:options:context:.
-- (NSDictionary*)observingInfo;
+- (id)addObserverForKeyPath:(NSString*)keyPath options:(NSKeyValueObservingOptions)options usingBlock:(REObserverHandler)block; // Don't pass returned object to addObserver:forKeyPath:options:context: and addObserver:toObjectsAtIndexes:forKeyPath:options:context:. // Really ?????
+- (NSArray*)observingInfos;
+- (NSArray*)observedInfos;
 - (void)stopObserving;
 
 @end

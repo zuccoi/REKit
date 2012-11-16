@@ -9,6 +9,7 @@
 
 
 @interface Logger : NSObject
+@property (copy, nonatomic) NSString *name;
 - (NSString*)log;
 @end
 
@@ -644,6 +645,28 @@
 	// Call log method
 	log = [obj log];
 	STAssertEqualObjects(log, @"-[Logger log]", @"");
+}
+
+- (void)test_observation
+{
+	// Make logger obj
+	Logger *obj;
+	obj = [[[Logger alloc] init] autorelease];
+	
+	// Add observer for name
+	__block NSString *recognizedName = nil;
+	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
+		recognizedName = [change objectForKey:NSKeyValueChangeNewKey];
+	}];
+	
+	// Override log method
+	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
+		return @"Overridden";
+	}];
+	
+	obj.name = @"name";
+	//
+	STAssertEqualObjects(recognizedName, @"name", @"");
 }
 
 @end

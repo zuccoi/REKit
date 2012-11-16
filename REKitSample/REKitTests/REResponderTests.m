@@ -656,7 +656,7 @@
 	// Add observer for name
 	__block NSString *recognizedName = nil;
 	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
-		recognizedName = [change objectForKey:NSKeyValueChangeNewKey];
+		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	
 	// Override log method

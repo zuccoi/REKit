@@ -91,8 +91,8 @@ NSString* const REObserverBlockKey = @"block";
 		// Get observingInfo
 		__block NSDictionary *observingInfo = nil;
 		[[self observingInfos] enumerateObjectsUsingBlock:^(NSDictionary *anObservingInfo, NSUInteger idx, BOOL *stop) {
-			if ([anObservingInfo objectForKey:REObserverObservedObjectKey] == object
-				&& [[anObservingInfo objectForKey:REObserverKeyPathKey] isEqualToString:keyPath]
+			if (anObservingInfo[REObserverObservedObjectKey] == object
+				&& [anObservingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
 			){
 				observingInfo = anObservingInfo;
 				*stop = YES;
@@ -104,7 +104,7 @@ NSString* const REObserverBlockKey = @"block";
 		
 		// Execute block
 		REObserverHandler block;
-		block = [observingInfo objectForKey:REObserverBlockKey];
+		block = observingInfo[REObserverBlockKey];
 		if (!block) {
 			return;
 		}
@@ -127,12 +127,12 @@ NSString* const REObserverBlockKey = @"block";
 		NSMutableArray *observedInfoToRemove;
 		observedInfoToRemove = [NSMutableArray array];
 		[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
-			if ([observingInfo objectForKey:REObserverObservedObjectKey] == self
-				&& [[observingInfo objectForKey:REObserverKeyPathKey] isEqualToString:keyPath]
+			if (observingInfo[REObserverObservedObjectKey] == self
+				&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
 			){
 				// Release block
 				id block;
-				block = [observingInfo objectForKey:REObserverBlockKey];
+				block = observingInfo[REObserverBlockKey];
 				if (block) {
 					Block_release(block);
 				}
@@ -163,13 +163,13 @@ NSString* const REObserverBlockKey = @"block";
 		NSMutableArray *observedInfoToRemove;
 		observedInfoToRemove = [NSMutableArray array];
 		[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
-			if ([observingInfo objectForKey:REObserverObservedObjectKey] == self
-				&& [[observingInfo objectForKey:REObserverKeyPathKey] isEqualToString:keyPath]
+			if (observingInfo[REObserverObservedObjectKey] == self
+				&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
 				&& context == NULL
 			){
 				// Release block
 				id block;
-				block = [observingInfo objectForKey:REObserverBlockKey];
+				block = observingInfo[REObserverBlockKey];
 				if (block) {
 					Block_release(block);
 				}
@@ -304,8 +304,8 @@ NSString* const REObserverBlockKey = @"block";
 			// Stop observing
 			id object;
 			NSString *keyPath;
-			object = [observingInfo objectForKey:REObserverObservedObjectKey];
-			keyPath = [observingInfo objectForKey:REObserverKeyPathKey];
+			object = observingInfo[REObserverObservedObjectKey];
+			keyPath = observingInfo[REObserverKeyPathKey];
 			[object removeObserver:self forKeyPath:keyPath];
 		}
 	}

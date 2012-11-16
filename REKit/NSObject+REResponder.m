@@ -51,7 +51,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 	// Check registered selector
 	NSString *selectorName;
 	selectorName = NSStringFromSelector(aSelector);
-	return ([[[self associatedValueForKey:kBlocksAssociationKey] objectForKey:selectorName] count] > 0);
+	return ([[self associatedValueForKey:kBlocksAssociationKey][selectorName] count] > 0);
 }
 
 - (NSMethodSignature*)REResponder_X_methodSignatureForSelector:(SEL)aSelector
@@ -63,9 +63,9 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 	// Check registered selector
 	@synchronized (self) {
 		NSDictionary *blockInfo;
-		blockInfo = [[[self associatedValueForKey:kBlocksAssociationKey] objectForKey:selectorName] lastObject];
+		blockInfo = [[self associatedValueForKey:kBlocksAssociationKey][selectorName] lastObject];
 		if (blockInfo) {
-			return [blockInfo objectForKey:kBlockInfoMethodSignatureKey];
+			return blockInfo[kBlockInfoMethodSignatureKey];
 		}
 	}
 	
@@ -83,7 +83,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [[[self associatedValueForKey:kBlocksAssociationKey] objectForKey:selectorName] lastObject];
+		blockInfo = [[self associatedValueForKey:kBlocksAssociationKey][selectorName] lastObject];
 		if (!blockInfo) {
 			goto ORIGINAL;
 		}
@@ -92,7 +92,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 		id block;
 		NSMethodSignature *methodSignature;
 		NSUInteger argc;
-		block = [blockInfo objectForKey:kBlockInfoBlockKey];
+		block = blockInfo[kBlockInfoBlockKey];
 		if (!block) {
 			goto ORIGINAL;
 		}
@@ -208,7 +208,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 	@synchronized (self) {
 		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *aStop) {
 			[aBlockInfos enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSDictionary *bBlockInfo, NSUInteger bIdx, BOOL *bStop) {
-				if ([[bBlockInfo objectForKey:kBlockInfoBlockNameKey] isEqualToString:blockName]) {
+				if ([bBlockInfo[kBlockInfoBlockNameKey] isEqualToString:blockName]) {
 					blockInfo = bBlockInfo;
 					if (blockInfos) {
 						*blockInfos = aBlockInfos;
@@ -332,7 +332,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 		
 		// Get blockInfos
 		NSMutableArray *blockInfos;
-		blockInfos = [blocks objectForKey:selectorName];
+		blockInfos = blocks[selectorName];
 		if (!blockInfos) {
 			// Make blocks
 			if (!blocks) {
@@ -393,7 +393,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 		// Get blockInfo
 		NSDictionary *blockInfo;
 		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:nil selectorName:nil];
-		block = [blockInfo objectForKey:kBlockInfoBlockKey];
+		block = blockInfo[kBlockInfoBlockKey];
 	}
 	
 	return block;
@@ -427,7 +427,7 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 			else {
 				// supermethod is superblock's IMP
 				id superblock;
-				superblock = [[blockInfos objectAtIndex:(index - 1)] objectForKey:kBlockInfoBlockKey];
+				superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
 				supermethod = imp_implementationWithBlock(superblock);
 			}
 		}
@@ -454,14 +454,14 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 				if (blockInfo == [blockInfos lastObject]) {
 					// Replace method
 					IMP supermethod;
-					supermethod = [self supermethodOfBlockNamed:[blockInfo objectForKey:kBlockInfoBlockNameKey]];
-					class_replaceMethod([self class], selector, supermethod, [[[blockInfo objectForKey:kBlockInfoMethodSignatureKey] objCTypes] UTF8String]);
+					supermethod = [self supermethodOfBlockNamed:blockInfo[kBlockInfoBlockNameKey]];
+					class_replaceMethod([self class], selector, supermethod, [[blockInfo[kBlockInfoMethodSignatureKey] objCTypes] UTF8String]);
 				}
 			}
 			
 			// Release block
 			id block;
-			block = [blockInfo objectForKey:kBlockInfoBlockKey];
+			block = blockInfo[kBlockInfoBlockKey];
 			if (block) {
 				Block_release(block);
 			}

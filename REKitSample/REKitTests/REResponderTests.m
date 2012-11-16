@@ -664,6 +664,7 @@
 		return @"Overridden";
 	}];
 	
+	// Change name
 	obj.name = @"name";
 	//
 	STAssertEqualObjects(recognizedName, @"name", @"");

@@ -198,6 +198,9 @@ NSString* const REObserverBlockKey = @"block";
 			[self REObserver_X_removeObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey]];
 		}
 	}];
+	
+	// original
+	[self REObserver_X_willBecomeInstanceOfClass:aClass];
 }
 
 - (void)REObserver_X_didBecomeInstanceOfClass:(Class)aClass
@@ -206,6 +209,9 @@ NSString* const REObserverBlockKey = @"block";
 	[[self observedInfos] enumerateObjectsUsingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
 		[self REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextKey] pointerValue]];
 	}];
+	
+	// original
+	[self REObserver_X_didBecomeInstanceOfClass:aClass];
 }
 
 - (void)REObserver_X_dealloc

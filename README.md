@@ -3,11 +3,9 @@ REKit
 REKit is a collection of NSObject extensions.
 
 ## Overview
------
 under construction…
 
 ## License
------
 
 Copyright (c) 2012 Kazki Miura
 

@@ -694,7 +694,6 @@
 	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
 		return @"Overridden";
 	}];
-	STAssertTrue([obj class] != [RELogger class], @"");
 	
 	// Change name
 	obj.name = @"name";
@@ -729,7 +728,6 @@
 	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
 		return @"Overridden";
 	}];
-	STAssertTrue([obj class] != [RELogger class], @"");
 	
 	// Change name
 	obj.name = @"name";
@@ -765,7 +763,6 @@
 	[logger0 respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
 		return @"Overrideen";
 	}];
-	STAssertTrue([logger0 class] != [RELogger class], @"");
 	
 	// Change name
 	logger0.name = @"name";

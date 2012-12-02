@@ -10,7 +10,7 @@
 @interface NSObject (REResponder)
 
 // Conformance
-- (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol; // Work ?????
+- (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
 
 // Block
 - (BOOL)respondsToSelector:(SEL)selector withBlockName:(NSString*)nameOrNil usingBlock:(id)block;

@@ -33,6 +33,25 @@
 
 @implementation REResponderTests
 
+- (void)test_becomeConformableToProtocol
+{
+	Protocol *protocol;
+	protocol = @protocol(NSCopying);
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+	
+	// Become conformable to protocol
+	[obj becomeConformable:YES toProtocol:protocol];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Revert
+	[obj becomeConformable:NO toProtocol:protocol];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+}
+
 - (void)test_overrideHardcodedMethod
 {
 	__block BOOL deallocated = NO;

@@ -7,14 +7,14 @@
 #import <Foundation/Foundation.h>
 
 
-// Keys for observingInfo
-extern NSString* const REObserverObservedObjectKey; // observed object is observed
-extern NSString* const REObserverObservingObjectKey; // observing object is observing
+// Keys for observingInfo and observedInfo
+extern NSString* const REObserverObservedObjectKey; // Observed object is observed. Only observingInfo contains this entry.
+extern NSString* const REObserverObservingObjectKey; // Observing object is observing. Only observedInfo contains this entry.
 extern NSString* const REObserverKeyPathKey;
 extern NSString* const REObserverOptionsKey;
 extern NSString* const REObserverContextPointerValueKey;
 extern NSString* const REObserverBlockKey;
-extern NSString* const REObserverContainerKey; // Container of observed object. When you use [array addObserver:toObjectsAtIndexes:forKeyPath:options:context:], the container is array.
+extern NSString* const REObserverContainerKey; // Container of observed object. When you use [array addObserver:toObjectsAtIndexes:forKeyPath:options:context:], array is set to this entry.
 
 // REObserverHandler
 typedef void (^REObserverHandler)(NSDictionary *change);

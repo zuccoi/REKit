@@ -356,7 +356,16 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Add observers removed in willBecomeInstanceOfClass: method
 	[[self observedInfos] enumerateObjectsUsingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
-		[self REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
+		id container;
+		container = observedInfo[REObserverContainerKey];
+		if ([container containsObject:self]) {
+			NSUInteger index;
+			index = [container indexOfObject:self];
+			[container REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] toObjectsAtIndexes:[NSIndexSet indexSetWithIndex:index] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
+		}
+		else {
+			[self REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
+		}
 	}];
 }
 

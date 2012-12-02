@@ -12,7 +12,7 @@ extern NSString* const REObserverObservedObjectKey; // observed object is observ
 extern NSString* const REObserverObservingObjectKey; // observing object is observing
 extern NSString* const REObserverKeyPathKey;
 extern NSString* const REObserverOptionsKey;
-extern NSString* const REObserverContextKey;
+extern NSString* const REObserverContextPointerValueKey;
 extern NSString* const REObserverBlockKey;
 
 // REObserverHandler

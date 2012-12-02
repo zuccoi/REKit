@@ -9,6 +9,7 @@
 #import "REUtil.h"
 
 // Override addObserver:toObjectsAtIndexes:forKeyPath:options:context: method >>>
+// Override - (void)removeObserver:(NSObject *)anObserver fromObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath >>>
 
 #if __has_feature(objc_arc)
 	#error This code needs compiler option -fno-objc-arc
@@ -24,7 +25,7 @@ NSString* const REObserverObservedObjectKey = @"observedObject";
 NSString* const REObserverObservingObjectKey = @"observingObject";
 NSString* const REObserverKeyPathKey = @"keyPath";
 NSString* const REObserverOptionsKey = @"options";
-NSString* const REObserverContextKey = @"context";
+NSString* const REObserverContextPointerValueKey = @"contextPointerValue";
 NSString* const REObserverBlockKey = @"block";
 
 
@@ -49,7 +50,7 @@ NSString* const REObserverBlockKey = @"block";
 		REObserverOptionsKey : @(options),
 	}];
 	if (context) {
-		observingInfo[REObserverContextKey] = [NSValue valueWithPointer:context];
+		observingInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
 	}
 	
 	// Add observingInfo
@@ -69,7 +70,7 @@ NSString* const REObserverBlockKey = @"block";
 		REObserverOptionsKey : @(options),
 	}];
 	if (context) {
-		observedInfo[REObserverContextKey] = [NSValue valueWithPointer:context];
+		observedInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
 	}
 	
 	// Add observedInfo
@@ -123,12 +124,11 @@ NSString* const REObserverBlockKey = @"block";
 		NSMutableArray *observedInfos;
 		observedInfos = [self associatedValueForKey:kObservedInfosKey];
 		
-		// Enumerate observingInfos
-		NSMutableArray *observedInfoToRemove;
-		observedInfoToRemove = [NSMutableArray array];
+		// Remove observingInfo
 		[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
 			if (observingInfo[REObserverObservedObjectKey] == self
 				&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
+				&& observingInfo[REObserverContextPointerValueKey] == nil
 			){
 				// Release block
 				id block;
@@ -138,8 +138,18 @@ NSString* const REObserverBlockKey = @"block";
 				}
 				
 				// Remove observingInfo
-				[observedInfos removeObject:observingInfo];
 				[observingInfos removeObject:observingInfo];
+			}
+		}];
+		
+		// Remove observedInfo
+		[observedInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
+			if (observedInfo[REObserverObservingObjectKey] == observer
+				&& [observedInfo[REObserverKeyPathKey] isEqualToString:keyPath]
+				&& observedInfo[REObserverContextPointerValueKey] == nil
+			){
+				// Remove observedInfo
+				[observedInfos removeObject:observedInfo];
 			}
 		}];
 	}
@@ -150,35 +160,45 @@ NSString* const REObserverBlockKey = @"block";
 
 - (void)REObserver_X_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath context:(void*)context
 {
-	@synchronized (self) {
-		// Get observingInfos
-		NSMutableArray *observingInfos;
-		observingInfos = [observer associatedValueForKey:kObservingInfosKey];
-		
-		// Get observedInfos
-		NSMutableArray *observedInfos;
-		observedInfos = [self associatedValueForKey:kObservedInfosKey];
-		
-		// Enumerate observingInfos
-		NSMutableArray *observedInfoToRemove;
-		observedInfoToRemove = [NSMutableArray array];
-		[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
-			if (observingInfo[REObserverObservedObjectKey] == self
-				&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
-				&& context == NULL
-			){
-				// Release block
-				id block;
-				block = observingInfo[REObserverBlockKey];
-				if (block) {
-					Block_release(block);
+	if (context) {
+		@synchronized (self) {
+			// Get observingInfos
+			NSMutableArray *observingInfos;
+			observingInfos = [observer associatedValueForKey:kObservingInfosKey];
+			
+			// Get observedInfos
+			NSMutableArray *observedInfos;
+			observedInfos = [self associatedValueForKey:kObservedInfosKey];
+			
+			// Remove observingInfo
+			[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
+				if (observingInfo[REObserverObservedObjectKey] == self
+					&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
+					&& [observingInfo[REObserverContextPointerValueKey] pointerValue] == context
+				){
+					// Release block
+					id block;
+					block = observingInfo[REObserverBlockKey];
+					if (block) {
+						Block_release(block);
+					}
+					
+					// Remove observingInfo
+					[observedInfos removeObject:observingInfo];
+					[observingInfos removeObject:observingInfo];
 				}
-				
-				// Remove observingInfo
-				[observedInfos removeObject:observingInfo];
-				[observingInfos removeObject:observingInfo];
-			}
-		}];
+			}];
+			
+			// Remove observedInfo
+			[observedInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
+				if (observedInfo[REObserverObservingObjectKey] == observer
+					&& [observedInfo[REObserverKeyPathKey] isEqualToString:keyPath]
+					&& [observedInfo[REObserverContextPointerValueKey] pointerValue] == context
+				){
+					[observedInfos removeObject:observedInfo];
+				}
+			}];
+		}
 	}
 	
 	// original
@@ -191,8 +211,8 @@ NSString* const REObserverBlockKey = @"block";
 	NSArray *observedInfos;
 	observedInfos = [self observedInfos];
 	[observedInfos enumerateObjectsUsingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
-		if (observedInfo[REObserverContextKey]) {
-			[self REObserver_X_removeObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] context:[observedInfo[REObserverContextKey] pointerValue]];
+		if (observedInfo[REObserverContextPointerValueKey]) {
+			[self REObserver_X_removeObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
 		}
 		else {
 			[self REObserver_X_removeObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey]];
@@ -210,7 +230,7 @@ NSString* const REObserverBlockKey = @"block";
 	
 	// Add observers removed in willBecomeInstanceOfClass: method
 	[[self observedInfos] enumerateObjectsUsingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
-		[self REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextKey] pointerValue]];
+		[self REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
 	}];
 }
 
@@ -310,9 +330,11 @@ NSString* const REObserverBlockKey = @"block";
 			// Stop observing
 			id object;
 			NSString *keyPath;
+			NSValue *contextPointerValue;
 			object = observingInfo[REObserverObservedObjectKey];
 			keyPath = observingInfo[REObserverKeyPathKey];
-			[object removeObserver:self forKeyPath:keyPath];
+			contextPointerValue = observingInfo[REObserverContextPointerValueKey];
+			[object removeObserver:self forKeyPath:keyPath context:[contextPointerValue pointerValue]];
 		}
 	}
 }

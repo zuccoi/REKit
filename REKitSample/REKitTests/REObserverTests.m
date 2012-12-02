@@ -8,7 +8,7 @@
 #import "REObserverTests.h"
 
 
-@interface Person : NSObject
+@interface REPerson : NSObject
 
 // Property
 @property (retain, nonatomic) NSString *name;
@@ -20,7 +20,7 @@
 @end
 
 
-@implementation Person
+@implementation REPerson
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
@@ -35,7 +35,7 @@
 
 + (instancetype)person
 {
-	return [[[Person alloc] init] autorelease];
+	return [[[REPerson alloc] init] autorelease];
 }
 
 @end
@@ -48,19 +48,19 @@
 - (void)test_addObserverUsingBlock
 {
 	// Make person
-	Person *p;
-	p = [Person person];
+	REPerson *person;
+	person = [REPerson person];
 	
 	// Add observer
 	__block BOOL observed = NO;
 	__block NSDictionary *dict = nil;
-	[p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+	[person addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
 		observed = YES;
 		dict = change;
 	}];
 	
 	// Change name
-	p.name = @"name";
+	person.name = @"name";
 	//
 	STAssertTrue(observed, @"");
 	STAssertNotNil(dict, @"");
@@ -69,19 +69,19 @@
 - (void)test_removeObserver
 {
 	// Make person
-	Person *p;
-	p = [Person person];
+	REPerson *person;
+	person = [REPerson person];
 	
 	// Add observer then remove it
 	id observer;
 	__block BOOL observed = NO;
-	observer = [p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+	observer = [person addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
 		observed = YES;
 	}];
-	[p removeObserver:observer forKeyPath:@"name"];
+	[person removeObserver:observer forKeyPath:@"name"];
 	
 	// Change name
-	p.name = @"name";
+	person.name = @"name";
 	//
 	STAssertFalse(observed, @"");
 }
@@ -89,20 +89,56 @@
 - (void)test_stopObserving
 {
 	// Make person
-	Person *p;
-	p = [Person person];
+	REPerson *person;
+	person = [REPerson person];
 	
 	// Add observer then remove it
 	id observer;
 	__block BOOL observed = NO;
-	observer = [p addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+	observer = [person addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
 		observed = YES;
 	}];
 	[observer stopObserving];
 	
 	// Change name
-	p.name = @"name";
+	person.name = @"name";
 	//
+	STAssertFalse(observed, @"");
+}
+
+- (void)test_ordinalAddObserver_toObjectsAtIndexes
+{
+	__block BOOL observed;
+	
+	// Make persons
+	NSArray *persons;
+	persons = @[[REPerson person], [REPerson person], [REPerson person]];
+	
+	// Make observer
+	id observer;
+	observer = [[[NSObject alloc] init] autorelease];
+	[persons addObserver:observer toObjectsAtIndexes:[NSIndexSet indexSetWithIndex:1] forKeyPath:@"name" options:0 context:nil];
+	
+	// Change 2nd person's name
+	observed = NO;
+	[observer respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withBlockName:@"blockName" usingBlock:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+		observed = YES;
+		STAssertEqualObjects(receiver, observer, @"");
+		STAssertEqualObjects(keyPath, @"name", @"");
+		STAssertEqualObjects(object, persons[1], @"");
+		STAssertEqualObjects(change, @{NSKeyValueChangeKindKey : @(NSKeyValueChangeSetting)}, @"");
+		STAssertNil(context, @"");
+	}];
+	((REPerson*)persons[1]).name = @"name";
+	STAssertTrue(observed, @"");
+	[observer removeBlockNamed:@"blockName"];
+	
+	// Change 1st person's name
+	observed = NO;
+	[observer respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withBlockName:@"blockName" usingBlock:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+		observed = YES;
+	}];
+	((REPerson*)persons[0]).name = @"name";
 	STAssertFalse(observed, @"");
 }
 

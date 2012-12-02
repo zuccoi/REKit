@@ -14,6 +14,7 @@ extern NSString* const REObserverKeyPathKey;
 extern NSString* const REObserverOptionsKey;
 extern NSString* const REObserverContextPointerValueKey;
 extern NSString* const REObserverBlockKey;
+extern NSString* const REObserverContainerKey; // Container of observed object. When you use [array addObserver:toObjectsAtIndexes:forKeyPath:options:context:], the container is array.
 
 // REObserverHandler
 typedef void (^REObserverHandler)(NSDictionary *change);

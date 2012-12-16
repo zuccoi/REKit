@@ -8,4 +8,11 @@
 
 
 @interface iREViewController : UIViewController
+
+// Property
+@property (weak, nonatomic) IBOutlet UILabel *label;
+
+// Action
+- (IBAction)changeBackgroundColorAction:(id)sender;
+
 @end

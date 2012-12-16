@@ -30,6 +30,42 @@
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
 }
 
+- (void)test_respondsToUnimplementedMethod
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		id obj;
+		SEL sel = @selector(log);
+		NSString *log;
+		
+		// Make obj
+		obj = [[[NSObject alloc] init] autorelease];
+		
+		// Responds to log method dynamically
+		[obj respondsToSelector:sel withBlockName:nil usingBlock:^NSString*(id me) {
+			return @"block1";
+		}];
+		log = [obj performSelector:sel];
+		STAssertEqualObjects(log, @"block1", @"");
+		
+		// Override dealloc method to check deallocation
+		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
+			// super
+			IMP supermethod;
+			if ((supermethod = [me supermethodOfBlockNamed:@"dealloc"])) {
+				supermethod(me, @selector(dealloc));
+			}
+			
+			// Raise deallocated
+			deallocated = YES;
+		}];
+	}
+	
+	// Check deallocated
+	STAssertTrue(deallocated, @"");
+}
+
 - (void)test_overrideHardcodedMethod
 {
 	__block BOOL deallocated = NO;
@@ -66,42 +102,6 @@
 		}];
 	}
 	
-	STAssertTrue(deallocated, @"");
-}
-
-- (void)test_respondsToUnimplementedMethod
-{
-	__block BOOL deallocated = NO;
-	
-	@autoreleasepool {
-		id obj;
-		SEL sel = @selector(log);
-		NSString *log;
-		
-		// Make obj
-		obj = [[[NSObject alloc] init] autorelease];
-		
-		// Responds to log method dynamically
-		[obj respondsToSelector:sel withBlockName:nil usingBlock:^NSString*(id me) {
-			return @"block1";
-		}];
-		log = [obj performSelector:sel];
-		STAssertEqualObjects(log, @"block1", @"");
-		
-		// Override dealloc method to check deallocation
-		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
-			// super
-			IMP supermethod;
-			if ((supermethod = [me supermethodOfBlockNamed:@"dealloc"])) {
-				supermethod(me, @selector(dealloc));
-			}
-			
-			// Raise deallocated
-			deallocated = YES;
-		}];
-	}
-	
-	// Check deallocated
 	STAssertTrue(deallocated, @"");
 }
 

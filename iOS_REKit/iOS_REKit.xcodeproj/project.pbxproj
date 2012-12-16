@@ -11,12 +11,12 @@
 		EBA420B0167DE1A10052D11E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AF167DE1A10052D11E /* Foundation.framework */; };
 		EBA420B2167DE1A10052D11E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420B1167DE1A10052D11E /* CoreGraphics.framework */; };
 		EBA420B8167DE1A10052D11E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EBA420B6167DE1A10052D11E /* InfoPlist.strings */; };
-		EBA420BA167DE1A10052D11E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420B9167DE1A10052D11E /* main.m */; };
-		EBA420BE167DE1A10052D11E /* iREAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420BD167DE1A10052D11E /* iREAppDelegate.m */; };
+		EBA420BA167DE1A10052D11E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420B9167DE1A10052D11E /* main.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
+		EBA420BE167DE1A10052D11E /* iREAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420BD167DE1A10052D11E /* iREAppDelegate.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBA420C0167DE1A10052D11E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420BF167DE1A10052D11E /* Default.png */; };
 		EBA420C2167DE1A10052D11E /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C1167DE1A10052D11E /* Default@2x.png */; };
 		EBA420C4167DE1A10052D11E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C3167DE1A10052D11E /* Default-568h@2x.png */; };
-		EBA420C7167DE1A10052D11E /* iREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420C6167DE1A10052D11E /* iREViewController.m */; };
+		EBA420C7167DE1A10052D11E /* iREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420C6167DE1A10052D11E /* iREViewController.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBA420CA167DE1A10052D11E /* iREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C8167DE1A10052D11E /* iREViewController.xib */; };
 		EBA42103167DE1DC0052D11E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA42102167DE1DC0052D11E /* SenTestingKit.framework */; };
 		EBA42104167DE1DC0052D11E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AD167DE1A10052D11E /* UIKit.framework */; };

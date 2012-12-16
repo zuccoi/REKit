@@ -16,3 +16,6 @@
 **/*.xcodeproj/*
 !**/*.xcodeproj/default.*
 !**/*.xcodeproj/project.pbxproj
+
+*.xcworkspace
+!default.xcworkspace

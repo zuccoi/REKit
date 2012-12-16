@@ -652,4 +652,32 @@
 	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
 }
 
+- (void)test_doNotChangeClassFrequently
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Override log method
+	[obj respondsToSelector:@selector(log) withBlockName:@"logBlock" usingBlock:^(id receiver) {
+		return @"Overridden log";
+	}];
+	STAssertTrue([obj class] != [RETestObject class], @"");
+	
+	// Record new class
+	Class newClass;
+	newClass = [obj class];
+	
+	// Override say method
+	[obj respondsToSelector:@selector(say) withBlockName:@"sayBlock" usingBlock:^(id receiver) {
+		return @"Overridden say";
+	}];
+	STAssertEquals([obj class], newClass, @"");
+	
+	// Remove blocks
+	[obj removeBlockNamed:@"logBlock"];
+	[obj removeBlockNamed:@"sayBlock"];
+	STAssertEquals([obj class], newClass, @"");
+}
+
 @end

@@ -102,30 +102,28 @@
 	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"Clear", nil];
 	
 	// Make alertView delegate of the alertView
-	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withBlockName:nil
-		usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
-			switch (buttonIndex) {
-			case 0: {
-				// Cancelled
-				break;
-			}
-			case 1: {
-				// Make indexPaths to delete
-				NSMutableArray *indexPaths;
-				indexPaths = [NSMutableArray array];
-				for (NSInteger i = 0; i < [_items count]; i++) {
-					[indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
-				}
-				
-				// Clear items
-				[self willChangeValueForKey:@"items"];
-				[_items removeAllObjects];
-				[self didChangeValueForKey:@"items"];
-				[self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
-			}
-			}
+	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withBlockName:nil usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+		switch (buttonIndex) {
+		case 0: {
+			// Cancelled
+			break;
 		}
-	];
+		case 1: {
+			// Make indexPaths to delete
+			NSMutableArray *indexPaths;
+			indexPaths = [NSMutableArray array];
+			for (NSInteger i = 0; i < [_items count]; i++) {
+				[indexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+			}
+			
+			// Clear items
+			[self willChangeValueForKey:@"items"];
+			[_items removeAllObjects];
+			[self didChangeValueForKey:@"items"];
+			[self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationFade];
+		}
+		}
+	}];
 	alertView.delegate = alertView;
 	
 	// Show alertView

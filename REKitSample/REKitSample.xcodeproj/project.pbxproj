@@ -23,6 +23,7 @@
 		EB1A2A9215AF08CC0085A39E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A8E15AF08CC0085A39E /* NSObject+REResponder.m */; };
 		EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A9015AF08CC0085A39E /* REUtil.m */; };
 		EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */; };
+		EBA41ED7167D9EE50052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA41ED6167D9EE50052D11E /* RETestObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,8 @@
 		EB1A2A9F15AF0A8E0085A39E /* REKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REKit.h; path = ../REKit/REKit.h; sourceTree = "<group>"; };
 		EB1A2AA015AF0B3B0085A39E /* RSMasterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMasterViewController.h; sourceTree = "<group>"; };
 		EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSMasterViewController.m; sourceTree = "<group>"; };
+		EBA41ED5167D9EE50052D11E /* RETestObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RETestObject.h; sourceTree = "<group>"; };
+		EBA41ED6167D9EE50052D11E /* RETestObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RETestObject.m; sourceTree = "<group>"; };
 		EBE31A6815F1DC9700CCC7EC /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
@@ -87,6 +90,8 @@
 				EB0F9066162ACD7D003EB0E8 /* REObserverTests.m */,
 				EB0F905E162A5E5A003EB0E8 /* REResponderTests.h */,
 				EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */,
+				EBA41ED5167D9EE50052D11E /* RETestObject.h */,
+				EBA41ED6167D9EE50052D11E /* RETestObject.m */,
 				EB0F904F162A5DE8003EB0E8 /* Supporting Files */,
 			);
 			path = REKitTests;
@@ -277,6 +282,7 @@
 			files = (
 				EB0F9060162A5E5A003EB0E8 /* REResponderTests.m in Sources */,
 				EB0F9067162ACD7D003EB0E8 /* REObserverTests.m in Sources */,
+				EBA41ED7167D9EE50052D11E /* RETestObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,6 +444,7 @@
 				EB0F905A162A5DE8003EB0E8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		EB1A2A5D15AF08450085A39E /* Build configuration list for PBXProject "REKitSample" */ = {
 			isa = XCConfigurationList;

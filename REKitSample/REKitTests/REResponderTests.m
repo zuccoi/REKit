@@ -4,31 +4,9 @@
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
-#import "REResponderTests.h"
 #import "REKit.h"
-
-
-@interface RELogger : NSObject
-@property (copy, nonatomic) NSString *name;
-+ (instancetype)logger;
-- (NSString*)log;
-@end
-
-@implementation RELogger
-
-+ (instancetype)logger
-{
-	return [[[RELogger alloc] init] autorelease];
-}
-
-- (NSString*)log
-{
-	return @"-[RELogger log]";
-}
-
-@end
-
-#pragma mark -
+#import "REResponderTests.h"
+#import "RETestObject.h"
 
 
 @implementation REResponderTests
@@ -59,8 +37,8 @@
 	@autoreleasepool {
 		// You can override hardcoded method
 		NSString *log;
-		RELogger *obj;
-		obj = [RELogger logger];
+		RETestObject *obj;
+		obj = [RETestObject testObject];
 		[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^NSString*(id me) {
 //			NSLog(@"obj = %@", obj); // Causes memory leak. Use me.
 			return @"block log";
@@ -70,10 +48,10 @@
 		
 		// The override doesn't affect other instances
 		NSString *log2;
-		RELogger *obj2;
-		obj2 = [RELogger logger];
+		RETestObject *obj2;
+		obj2 = [RETestObject testObject];
 		log2 = [obj2 log];
-		STAssertEqualObjects(log2, @"-[RELogger log]", @"");
+		STAssertEqualObjects(log2, @"-[RETestObject log]", @"");
 		
 		// Override dealloc method to check deallocation
 		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
@@ -255,12 +233,12 @@
 
 - (void)test_stackOfOverrideBlocks
 {
-	RELogger *obj;
+	RETestObject *obj;
 	SEL sel = @selector(log);
 	NSString *log;
 	
 	// Make obj
-	obj = [RELogger logger];
+	obj = [RETestObject testObject];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Add bock1
@@ -315,7 +293,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
 }
 
 - (void)test_allowsOverrideOfDynamicBlock
@@ -352,12 +330,12 @@
 
 - (void)test_allowsOverrideOfOverrideBlock
 {
-	RELogger *obj;
+	RETestObject *obj;
 	SEL sel = @selector(log);
 	NSString *log;
 	
 	// Make obj
-	obj = [RELogger logger];
+	obj = [RETestObject testObject];
 	
 	// Add block with name
 	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id me) {
@@ -382,10 +360,10 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
 }
 
-- (void)test_denyDynamicBlockIfTheNameExistsForOtherSelector
+- (void)test_denyDynamicBlockIfTheNameExistsForOtherSelector // >>>
 {
 	id obj;
 	NSString *log;
@@ -432,14 +410,14 @@
 	STAssertEqualObjects(log, @"Other", @"");
 }
 
-- (void)test_denyOverrideBlockIfTheNameExistsForOtherSelector
+- (void)test_denyOverrideBlockIfTheNameExistsForOtherSelector // >>>
 {
-	RELogger *obj;
+	RETestObject *obj;
 	NSString *log;
 	BOOL res;
 	
 	// Make obj
-	obj = [RELogger logger];
+	obj = [RETestObject testObject];
 	
 	// Add block
 	res = [obj respondsToSelector:@selector(log) withBlockName:@"name" usingBlock:^NSString*(id me) {
@@ -480,7 +458,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
 }
 
 - (void)test_supermethodOfDynamicBlock
@@ -579,12 +557,12 @@
 
 - (void)test_supermethodOfOverrideBlock
 {
-	RELogger *obj;
+	RETestObject *obj;
 	__block SEL sel = @selector(log);
 	NSString *log;
 	
 	// Make obj
-	obj = [RELogger logger];
+	obj = [RETestObject testObject];
 	
 	// Add block1
 	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id me) {
@@ -606,7 +584,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]-block1", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]-block1", @"");
 	
 	// Add block2
 	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id me) {
@@ -628,7 +606,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]-block1-block2", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]-block1-block2", @"");
 	
 	// Add block3
 	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id me) {
@@ -650,132 +628,28 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]-block1-block2-block3", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]-block1-block2-block3", @"");
 	
 	// Remove block3
 	[obj removeBlockNamed:@"block3"];
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]-block1-block2", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]-block1-block2", @"");
 	
 	// Remove block1
 	[obj removeBlockNamed:@"block1"];
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]-block2", @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]-block2", @"");
 	
 	// Remove block2
 	[obj removeBlockNamed:@"block2"];
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RELogger log]", @"");
-}
-
-- (void)test_observationAfterClassChange
-{
-	// Make logger obj
-	RELogger *obj;
-	obj = [RELogger logger];
-	
-	// Add observer for name
-	__block NSString *recognizedName = nil;
-	id observer;
-	REObserverHandler block;
-	block = ^(NSDictionary *change) {
-		recognizedName = change[NSKeyValueChangeNewKey];
-	};
-	block = Block_copy(block);
-	observer = [obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:block];
-	
-	// Override log method
-	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
-		return @"Overridden";
-	}];
-	
-	// Change name
-	obj.name = @"name";
-	//
-	STAssertEqualObjects(recognizedName, @"name", @"");
-	
-	// Check observingInfos and observedInfos
-	NSArray *observingInfos;
-	NSArray *observedInfos;
-	observingInfos = @[@{REObserverObservedObjectKey : obj, REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverBlockKey : block}];
-	observedInfos = @[@{REObserverObservingObjectKey : observer, REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverBlockKey : block}];
-	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
-	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
-}
-
-- (void)test_ordinalObservationAfterClassChange
-{
-	// Make logger obj
-	RELogger *obj;
-	obj = [RELogger logger];
-	
-	// Make observer
-	id observer;
-	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withBlockName:@"blockName" usingBlock:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
-		recognizedName = change[NSKeyValueChangeNewKey];
-	}];
-	[obj addObserver:observer forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
-	
-	// Override log method
-	[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
-		return @"Overridden";
-	}];
-	
-	// Change name
-	obj.name = @"name";
-	//
-	STAssertEqualObjects(recognizedName, @"name", @"");
-	
-	// Check observingInfos and observedInfos
-	NSArray *observingInfos;
-	NSArray *observedInfos;
-	observingInfos = @[@{REObserverObservedObjectKey : obj, REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew)}];
-	observedInfos = @[@{REObserverObservingObjectKey : observer, REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew)}];
-	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
-	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
-}
-
-- (void)test_observationAtIndexes
-{
-	// Make loggers
-	NSArray *loggers;
-	RELogger *logger0, *logger1;
-	loggers = @[(logger0 = [RELogger logger]), (logger1 = [RELogger logger])];
-	
-	// Add observer for name
-	id observer;
-	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withBlockName:@"blockName" usingBlock:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
-		recognizedName = change[NSKeyValueChangeNewKey];
-	}];
-	[loggers addObserver:observer toObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 1)] forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
-	
-	// Override log method
-	[logger0 respondsToSelector:@selector(log) withBlockName:nil usingBlock:^(id receiver) {
-		return @"Overrideen";
-	}];
-	
-	// Change name
-	logger0.name = @"name";
-	//
-	STAssertEqualObjects(recognizedName, @"name", @"");
-	
-	// Check observingInfos and observedInfos
-	NSArray *observingInfos;
-	NSArray *observedInfos;
-	observingInfos = @[@{REObserverObservedObjectKey : logger0, REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverContainerKey : loggers}];
-	observedInfos = @[@{REObserverObservingObjectKey : observer, REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverContainerKey : loggers}];
-	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
-	STAssertEqualObjects([logger0 observedInfos], observedInfos, @"");
+	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
 }
 
 @end

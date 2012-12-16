@@ -312,10 +312,8 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 	}
 	
 	// Update blocks
+	[self removeBlockNamed:name];
 	@synchronized (self) {
-		// Remove block with name
-		[self removeBlockNamed:name];
-		
 		// Get blocks
 		NSMutableDictionary *blocks;
 		blocks = [self associatedValueForKey:kBlocksAssociationKey];

@@ -178,14 +178,29 @@
 	RETestObject *obj;
 	obj = [RETestObject testObject];
 	
-	// Add log block
+	// Add shout block
+	[obj respondsToSelector:@selector(shout) withBlockName:@"blockName" usingBlock:^(id receiver) {
+		return @"shout";
+	}];
+	string = [obj performSelector:@selector(shout)];
+	STAssertEqualObjects(string, @"shout", @"");
+	
+	// Override log method with same block name
 	[obj respondsToSelector:@selector(log) withBlockName:@"blockName" usingBlock:^(id receiver) {
 		return @"Overridden log";
 	}];
 	string = [obj log];
 	STAssertEqualObjects(string, @"Overridden log", @"");
+	STAssertFalse([obj respondsToSelector:@selector(shout)], @"");
 	
-	// Add say block with same name
+	// Override log method with same block name again
+	[obj respondsToSelector:@selector(log) withBlockName:@"blockName" usingBlock:^(id receiver) {
+		return @"Overridden log 2";
+	}];
+	string = [obj log];
+	STAssertEqualObjects(string, @"Overridden log 2", @"");
+	
+	// Override say method with same block name
 	[obj respondsToSelector:@selector(say) withBlockName:@"blockName" usingBlock:^(id receiver) {
 		return @"Overridden say";
 	}];

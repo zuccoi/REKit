@@ -51,7 +51,7 @@
 		RETestObject *obj2;
 		obj2 = [RETestObject testObject];
 		log2 = [obj2 log];
-		STAssertEqualObjects(log2, @"-[RETestObject log]", @"");
+		STAssertEqualObjects(log2, @"log", @"");
 		
 		// Override dealloc method to check deallocation
 		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
@@ -168,6 +168,31 @@
 	
 	// Check name of block
 	STAssertEqualObjects(block, [obj blockNamed:@"name"], @"");
+}
+
+- (void)test_removeOldBlock
+{
+	NSString *string;
+	
+	// Make test obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Add log block
+	[obj respondsToSelector:@selector(log) withBlockName:@"blockName" usingBlock:^(id receiver) {
+		return @"Overridden log";
+	}];
+	string = [obj log];
+	STAssertEqualObjects(string, @"Overridden log", @"");
+	
+	// Add say block with same name
+	[obj respondsToSelector:@selector(say) withBlockName:@"blockName" usingBlock:^(id receiver) {
+		return @"Overridden say";
+	}];
+	string = [obj say];
+	STAssertEqualObjects(string, @"Overridden say", @"");
+	string = [obj log];
+	STAssertEqualObjects(string, @"log", @"");
 }
 
 - (void)test_stackOfDynamicBlocks
@@ -293,7 +318,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
+	STAssertEqualObjects(log, @"log", @"");
 }
 
 - (void)test_allowsOverrideOfDynamicBlock
@@ -360,105 +385,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
-}
-
-- (void)test_denyDynamicBlockIfTheNameExistsForOtherSelector // >>>
-{
-	id obj;
-	NSString *log;
-	BOOL res;
-	
-	// Make obj
-	obj = [[[NSObject alloc] init] autorelease];
-	
-	// Add block
-	res = [obj respondsToSelector:@selector(log) withBlockName:@"name" usingBlock:^NSString*(id me) {
-		return @"block1";
-	}];
-	STAssertTrue(res, @"");
-	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
-	
-	// Call log method
-	log = [obj performSelector:@selector(log)];
-	STAssertEqualObjects(log, @"block1", @"");
-	
-	// Try to add block
-	res = [obj respondsToSelector:@selector(other) withBlockName:@"name" usingBlock:^NSString*(id me) {
-		return @"block2";
-	}];
-	STAssertFalse(res, @"");
-	STAssertFalse([obj respondsToSelector:@selector(other)], @"");
-	
-	// Call log method
-	log = [obj performSelector:@selector(log)];
-	STAssertEqualObjects(log, @"block1", @"");
-	
-	// Remove block
-	[obj removeBlockNamed:@"name"];
-	STAssertFalse([obj respondsToSelector:@selector(log)], @"");
-	
-	// Try to add block
-	res = [obj respondsToSelector:@selector(other) withBlockName:@"name" usingBlock:^NSString*(id me) {
-		return @"Other";
-	}];
-	STAssertTrue(res, @"");
-	STAssertTrue([obj respondsToSelector:@selector(other)], @"");
-	
-	// Call other method
-	log = [obj performSelector:@selector(other)];
-	STAssertEqualObjects(log, @"Other", @"");
-}
-
-- (void)test_denyOverrideBlockIfTheNameExistsForOtherSelector // >>>
-{
-	RETestObject *obj;
-	NSString *log;
-	BOOL res;
-	
-	// Make obj
-	obj = [RETestObject testObject];
-	
-	// Add block
-	res = [obj respondsToSelector:@selector(log) withBlockName:@"name" usingBlock:^NSString*(id me) {
-		return @"block1";
-	}];
-	STAssertTrue(res, @"");
-	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
-	
-	// Call log method
-	log = [obj log];
-	STAssertEqualObjects(log, @"block1", @"");
-	
-	// Try to add block
-	res = [obj respondsToSelector:@selector(other) withBlockName:@"name" usingBlock:^NSString*(id me) {
-		return @"block2";
-	}];
-	STAssertFalse(res, @"");
-	STAssertFalse([obj respondsToSelector:@selector(other)], @"");
-	
-	// Call log method
-	log = [obj log];
-	STAssertEqualObjects(log, @"block1", @"");
-	
-	// Remove block
-	[obj removeBlockNamed:@"name"];
-	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
-	
-	// Try to add block
-	res = [obj respondsToSelector:@selector(other) withBlockName:@"name" usingBlock:^NSString*(id me) {
-		return @"Other";
-	}];
-	STAssertTrue(res, @"");
-	STAssertTrue([obj respondsToSelector:@selector(other)], @"");
-	
-	// Call other method
-	log = [obj performSelector:@selector(other)];
-	STAssertEqualObjects(log, @"Other", @"");
-	
-	// Call log method
-	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
+	STAssertEqualObjects(log, @"log", @"");
 }
 
 - (void)test_supermethodOfDynamicBlock
@@ -584,7 +511,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]-block1", @"");
+	STAssertEqualObjects(log, @"log-block1", @"");
 	
 	// Add block2
 	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id me) {
@@ -606,7 +533,7 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]-block1-block2", @"");
+	STAssertEqualObjects(log, @"log-block1-block2", @"");
 	
 	// Add block3
 	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id me) {
@@ -628,28 +555,28 @@
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]-block1-block2-block3", @"");
+	STAssertEqualObjects(log, @"log-block1-block2-block3", @"");
 	
 	// Remove block3
 	[obj removeBlockNamed:@"block3"];
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]-block1-block2", @"");
+	STAssertEqualObjects(log, @"log-block1-block2", @"");
 	
 	// Remove block1
 	[obj removeBlockNamed:@"block1"];
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]-block2", @"");
+	STAssertEqualObjects(log, @"log-block2", @"");
 	
 	// Remove block2
 	[obj removeBlockNamed:@"block2"];
 	
 	// Call log method
 	log = [obj log];
-	STAssertEqualObjects(log, @"-[RETestObject log]", @"");
+	STAssertEqualObjects(log, @"log", @"");
 }
 
 - (void)test_doNotChangeClassFrequently

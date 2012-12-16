@@ -276,11 +276,11 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 #pragma mark -- Block --
 //--------------------------------------------------------------//
 
-- (BOOL)respondsToSelector:(SEL)selector withBlockName:(NSString*)name usingBlock:(id)block
+- (void)respondsToSelector:(SEL)selector withBlockName:(NSString*)name usingBlock:(id)block
 {
 	// Filter
 	if (!selector || !block) {
-		return NO;
+		return;
 	}
 	
 	// Get blockName
@@ -308,23 +308,13 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 	methodSignature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
 	if (!methodSignature) {
 		NSLog(@"Failed to get signature for block named %@", blockName);
-		return NO;
+		return;
 	}
 	
 	// Update blocks
 	@synchronized (self) {
-		// Avoid adding block with existing blockName
-		NSDictionary *oldBlockInfo;
-		NSMutableArray *oldBlockInfos;
-		NSString *oldSelectorName;
-		oldBlockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&oldBlockInfos selectorName:&oldSelectorName];
-		if (oldBlockInfo && ![oldSelectorName isEqualToString:selectorName]) {
-			NSLog(@"Could not add block named '%@' because it already exists", blockName);
-			return NO;
-		}
-		if (oldBlockInfos) {
-			[self removeBlockNamed:blockName];
-		}
+		// Remove block with name
+		[self removeBlockNamed:name];
 		
 		// Get blocks
 		NSMutableDictionary *blocks;
@@ -381,8 +371,6 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 		};
 		[blockInfos addObject:blockInfo];
 	}
-	
-	return YES;
 }
 
 - (id)blockNamed:(NSString*)blockName

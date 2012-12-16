@@ -13,7 +13,7 @@
 - (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
 
 // Block
-- (BOOL)respondsToSelector:(SEL)selector withBlockName:(NSString*)nameOrNil usingBlock:(id)block;
+- (void)respondsToSelector:(SEL)selector withBlockName:(NSString*)nameOrNil usingBlock:(id)block;
 - (id)blockNamed:(NSString*)blockName;
 - (IMP)supermethodOfBlockNamed:(NSString*)blockName;
 - (void)removeBlockNamed:(NSString*)blockName;

@@ -33,12 +33,12 @@
 
 - (NSString*)log
 {
-	return @"-[RETestObject log]";
+	return @"log";
 }
 
 - (NSString*)say
 {
-	return @"I'm RETestObject";
+	return @"say";
 }
 
 @end

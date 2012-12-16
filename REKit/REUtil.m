@@ -7,6 +7,15 @@
 #import "REUtil.h"
 
 
+// Notifications
+NSString* const REObjectWillChangeClassNotification = @"REObjectWillChangeClassNotification";
+NSString* const REObjectDidChangeClassNotification = @"REObjectDidChangeClassNotification";
+
+// Keys for userInfo of notifications above
+NSString* const REObjectOldClassNameKey = @"REObjectOldClassNameKey";
+NSString* const REObjectNewClassNameKey = @"REObjectNewClassNameKey";
+
+
 const char* REBlockGetObjCTypes(id _block)
 {
 	// Get descriptor of block
@@ -82,10 +91,20 @@ NSString* REUUIDString()
 
 - (void)willChangeClass:(Class)toClass
 {
+	// Post notification
+	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectWillChangeClassNotification object:self userInfo:@{
+		REObjectOldClassNameKey : NSStringFromClass([self class]),
+		REObjectNewClassNameKey : NSStringFromClass(toClass)
+	}];
 }
 
 - (void)didChangeClass:(Class)fromClass
 {
+	// Post notification
+	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectDidChangeClassNotification object:self userInfo:@{
+		REObjectOldClassNameKey : NSStringFromClass(fromClass),
+		REObjectNewClassNameKey : NSStringFromClass([self class])
+	}];
 }
 
 //--------------------------------------------------------------//

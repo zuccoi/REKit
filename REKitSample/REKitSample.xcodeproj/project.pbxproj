@@ -24,6 +24,7 @@
 		EB1A2A9315AF08CC0085A39E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2A9015AF08CC0085A39E /* REUtil.m */; };
 		EB1A2AA315AF0B3B0085A39E /* RSMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */; };
 		EBA41ED7167D9EE50052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA41ED6167D9EE50052D11E /* RETestObject.m */; };
+		EBA41EDA167DC5440052D11E /* REUtilTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA41ED9167DC5440052D11E /* REUtilTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,8 @@
 		EB1A2AA115AF0B3B0085A39E /* RSMasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSMasterViewController.m; sourceTree = "<group>"; };
 		EBA41ED5167D9EE50052D11E /* RETestObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RETestObject.h; sourceTree = "<group>"; };
 		EBA41ED6167D9EE50052D11E /* RETestObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RETestObject.m; sourceTree = "<group>"; };
+		EBA41ED8167DC5440052D11E /* REUtilTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REUtilTests.h; sourceTree = "<group>"; };
+		EBA41ED9167DC5440052D11E /* REUtilTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REUtilTests.m; sourceTree = "<group>"; };
 		EBE31A6815F1DC9700CCC7EC /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
@@ -92,6 +95,8 @@
 				EB0F905F162A5E5A003EB0E8 /* REResponderTests.m */,
 				EBA41ED5167D9EE50052D11E /* RETestObject.h */,
 				EBA41ED6167D9EE50052D11E /* RETestObject.m */,
+				EBA41ED8167DC5440052D11E /* REUtilTests.h */,
+				EBA41ED9167DC5440052D11E /* REUtilTests.m */,
 				EB0F904F162A5DE8003EB0E8 /* Supporting Files */,
 			);
 			path = REKitTests;
@@ -283,6 +288,7 @@
 				EB0F9060162A5E5A003EB0E8 /* REResponderTests.m in Sources */,
 				EB0F9067162ACD7D003EB0E8 /* REObserverTests.m in Sources */,
 				EBA41ED7167D9EE50052D11E /* RETestObject.m in Sources */,
+				EBA41EDA167DC5440052D11E /* REUtilTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

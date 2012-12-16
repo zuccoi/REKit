@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'Mac_REKit' target in the 'Mac_REKit' project
+//
+
+#ifdef __OBJC__
+	#import <Cocoa/Cocoa.h>
+#endif

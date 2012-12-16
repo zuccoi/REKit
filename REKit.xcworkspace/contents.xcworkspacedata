@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "group:REKit"
+      name = "REKit">
+      <FileRef
+         location = "group:NSObject+REObserver.h">
+      </FileRef>
+      <FileRef
+         location = "group:NSObject+REObserver.m">
+      </FileRef>
+      <FileRef
+         location = "group:NSObject+REResponder.h">
+      </FileRef>
+      <FileRef
+         location = "group:NSObject+REResponder.m">
+      </FileRef>
+      <FileRef
+         location = "group:REKit.h">
+      </FileRef>
+      <FileRef
+         location = "group:REUtil.h">
+      </FileRef>
+      <FileRef
+         location = "group:REUtil.m">
+      </FileRef>
+   </Group>
+   <Group
+      location = "group:REKitLogicTests"
+      name = "REKitLogicTests">
+      <FileRef
+         location = "group:REObserverLogicTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:REObserverLogicTests.m">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderLogicTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderLogicTests.m">
+      </FileRef>
+      <FileRef
+         location = "group:RETestObject.h">
+      </FileRef>
+      <FileRef
+         location = "group:RETestObject.m">
+      </FileRef>
+      <FileRef
+         location = "group:REUtilLogicTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:REUtilLogicTests.m">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:iOS_REKit/iOS_REKit.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Mac_REKit/Mac_REKit.xcodeproj">
+   </FileRef>
+</Workspace>

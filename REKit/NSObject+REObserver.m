@@ -332,6 +332,9 @@ NSString* const REObserverContainerKey = @"container";
 
 - (void)REObserver_X_willChangeClass:(Class)toClass
 {
+	// original
+	[self REObserver_X_willChangeClass:toClass];
+	
 	// Remove observers
 	NSArray *observedInfos;
 	observedInfos = [self observedInfos];
@@ -343,16 +346,10 @@ NSString* const REObserverContainerKey = @"container";
 			[self REObserver_X_removeObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey]];
 		}
 	}];
-	
-	// original
-	[self REObserver_X_willChangeClass:toClass];
 }
 
 - (void)REObserver_X_didChangeClass:(Class)fromClass
 {
-	// original
-	[self REObserver_X_didChangeClass:fromClass];
-	
 	// Add observers removed in willChangeClass: method
 	[[self observedInfos] enumerateObjectsUsingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
 		id container;
@@ -366,6 +363,9 @@ NSString* const REObserverContainerKey = @"container";
 			[self REObserver_X_addObserver:observedInfo[REObserverObservingObjectKey] forKeyPath:observedInfo[REObserverKeyPathKey] options:[observedInfo[REObserverOptionsKey] integerValue] context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
 		}
 	}];
+	
+	// original
+	[self REObserver_X_didChangeClass:fromClass];
 }
 
 - (void)REObserver_X_dealloc

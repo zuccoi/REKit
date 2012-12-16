@@ -347,15 +347,17 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 			// Become subclass
 			if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
 				static NSUInteger _number = 1;
+				Class originalClass;
 				Class subclass;
 				NSString *className;
+				originalClass = [self class];
 				className = [NSString stringWithFormat:@"%@%u_%@", kClassNamePrefix, _number++, NSStringFromClass([self class])];
-				subclass = objc_allocateClassPair([self class], [className UTF8String], 0);
+				subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 				class_addMethod(subclass, selector, NULL, [objCTypes UTF8String]);
 				objc_registerClassPair(subclass);
 				[self willChangeClass:subclass];
 				object_setClass(self, subclass);
-				[self didChangeClass:subclass];
+				[self didChangeClass:originalClass];
 			}
 			
 			// Replace method

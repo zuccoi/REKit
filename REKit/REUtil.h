@@ -67,13 +67,17 @@ extern NSString* REUUIDString();
 
 @interface NSObject (REUtil)
 
+// Class Exchange
+- (void)willChangeClass:(Class)toClass;
+- (void)didChangeClass:(Class)fromClass;
+
 // Method Exchange
 + (void)exchangeClassMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector;
 + (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector;
 + (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
 + (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
 
-// Associated Value
+// Association
 - (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
 - (id)associatedValueForKey:(void*)key;
 

@@ -5,7 +5,6 @@
 */
 
 #import "NSObject+REObserver.h"
-#import "NSObject+REResponder.h"
 #import "REUtil.h"
 
 #if __has_feature(objc_arc)

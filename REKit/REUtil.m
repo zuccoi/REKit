@@ -77,6 +77,18 @@ NSString* REUUIDString()
 @implementation NSObject (REUtil)
 
 //--------------------------------------------------------------//
+#pragma mark -- Class Exchange --
+//--------------------------------------------------------------//
+
+- (void)willChangeClass:(Class)toClass
+{
+}
+
+- (void)didChangeClass:(Class)fromClass
+{
+}
+
+//--------------------------------------------------------------//
 #pragma mark -- Method Exchange --
 //--------------------------------------------------------------//
 
@@ -143,7 +155,7 @@ NSString* REUUIDString()
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Associated Value --
+#pragma mark -- Association --
 //--------------------------------------------------------------//
 
 - (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy

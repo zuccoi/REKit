@@ -460,16 +460,4 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 	}
 }
 
-//--------------------------------------------------------------//
-#pragma mark -- Class --
-//--------------------------------------------------------------//
-
-- (void)willChangeClass:(Class)toClass
-{
-}
-
-- (void)didChangeClass:(Class)fromClass
-{
-}
-
 @end

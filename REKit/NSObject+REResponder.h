@@ -18,8 +18,4 @@
 - (IMP)supermethodOfBlockNamed:(NSString*)blockName;
 - (void)removeBlockNamed:(NSString*)blockName;
 
-// Class
-- (void)willChangeClass:(Class)toClass;
-- (void)didChangeClass:(Class)fromClass;
-
 @end

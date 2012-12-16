@@ -14,10 +14,10 @@
 
 
 // Constants
-static NSString* const kObservingInfosKey = @"REObserverObservingInfos";
-static NSString* const kObservedInfosKey = @"REObserverObservedInfos";
+static NSString* const kObservingInfosAssociationKey = @"REObserver_observingInfos";
+static NSString* const kObservedInfosAssociationKey = @"REObserver_observedInfos";
 
-// Keys
+// Keys for observing/observedInfo
 NSString* const REObserverObservedObjectKey = @"observedObject";
 NSString* const REObserverObservingObjectKey = @"observingObject";
 NSString* const REObserverKeyPathKey = @"keyPath";
@@ -57,10 +57,10 @@ NSString* const REObserverContainerKey = @"container";
 			
 			// Add observingInfo
 			NSMutableArray *observingInfos;
-			observingInfos = [observer associatedValueForKey:kObservingInfosKey];
+			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 			if (!observingInfos) {
 				observingInfos = [NSMutableArray array];
-				[observer associateValue:observingInfos forKey:kObservingInfosKey policy:OBJC_ASSOCIATION_RETAIN];
+				[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[observingInfos addObject:observingInfo];
 			
@@ -78,10 +78,10 @@ NSString* const REObserverContainerKey = @"container";
 			
 			// Add observedInfo
 			NSMutableArray *observedInfos;
-			observedInfos = [obj associatedValueForKey:kObservedInfosKey];
+			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
 			if (!observedInfos) {
 				observedInfos = [NSMutableArray array];
-				[obj associateValue:observedInfos forKey:kObservedInfosKey policy:OBJC_ASSOCIATION_RETAIN];
+				[obj associateValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[observedInfos addObject:observedInfo];
 		}];	
@@ -97,11 +97,11 @@ NSString* const REObserverContainerKey = @"container";
 		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 			// Get observingInfos
 			NSMutableArray *observingInfos;
-			observingInfos = [observer associatedValueForKey:kObservingInfosKey];
+			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 			
 			// Get observedInfos
 			NSMutableArray *observedInfos;
-			observedInfos = [obj associatedValueForKey:kObservedInfosKey];
+			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
 			
 			// Remove observingInfo
 			[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
@@ -180,10 +180,10 @@ NSString* const REObserverContainerKey = @"container";
 		
 		// Add observingInfo
 		NSMutableArray *observingInfos;
-		observingInfos = [observer associatedValueForKey:kObservingInfosKey];
+		observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 		if (!observingInfos) {
 			observingInfos = [NSMutableArray array];
-			[observer associateValue:observingInfos forKey:kObservingInfosKey policy:OBJC_ASSOCIATION_RETAIN];
+			[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observingInfos addObject:observingInfo];
 		
@@ -200,10 +200,10 @@ NSString* const REObserverContainerKey = @"container";
 		
 		// Add observedInfo
 		NSMutableArray *observedInfos;
-		observedInfos = [self associatedValueForKey:kObservedInfosKey];
+		observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
 		if (!observedInfos) {
 			observedInfos = [NSMutableArray array];
-			[self associateValue:observedInfos forKey:kObservedInfosKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self associateValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observedInfos addObject:observedInfo];
 	}
@@ -244,11 +244,11 @@ NSString* const REObserverContainerKey = @"container";
 	@synchronized (self) {
 		// Get observingInfos
 		NSMutableArray *observingInfos;
-		observingInfos = [observer associatedValueForKey:kObservingInfosKey];
+		observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 		
 		// Get observedInfos
 		NSMutableArray *observedInfos;
-		observedInfos = [self associatedValueForKey:kObservedInfosKey];
+		observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
 		
 		// Remove observingInfo
 		[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
@@ -290,11 +290,11 @@ NSString* const REObserverContainerKey = @"container";
 		@synchronized (self) {
 			// Get observingInfos
 			NSMutableArray *observingInfos;
-			observingInfos = [observer associatedValueForKey:kObservingInfosKey];
+			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 			
 			// Get observedInfos
 			NSMutableArray *observedInfos;
-			observedInfos = [self associatedValueForKey:kObservedInfosKey];
+			observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
 			
 			// Remove observingInfo
 			[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
@@ -435,7 +435,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Get observingInfo
 	NSArray *observingInfos;
 	@synchronized (self) {
-		observingInfos = [NSArray arrayWithArray:[self associatedValueForKey:kObservingInfosKey]];
+		observingInfos = [NSArray arrayWithArray:[self associatedValueForKey:kObservingInfosAssociationKey]];
 	}
 	
 	return observingInfos;
@@ -446,7 +446,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Get observedInfos
 	NSArray *observedInfos;
 	@synchronized (self) {
-		observedInfos = [NSArray arrayWithArray:[self associatedValueForKey:kObservedInfosKey]];
+		observedInfos = [NSArray arrayWithArray:[self associatedValueForKey:kObservedInfosAssociationKey]];
 	}
 	
 	return observedInfos;
@@ -457,7 +457,7 @@ NSString* const REObserverContainerKey = @"container";
 	@synchronized (self) {
 		// Enumerate observingInfos
 		NSMutableArray *observingInfos;
-		observingInfos = [self associatedValueForKey:kObservingInfosKey];
+		observingInfos = [self associatedValueForKey:kObservingInfosAssociationKey];
 		while ([observingInfos count]) {
 			NSDictionary *observingInfo;
 			observingInfo = [observingInfos lastObject];

@@ -16,10 +16,12 @@
 static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kBlocksAssociationKey = @"REResponder_blocks";
+static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
+
+// Keys for blockInfo
 static NSString* const kBlockInfoBlockKey = @"block";
 static NSString* const kBlockInfoBlockNameKey = @"blockName";
 static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
-static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
 
 @implementation NSObject (REResponder)

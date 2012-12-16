@@ -19,7 +19,7 @@
 - (void)removeBlockNamed:(NSString*)blockName;
 
 // Class
-- (void)willBecomeInstanceOfClass:(Class)aClass;
-- (void)didBecomeInstanceOfClass:(Class)aClass;
+- (void)willChangeClass:(Class)toClass;
+- (void)didChangeClass:(Class)fromClass;
 
 @end

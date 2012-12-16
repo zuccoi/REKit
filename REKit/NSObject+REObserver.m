@@ -331,7 +331,7 @@ NSString* const REObserverContainerKey = @"container";
 	[self REObserver_X_removeObserver:observer forKeyPath:keyPath context:context];
 }
 
-- (void)REObserver_X_willBecomeInstanceOfClass:(Class)aClass
+- (void)REObserver_X_willChangeClass:(Class)toClass
 {
 	// Remove observers
 	NSArray *observedInfos;
@@ -346,15 +346,15 @@ NSString* const REObserverContainerKey = @"container";
 	}];
 	
 	// original
-	[self REObserver_X_willBecomeInstanceOfClass:aClass];
+	[self REObserver_X_willChangeClass:toClass];
 }
 
-- (void)REObserver_X_didBecomeInstanceOfClass:(Class)aClass
+- (void)REObserver_X_didChangeClass:(Class)fromClass
 {
 	// original
-	[self REObserver_X_didBecomeInstanceOfClass:aClass];
+	[self REObserver_X_didChangeClass:fromClass];
 	
-	// Add observers removed in willBecomeInstanceOfClass: method
+	// Add observers removed in willChangeClass: method
 	[[self observedInfos] enumerateObjectsUsingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
 		id container;
 		container = observedInfo[REObserverContainerKey];
@@ -387,8 +387,8 @@ NSString* const REObserverContainerKey = @"container";
 			@selector(observeValueForKeyPath:ofObject:change:context:),
 			@selector(removeObserver:forKeyPath:),
 			@selector(removeObserver:forKeyPath:context:),
-			@selector(willBecomeInstanceOfClass:),
-			@selector(didBecomeInstanceOfClass:),
+			@selector(willChangeClass:),
+			@selector(didChangeClass:),
 			@selector(dealloc),
 			nil
 		];

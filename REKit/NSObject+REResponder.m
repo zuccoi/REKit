@@ -363,9 +363,9 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 				subclass = objc_allocateClassPair([self class], [className UTF8String], 0);
 				class_addMethod(subclass, selector, NULL, [objCTypes UTF8String]);
 				objc_registerClassPair(subclass);
-				[self willBecomeInstanceOfClass:subclass];
+				[self willChangeClass:subclass];
 				object_setClass(self, subclass);
-				[self didBecomeInstanceOfClass:subclass];
+				[self didChangeClass:subclass];
 			}
 			
 			// Replace method
@@ -476,11 +476,11 @@ static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMetho
 #pragma mark -- Class --
 //--------------------------------------------------------------//
 
-- (void)willBecomeInstanceOfClass:(Class)aClass
+- (void)willChangeClass:(Class)toClass
 {
 }
 
-- (void)didBecomeInstanceOfClass:(Class)aClass
+- (void)didChangeClass:(Class)fromClass
 {
 }
 

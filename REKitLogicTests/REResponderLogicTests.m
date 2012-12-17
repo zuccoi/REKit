@@ -43,18 +43,18 @@
 		obj = [[[NSObject alloc] init] autorelease];
 		
 		// Responds to log method dynamically
-		[obj respondsToSelector:sel withBlockName:nil usingBlock:^NSString*(id me) {
+		[obj respondsToSelector:sel withBlockName:nil usingBlock:^NSString*(id receiver) {
 			return @"block1";
 		}];
 		log = [obj performSelector:sel];
 		STAssertEqualObjects(log, @"block1", @"");
 		
 		// Override dealloc method to check deallocation
-		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
+		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [me supermethodOfBlockNamed:@"dealloc"])) {
-				supermethod(me, @selector(dealloc));
+			if ((supermethod = [receiver supermethodOfBlockNamed:@"dealloc"])) {
+				supermethod(receiver, @selector(dealloc));
 			}
 			
 			// Raise deallocated
@@ -75,7 +75,7 @@
 		NSString *log;
 		RETestObject *obj;
 		obj = [RETestObject testObject];
-		[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^NSString*(id me) {
+		[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^NSString*(id receiver) {
 //			NSLog(@"obj = %@", obj); // Causes memory leak. Use me.
 			return @"block log";
 		}];
@@ -90,11 +90,11 @@
 		STAssertEqualObjects(log2, @"log", @"");
 		
 		// Override dealloc method to check deallocation
-		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id me) {
+		[obj respondsToSelector:@selector(dealloc) withBlockName:@"dealloc" usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [me supermethodOfBlockNamed:@"dealloc"])) {
-				supermethod(me, @selector(dealloc));
+			if ((supermethod = [receiver supermethodOfBlockNamed:@"dealloc"])) {
+				supermethod(receiver, @selector(dealloc));
 			}
 			
 			// Raise deallocated
@@ -114,7 +114,7 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add block with arguments
-	[obj respondsToSelector:@selector(logWithSuffix:) withBlockName:nil usingBlock:^NSString*(id me, NSString *suffix) {
+	[obj respondsToSelector:@selector(logWithSuffix:) withBlockName:nil usingBlock:^NSString*(id receiver, NSString *suffix) {
 		return [NSString stringWithFormat:@"block1-%@", suffix];
 	}];
 	
@@ -133,7 +133,7 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add block
-	[obj respondsToSelector:sel withBlockName:@"block" usingBlock:^CGRect(id me, CGPoint origin, CGSize size) {
+	[obj respondsToSelector:sel withBlockName:@"block" usingBlock:^CGRect(id receiver, CGPoint origin, CGSize size) {
 		return (CGRect){.origin = origin, .size = size};
 	}];
 	
@@ -157,7 +157,7 @@
 {
 	// Make block
 	void (^block)(id);
-	block = ^(id me) {
+	block = ^(id receiver) {
 		// Do something
 	};
 	
@@ -221,7 +221,7 @@
 	STAssertFalse([obj respondsToSelector:sel], @"");
 	
 	// Add block1
-	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id receiver) {
 		return @"block1";
 	}];
 	STAssertTrue([obj respondsToSelector:sel], @"");
@@ -231,7 +231,7 @@
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Add block2
-	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id receiver) {
 		return @"block2";
 	}];
 	STAssertTrue([obj respondsToSelector:sel], @"");
@@ -241,7 +241,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Add block3
-	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id receiver) {
 		return @"block3";
 	}];
 	STAssertTrue([obj respondsToSelector:sel], @"");
@@ -282,7 +282,7 @@
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Add bock1
-	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id receiver) {
 		return @"block1";
 	}];
 	STAssertTrue([obj respondsToSelector:sel], @"");
@@ -292,7 +292,7 @@
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Add block2
-	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id receiver) {
 		return @"block2";
 	}];
 	STAssertTrue([obj respondsToSelector:sel], @"");
@@ -302,7 +302,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Add block3
-	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id receiver) {
 		return @"block3";
 	}];
 	STAssertTrue([obj respondsToSelector:sel], @"");
@@ -346,7 +346,7 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add block with name
-	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id receiver) {
 		return @"block1";
 	}];
 	
@@ -355,7 +355,7 @@
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Override the block
-	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id receiver) {
 		return @"block2";
 	}];
 	
@@ -378,7 +378,7 @@
 	obj = [RETestObject testObject];
 	
 	// Add block with name
-	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id receiver) {
 		return @"block1";
 	}];
 	
@@ -387,7 +387,7 @@
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Override the block
-	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"name" usingBlock:^NSString*(id receiver) {
 		return @"block2";
 	}];
 	
@@ -413,15 +413,15 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add block1
-	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [me supermethodOfBlockNamed:@"block1"])) {
-			[log appendString:supermethod(me, sel)];
+		if ((supermethod = [receiver supermethodOfBlockNamed:@"block1"])) {
+			[log appendString:supermethod(receiver, sel)];
 		}
 		
 		// Append my log
@@ -435,15 +435,15 @@
 	STAssertEqualObjects(log, @"-block1", @"");
 	
 	// Add block2
-	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [me supermethodOfBlockNamed:@"block2"])) {
-			[log appendString:supermethod(me, sel)];
+		if ((supermethod = [receiver supermethodOfBlockNamed:@"block2"])) {
+			[log appendString:supermethod(receiver, sel)];
 		}
 		
 		// Append my log
@@ -457,15 +457,15 @@
 	STAssertEqualObjects(log, @"-block1-block2", @"");
 	
 	// Add block3
-	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [me supermethodOfBlockNamed:@"block3"])) {
-			[log appendString:supermethod(me, sel)];
+		if ((supermethod = [receiver supermethodOfBlockNamed:@"block3"])) {
+			[log appendString:supermethod(receiver, sel)];
 		}
 		
 		// Append my log
@@ -507,15 +507,15 @@
 	obj = [RETestObject testObject];
 	
 	// Add block1
-	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block1" usingBlock:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [me supermethodOfBlockNamed:@"block1"])) {
-			[log appendString:supermethod(me, sel)];
+		if ((supermethod = [receiver supermethodOfBlockNamed:@"block1"])) {
+			[log appendString:supermethod(receiver, sel)];
 		}
 		
 		// Append my log
@@ -529,15 +529,15 @@
 	STAssertEqualObjects(log, @"log-block1", @"");
 	
 	// Add block2
-	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block2" usingBlock:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [me supermethodOfBlockNamed:@"block2"])) {
-			[log appendString:supermethod(me, sel)];
+		if ((supermethod = [receiver supermethodOfBlockNamed:@"block2"])) {
+			[log appendString:supermethod(receiver, sel)];
 		}
 		
 		// Append my log
@@ -551,15 +551,15 @@
 	STAssertEqualObjects(log, @"log-block1-block2", @"");
 	
 	// Add block3
-	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id me) {
+	[obj respondsToSelector:sel withBlockName:@"block3" usingBlock:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [me supermethodOfBlockNamed:@"block3"])) {
-			[log appendString:supermethod(me, sel)];
+		if ((supermethod = [receiver supermethodOfBlockNamed:@"block3"])) {
+			[log appendString:supermethod(receiver, sel)];
 		}
 		
 		// Append my log

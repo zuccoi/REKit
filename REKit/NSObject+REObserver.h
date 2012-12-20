@@ -8,8 +8,8 @@
 
 
 // Keys for observingInfo and observedInfo
-extern NSString* const REObserverObservedObjectKey; // Observed object is observed. Only observingInfo contains this entry.
-extern NSString* const REObserverObservingObjectKey; // Observing object is observing. Only observedInfo contains this entry.
+extern NSString* const REObserverObservedObjectPointerValueKey; // Observed object is observed. Only observingInfo contains this entry.
+extern NSString* const REObserverObservingObjectPointerValueKey; // Observing object is observing. Only observedInfo contains this entry.
 extern NSString* const REObserverKeyPathKey;
 extern NSString* const REObserverOptionsKey;
 extern NSString* const REObserverContextPointerValueKey;

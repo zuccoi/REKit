@@ -41,18 +41,20 @@
 	[super viewWillAppear:animated];
 	
 	// Start observing
-	id observer;
-	observer = [self.view addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
-		// Get new color and its components
-		UIColor *color;
-		CGFloat r, g, b;
-		color = change[NSKeyValueChangeNewKey];
-		[color getRed:&r green:&g blue:&b alpha:nil];
-		
-		// Update label
-		self.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
-	}];
-	[_observers addObject:observer];
+	if (![_observers count]) {
+		id observer;
+		observer = [self.view addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
+			// Get new color and its components
+			UIColor *color;
+			CGFloat r, g, b;
+			color = change[NSKeyValueChangeNewKey];
+			[color getRed:&r green:&g blue:&b alpha:nil];
+			
+			// Update label
+			self.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
+		}];
+		[_observers addObject:observer];
+	}
 }
 
 - (void)viewWillDisappear:(BOOL)animated

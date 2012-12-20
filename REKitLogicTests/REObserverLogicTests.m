@@ -611,7 +611,33 @@
 	STAssertEqualObjects(obj0.name, @"name2", @"");
 }
 
-- (void)test_stopBeingObserved
+- (void)test_stopObservingInDeallocMethod
+{
+	__block BOOL observed = NO;
+	
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	@autoreleasepool {
+		// Start observing
+		id observer;
+		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+			observed = YES;
+		}];
+		STAssertTrue([[obj observedInfos] count] == 1, @"");
+		
+		// Cahnge name
+		obj.name = @"name";
+		
+		// observer will be deallocated…
+	}
+	STAssertTrue(observed, @"");
+	STAssertNotNil(obj, @"");
+	STAssertTrue([[obj observedInfos] count] == 0, @"");
+}
+
+- (void)test_stopBeingObservedInDeallocMethod
 {
 	__block BOOL observed = NO;
 	id observer;
@@ -625,17 +651,19 @@
 		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
 			observed = YES;
 		}];
+		STAssertTrue([[observer observingInfos] count] == 1, @"");
 		
 		// Retain observer
 		[observer retain];
 		
 		// Change name
 		obj.name = @"name";
+		
+		// Observed object (obj) will be deallocated…
 	}
-	
 	STAssertTrue(observed, @"");
 	STAssertNotNil(observer, @"");
-	STAssertEqualObjects([observer observingInfos], [NSArray array], @"");
+	STAssertTrue([[observer observingInfos] count] == 0, @"");
 	
 	// Release observer
 	[observer release];

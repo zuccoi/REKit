@@ -342,12 +342,14 @@ NSString* const REObserverContainerKey = @"container";
 		// Get elements
 		id observingObject;
 		NSString *keyPath;
+		void *context;
 		observingObject = [observedInfo[REObserverObservingObjectPointerValueKey] pointerValue];
 		keyPath = observedInfo[REObserverKeyPathKey];
+		context = [observedInfo[REObserverContextPointerValueKey] pointerValue];
 		
 		// Remove observer
-		if (observedInfo[REObserverContextPointerValueKey]) {
-			[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath context:[observedInfo[REObserverContextPointerValueKey] pointerValue]];
+		if (context) {
+			[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath context:context];
 		}
 		else {
 			[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath];
@@ -534,7 +536,12 @@ NSString* const REObserverContainerKey = @"container";
 			observedObject = [observingInfo[REObserverObservedObjectPointerValueKey] pointerValue];
 			keyPath = observingInfo[REObserverKeyPathKey];
 			context = [observingInfo[REObserverContextPointerValueKey] pointerValue];
-			[observedObject removeObserver:self forKeyPath:keyPath context:context];
+			if (context) {
+				[observedObject removeObserver:self forKeyPath:keyPath context:context];
+			}
+			else {
+				[observedObject removeObserver:self forKeyPath:keyPath];
+			}
 		}
 	}
 }

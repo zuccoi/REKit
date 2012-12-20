@@ -334,6 +334,89 @@
 	STAssertNotNil(dict, @"");
 }
 
+- (void)test_NSKeyVvalueObservingOptionNew
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Add observer
+	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
+		NSDictionary *dictionary;
+		dictionary = @{
+			NSKeyValueChangeKindKey : @(NSKeyValueChangeSetting),
+			NSKeyValueChangeNewKey : @"name",
+		};
+		STAssertEqualObjects(change, dictionary, @"");
+	}];
+	obj.name = @"name";
+}
+
+- (void)test_NSKeyVvalueObservingOptionOld
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	obj.name = @"old name";
+	
+	// Add observer
+	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionOld usingBlock:^(NSDictionary *change) {
+		NSDictionary *dictionary;
+		dictionary = @{
+			NSKeyValueChangeKindKey : @(NSKeyValueChangeSetting),
+			NSKeyValueChangeOldKey : @"old name",
+		};
+		STAssertEqualObjects(change, dictionary, @"");
+	}];
+	obj.name = @"new name";
+}
+
+- (void)test_NSKeyVvalueObservingOptionInitial
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Add observer
+	__block BOOL observed = NO;
+	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionInitial usingBlock:^(NSDictionary *change) {
+		observed = YES;
+	}];
+	STAssertTrue(observed, @"");
+}
+
+- (void)test_NSKeyVvalueObservingOptionPrior
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Add observer
+	__block NSUInteger count = 0;
+	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionPrior usingBlock:^(NSDictionary *change) {
+		count++;
+		if (count == 1) {
+			NSDictionary *dictionary;
+			dictionary = @{
+				NSKeyValueChangeNotificationIsPriorKey : @YES,
+				NSKeyValueChangeKindKey : @(NSKeyValueChangeSetting),
+			};
+			STAssertEqualObjects(change, dictionary, @"");
+		}
+		else if (count == 2) {
+			NSDictionary *dictionary;
+			dictionary = @{
+				NSKeyValueChangeKindKey : @(NSKeyValueChangeSetting),
+			};
+			STAssertEqualObjects(change, dictionary, @"");
+		}
+		else {
+			STFail(@"");
+		}
+	}];
+	obj.name = @"name";
+}
+
 - (void)test_removeObserver
 {
 	__block BOOL observed = NO;

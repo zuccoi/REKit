@@ -16,11 +16,11 @@
 		EBA4211A167DE1F20052D11E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA42119167DE1F20052D11E /* SenTestingKit.framework */; };
 		EBA4211B167DE1F20052D11E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420DF167DE1BE0052D11E /* Cocoa.framework */; };
 		EBA42121167DE1F20052D11E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EBA4211F167DE1F20052D11E /* InfoPlist.strings */; };
-		EBA4213F167DE21F0052D11E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42139167DE21F0052D11E /* NSObject+REObserver.m */; };
+		EBA4213F167DE21F0052D11E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42139167DE21F0052D11E /* NSObject+REObserver.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		EBA42140167DE21F0052D11E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42139167DE21F0052D11E /* NSObject+REObserver.m */; };
-		EBA42141167DE21F0052D11E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213B167DE21F0052D11E /* NSObject+REResponder.m */; };
+		EBA42141167DE21F0052D11E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213B167DE21F0052D11E /* NSObject+REResponder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		EBA42142167DE21F0052D11E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213B167DE21F0052D11E /* NSObject+REResponder.m */; };
-		EBA42143167DE21F0052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213E167DE21F0052D11E /* REUtil.m */; };
+		EBA42143167DE21F0052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213E167DE21F0052D11E /* REUtil.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		EBA42144167DE21F0052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213E167DE21F0052D11E /* REUtil.m */; };
 		EBA4215D167DE2B80052D11E /* REObserverLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBA42155167DE2B80052D11E /* REObserverLogicTests.h */; };
 		EBA4215E167DE2B80052D11E /* REObserverLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBA42156167DE2B80052D11E /* REObserverLogicTests.m */; };
@@ -34,6 +34,8 @@
 		EBA4217E167DFFFA0052D11E /* REResponderLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42158167DE2B80052D11E /* REResponderLogicTests.m */; };
 		EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215A167DE2B80052D11E /* RETestObject.m */; };
 		EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */; };
+		EBEC4FF81681B72000E94925 /* MREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBEC4FF61681B72000E94925 /* MREViewController.m */; };
+		EBEC4FF91681B72000E94925 /* MREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBEC4FF71681B72000E94925 /* MREViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +72,9 @@
 		EBA4215A167DE2B80052D11E /* RETestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RETestObject.m; path = ../../REKitLogicTests/RETestObject.m; sourceTree = "<group>"; };
 		EBA4215B167DE2B80052D11E /* REUtilLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REUtilLogicTests.h; path = ../../REKitLogicTests/REUtilLogicTests.h; sourceTree = "<group>"; };
 		EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REUtilLogicTests.m; path = ../../REKitLogicTests/REUtilLogicTests.m; sourceTree = "<group>"; };
+		EBEC4FF51681B72000E94925 /* MREViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MREViewController.h; sourceTree = "<group>"; };
+		EBEC4FF61681B72000E94925 /* MREViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MREViewController.m; sourceTree = "<group>"; };
+		EBEC4FF71681B72000E94925 /* MREViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MREViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,9 +141,12 @@
 		EBA420E5167DE1BE0052D11E /* Mac_REKit */ = {
 			isa = PBXGroup;
 			children = (
+				EBA420F4167DE1BF0052D11E /* MainMenu.xib */,
 				EBA420F1167DE1BE0052D11E /* MREAppDelegate.h */,
 				EBA420F2167DE1BE0052D11E /* MREAppDelegate.m */,
-				EBA420F4167DE1BF0052D11E /* MainMenu.xib */,
+				EBEC4FF51681B72000E94925 /* MREViewController.h */,
+				EBEC4FF61681B72000E94925 /* MREViewController.m */,
+				EBEC4FF71681B72000E94925 /* MREViewController.xib */,
 				EBA420E6167DE1BE0052D11E /* Supporting Files */,
 			);
 			path = Mac_REKit;
@@ -271,6 +279,7 @@
 				EBA420EA167DE1BE0052D11E /* InfoPlist.strings in Resources */,
 				EBA420F0167DE1BE0052D11E /* Credits.rtf in Resources */,
 				EBA420F6167DE1BF0052D11E /* MainMenu.xib in Resources */,
+				EBEC4FF91681B72000E94925 /* MREViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,6 +327,7 @@
 				EBA4213F167DE21F0052D11E /* NSObject+REObserver.m in Sources */,
 				EBA42141167DE21F0052D11E /* NSObject+REResponder.m in Sources */,
 				EBA42143167DE21F0052D11E /* REUtil.m in Sources */,
+				EBEC4FF81681B72000E94925 /* MREViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,6 +390,7 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
@@ -409,6 +420,7 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
@@ -451,6 +463,7 @@
 		EBA42127167DE1F20052D11E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -465,6 +478,7 @@
 		EBA42128167DE1F20052D11E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

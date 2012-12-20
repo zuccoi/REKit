@@ -11,22 +11,19 @@
 		EBA420B0167DE1A10052D11E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AF167DE1A10052D11E /* Foundation.framework */; };
 		EBA420B2167DE1A10052D11E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420B1167DE1A10052D11E /* CoreGraphics.framework */; };
 		EBA420B8167DE1A10052D11E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EBA420B6167DE1A10052D11E /* InfoPlist.strings */; };
-		EBA420BA167DE1A10052D11E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420B9167DE1A10052D11E /* main.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
-		EBA420BE167DE1A10052D11E /* iREAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420BD167DE1A10052D11E /* iREAppDelegate.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBA420C0167DE1A10052D11E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420BF167DE1A10052D11E /* Default.png */; };
 		EBA420C2167DE1A10052D11E /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C1167DE1A10052D11E /* Default@2x.png */; };
 		EBA420C4167DE1A10052D11E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C3167DE1A10052D11E /* Default-568h@2x.png */; };
-		EBA420C7167DE1A10052D11E /* iREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420C6167DE1A10052D11E /* iREViewController.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBA420CA167DE1A10052D11E /* iREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C8167DE1A10052D11E /* iREViewController.xib */; };
 		EBA42103167DE1DC0052D11E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA42102167DE1DC0052D11E /* SenTestingKit.framework */; };
 		EBA42104167DE1DC0052D11E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AD167DE1A10052D11E /* UIKit.framework */; };
 		EBA42105167DE1DC0052D11E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AF167DE1A10052D11E /* Foundation.framework */; };
 		EBA4210B167DE1DC0052D11E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EBA42109167DE1DC0052D11E /* InfoPlist.strings */; };
-		EBA42131167DE2130052D11E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4212B167DE2130052D11E /* NSObject+REObserver.m */; };
+		EBA42131167DE2130052D11E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4212B167DE2130052D11E /* NSObject+REObserver.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		EBA42132167DE2130052D11E /* NSObject+REObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4212B167DE2130052D11E /* NSObject+REObserver.m */; };
-		EBA42133167DE2130052D11E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4212D167DE2130052D11E /* NSObject+REResponder.m */; };
+		EBA42133167DE2130052D11E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4212D167DE2130052D11E /* NSObject+REResponder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		EBA42134167DE2130052D11E /* NSObject+REResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4212D167DE2130052D11E /* NSObject+REResponder.m */; };
-		EBA42135167DE2130052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42130167DE2130052D11E /* REUtil.m */; };
+		EBA42135167DE2130052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42130167DE2130052D11E /* REUtil.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		EBA42136167DE2130052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42130167DE2130052D11E /* REUtil.m */; };
 		EBA4214D167DE2A30052D11E /* REObserverLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBA42145167DE2A30052D11E /* REObserverLogicTests.h */; };
 		EBA4214E167DE2A30052D11E /* REObserverLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBA42146167DE2A30052D11E /* REObserverLogicTests.m */; };
@@ -40,6 +37,9 @@
 		EBA42172167DFE280052D11E /* REResponderLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42148167DE2A30052D11E /* REResponderLogicTests.m */; };
 		EBA42173167DFE280052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4214A167DE2A30052D11E /* RETestObject.m */; };
 		EBA42174167DFE280052D11E /* REUtilLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4214C167DE2A30052D11E /* REUtilLogicTests.m */; };
+		EBEC50001683457B00E94925 /* iREAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420BD167DE1A10052D11E /* iREAppDelegate.m */; };
+		EBEC50011683457B00E94925 /* iREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420C6167DE1A10052D11E /* iREViewController.m */; };
+		EBEC50021683457B00E94925 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420B9167DE1A10052D11E /* main.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -322,9 +322,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EBA420BA167DE1A10052D11E /* main.m in Sources */,
-				EBA420BE167DE1A10052D11E /* iREAppDelegate.m in Sources */,
-				EBA420C7167DE1A10052D11E /* iREViewController.m in Sources */,
+				EBEC50001683457B00E94925 /* iREAppDelegate.m in Sources */,
+				EBEC50011683457B00E94925 /* iREViewController.m in Sources */,
+				EBEC50021683457B00E94925 /* main.m in Sources */,
 				EBA42131167DE2130052D11E /* NSObject+REObserver.m in Sources */,
 				EBA42133167DE2130052D11E /* NSObject+REResponder.m in Sources */,
 				EBA42135167DE2130052D11E /* REUtil.m in Sources */,
@@ -381,7 +381,9 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
@@ -408,7 +410,9 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
@@ -426,9 +430,11 @@
 		EBA420CE167DE1A10052D11E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iOS_REKit/iOS_REKit-Prefix.pch";
 				INFOPLIST_FILE = "iOS_REKit/iOS_REKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -437,9 +443,11 @@
 		EBA420CF167DE1A10052D11E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iOS_REKit/iOS_REKit-Prefix.pch";
 				INFOPLIST_FILE = "iOS_REKit/iOS_REKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -448,6 +456,7 @@
 		EBA42111167DE1DC0052D11E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
@@ -455,7 +464,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iOS_REKitLogicTests/iOS_REKitLogicTests-Prefix.pch";
 				INFOPLIST_FILE = "iOS_REKitLogicTests/iOS_REKitLogicTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
 			};
@@ -464,6 +473,7 @@
 		EBA42112167DE1DC0052D11E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
@@ -471,7 +481,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iOS_REKitLogicTests/iOS_REKitLogicTests-Prefix.pch";
 				INFOPLIST_FILE = "iOS_REKitLogicTests/iOS_REKitLogicTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
 			};

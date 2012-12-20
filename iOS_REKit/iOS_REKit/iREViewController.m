@@ -85,9 +85,7 @@
 		}
 		
 		// Change backgroundColor
-		CGFloat hue;
-		hue = (float)(arc4random() % 11) / 10.0f;
-		self.view.backgroundColor = [UIColor colorWithHue:hue saturation:1.0f brightness:0.5f alpha:1.0f];
+		self.view.backgroundColor = [UIColor colorWithRed:(float)(arc4random() % 11) / 10.0f green:(float)(arc4random() % 11) / 10.0f blue:(float)(arc4random() % 11) / 10.0f alpha:1.0f];
 	}];
 	alertView.delegate = alertView;
 	[alertView show];

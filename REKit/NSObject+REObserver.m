@@ -409,22 +409,50 @@ NSString* const REObserverContainerKey = @"container";
 	id observer;
 	observer = [[NSObject alloc] init];
 	
-	// Add observer to self
-	[self addObserver:observer forKeyPath:keyPath options:options context:NULL];
-	
 	// Get copied block
 	id copiedBock;
 	copiedBock = Block_copy(block);
 	
-	// Add block to observingInfo
-	NSMutableDictionary *observingInfo;
-	observingInfo = (id)[[observer observingInfos] lastObject];
-	[observingInfo setObject:copiedBock forKey:REObserverBlockKey];
+	@synchronized (self) {
+		// Make observingInfo
+		NSMutableDictionary *observingInfo;
+		observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+			REObserverObservedObjectKey : self,
+			REObserverKeyPathKey : keyPath,
+			REObserverOptionsKey : @(options),
+			REObserverBlockKey : copiedBock,
+		}];
+		
+		// Add observingInfo
+		NSMutableArray *observingInfos;
+		observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
+		if (!observingInfos) {
+			observingInfos = [NSMutableArray array];
+			[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		}
+		[observingInfos addObject:observingInfo];
+		
+		// Make observedInfo
+		NSMutableDictionary *observedInfo;
+		observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+			REObserverObservingObjectKey : observer,
+			REObserverKeyPathKey : keyPath,
+			REObserverOptionsKey : @(options),
+			REObserverBlockKey : copiedBock,
+		}];
+		
+		// Add observedInfo
+		NSMutableArray *observedInfos;
+		observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
+		if (!observedInfos) {
+			observedInfos = [NSMutableArray array];
+			[self associateValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		}
+		[observedInfos addObject:observedInfo];
+	}
 	
-	// Add block to observedInfo
-	NSMutableDictionary *observedInfo;
-	observedInfo = (id)[[self observedInfos] lastObject];
-	[observedInfo setObject:copiedBock forKey:REObserverBlockKey];
+	// Add observer to self using original implementation
+	[self REObserver_X_addObserver:observer forKeyPath:keyPath options:options context:nil];
 	
 	return [observer autorelease];
 }

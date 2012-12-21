@@ -33,8 +33,16 @@
 	// Make elements
 	NSArray *observingInfos;
 	NSArray *observedInfos;
-	observingInfos = @[@{REObserverKeyPathKey : @"name", REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj], REObserverOptionsKey : @0}];
-	observedInfos = @[@{REObserverKeyPathKey : @"name", REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverOptionsKey : @0}];
+	observingInfos = @[@{
+		REObserverKeyPathKey : @"name",
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverOptionsKey : @0
+	}];
+	observedInfos = @[@{
+		REObserverKeyPathKey : @"name",
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverOptionsKey : @0
+	}];
 	
 	// Add observer
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
@@ -85,8 +93,18 @@
 	};
 	block = Block_copy(block);
 	observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:block];
-	observingInfo = @{REObserverKeyPathKey : @"name", REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj], REObserverOptionsKey : @0, REObserverBlockKey : block};
-	observedInfo = @{REObserverKeyPathKey : @"name", REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverOptionsKey : @0, REObserverBlockKey : block};
+	observingInfo = @{
+		REObserverKeyPathKey : @"name",
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverOptionsKey : @0,
+		REObserverBlockKey : block
+	};
+	observedInfo = @{
+		REObserverKeyPathKey : @"name",
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverOptionsKey : @0,
+		REObserverBlockKey : block
+	};
 	observed = NO;
 	obj.name = @"name6";
 	STAssertTrue(observed, @"");
@@ -146,8 +164,18 @@
 	NSArray *observingInfos;
 	NSArray *observedInfos;
 	context = @"context";
-	observingInfos = @[@{REObserverKeyPathKey : @"name", REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj], REObserverOptionsKey : @0, REObserverContextPointerValueKey : [NSValue valueWithPointer:context]}];
-	observedInfos = @[@{REObserverKeyPathKey : @"name", REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverOptionsKey : @0, REObserverContextPointerValueKey : [NSValue valueWithPointer:context]}];
+	observingInfos = @[@{
+		REObserverKeyPathKey : @"name",
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverOptionsKey : @0,
+		REObserverContextPointerValueKey : [NSValue valueWithPointer:context]
+	}];
+	observedInfos = @[@{
+		REObserverKeyPathKey : @"name",
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverOptionsKey : @0,
+		REObserverContextPointerValueKey : [NSValue valueWithPointer:context]
+	}];
 	
 	// Add observer
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:context];
@@ -211,8 +239,17 @@
 	NSArray *observedInfos;
 	NSIndexSet *indexes;
 	NSString *context;
-	observingInfos = @[@{REObserverContainerKey : objs, REObserverKeyPathKey : @"name", REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj0], REObserverOptionsKey : @0}];
-	observedInfos = @[@{REObserverContainerKey : objs,REObserverKeyPathKey : @"name", REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverOptionsKey : @0}];
+	observingInfos = @[@{
+		REObserverContainerKey : objs,
+		REObserverKeyPathKey : @"name",
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj0],
+		REObserverOptionsKey : @0
+	}];
+	observedInfos = @[@{
+		REObserverContainerKey : objs,REObserverKeyPathKey : @"name",
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverOptionsKey : @0
+	}];
 	indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 1)];
 	context = @"context";
 	
@@ -247,8 +284,18 @@
 	
 	// Add observer with context
 	[objs addObserver:observer toObjectsAtIndexes:indexes forKeyPath:@"name" options:0 context:context];
-	observingInfos = @[@{REObserverContainerKey : objs,REObserverKeyPathKey : @"name", REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj0], REObserverOptionsKey : @0, REObserverContextPointerValueKey : [NSValue valueWithPointer:context]}];
-	observedInfos = @[@{REObserverContainerKey : objs,REObserverKeyPathKey : @"name", REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverOptionsKey : @0, REObserverContextPointerValueKey : [NSValue valueWithPointer:context]}];
+	observingInfos = @[@{
+		REObserverContainerKey : objs,REObserverKeyPathKey : @"name",
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj0],
+		REObserverOptionsKey : @0,
+		REObserverContextPointerValueKey : [NSValue valueWithPointer:context]
+	}];
+	observedInfos = @[@{
+		REObserverContainerKey : objs,REObserverKeyPathKey : @"name",
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverOptionsKey : @0,
+		REObserverContextPointerValueKey : [NSValue valueWithPointer:context]
+	}];
 	observed = NO;
 	obj0.name = @"name4";
 	STAssertTrue(observed, @"");
@@ -511,8 +558,18 @@
 	// Check observingInfos and observedInfos
 	NSArray *observingInfos;
 	NSArray *observedInfos;
-	observingInfos = @[@{REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj], REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverBlockKey : block}];
-	observedInfos = @[@{REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverBlockKey : block}];
+	observingInfos = @[@{
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew),
+		REObserverBlockKey : block
+	}];
+	observedInfos = @[@{
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew),
+		REObserverBlockKey : block
+	}];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -556,8 +613,16 @@
 	// Check observingInfos and observedInfos
 	NSArray *observingInfos;
 	NSArray *observedInfos;
-	observingInfos = @[@{REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj], REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew)}];
-	observedInfos = @[@{REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew)}];
+	observingInfos = @[@{
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew)
+	}];
+	observedInfos = @[@{
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew)
+	}];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -600,8 +665,18 @@
 	// Check observingInfos and observedInfos
 	NSArray *observingInfos;
 	NSArray *observedInfos;
-	observingInfos = @[@{REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj0], REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverContainerKey : objs}];
-	observedInfos = @[@{REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer], REObserverKeyPathKey : @"name", REObserverOptionsKey : @(NSKeyValueObservingOptionNew), REObserverContainerKey : objs}];
+	observingInfos = @[@{
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj0],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew),
+		REObserverContainerKey : objs
+	}];
+	observedInfos = @[@{
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew),
+		REObserverContainerKey : objs
+	}];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	

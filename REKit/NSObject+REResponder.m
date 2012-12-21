@@ -372,7 +372,7 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 		NSDictionary *blockInfo;
 		blockInfo = @{
 			kBlockInfoBlockKey : Block_copy(block),
-			kBlockInfoBlockNameKey : blockName,
+			kBlockInfoBlockNameKey : [blockName copy],
 			kBlockInfoMethodSignatureKey : methodSignature,
 		};
 		[blockInfos addObject:blockInfo];

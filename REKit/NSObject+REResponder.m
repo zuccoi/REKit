@@ -32,23 +32,13 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)aProtocol
 {
-	// Check registered protocol
-	@synchronized (self) {
-		// Get protocols
-		NSDictionary *protocols;
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
-		if (protocols) {
-			// Gete keys
-			NSSet *keys;
-			keys = protocols[NSStringFromProtocol(aProtocol)];
-			if ([keys count]) {
-				return YES;
-			}
-		}
+	// original
+	if ([self REResponder_X_conformsToProtocol:aProtocol]) {
+		return YES;
 	}
 	
-	// original
-	return [self REResponder_X_conformsToProtocol:aProtocol];
+	// Check protocols
+	return ([[self associatedValueForKey:kProtocolsAssociationKey][NSStringFromProtocol(aProtocol)] count] > 0);
 }
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector

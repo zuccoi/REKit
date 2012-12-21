@@ -447,7 +447,7 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 		protocolName = NSStringFromProtocol(protocol);
 		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
 		
-		// Add protocol
+		// Add key
 		if (comformable) {
 			// Associate protocols
 			if (!protocols) {
@@ -466,7 +466,7 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 			// Add key
 			[keys addObject:[key copy]];
 		}
-		// Remove protocol
+		// Remove key
 		else {
 			// Get keys
 			NSMutableSet *keys;

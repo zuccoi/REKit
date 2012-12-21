@@ -21,7 +21,7 @@ const char* REBlockGetObjCTypes(id _block)
 	// Get descriptor of block
 	struct BlockDescriptor *descriptor;
 	struct Block *block;
-	block = (void*)_block;
+	block = (struct Block*)_block;
 	descriptor = block->descriptor;
 	
 	// Get index of rest

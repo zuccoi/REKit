@@ -474,7 +474,7 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 			}
 			
 			// Add key
-			[keys addObject:key];
+			[keys addObject:[key copy]];
 		}
 		// Remove protocol
 		else {

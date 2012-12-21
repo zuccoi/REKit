@@ -8,6 +8,10 @@
 #import "REObserverLogicTests.h"
 #import "RETestObject.h"
 
+#if __has_feature(objc_arc)
+	#error This code needs compiler option -fno-objc-arc
+#endif
+
 
 @implementation REObserverLogicTests
 

@@ -15,25 +15,6 @@
 
 @implementation REResponderLogicTests
 
-- (void)test_becomeConformableToProtocol
-{
-	Protocol *protocol;
-	protocol = @protocol(NSCopying);
-	
-	// Make obj
-	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
-	STAssertFalse([obj conformsToProtocol:protocol], @"");
-	
-	// Become conformable to protocol
-	[obj becomeConformable:YES toProtocol:protocol];
-	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	
-	// Revert
-	[obj becomeConformable:NO toProtocol:protocol];
-	STAssertFalse([obj conformsToProtocol:protocol], @"");
-}
-
 - (void)test_respondsToUnimplementedMethod
 {
 	__block BOOL deallocated = NO;
@@ -624,6 +605,146 @@
 	[obj removeBlockNamed:@"logBlock"];
 	[obj removeBlockNamed:@"sayBlock"];
 	STAssertEquals([obj class], newClass, @"");
+}
+
+- (void)test_setConformableToProtocol
+{
+	// Make elements
+	Protocol *protocol;
+	NSString *key;
+	protocol = @protocol(NSCopying);
+	key = NSStringFromSelector(_cmd);
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+	
+	// Set obj conformable to protocol
+	[obj setConformable:YES toProtocol:protocol withKey:key];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Set obj not-conformable to protocol
+	[obj setConformable:NO toProtocol:protocol withKey:key];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+}
+
+- (void)test_setConformableToProtocolWithInvalidArguments
+{
+	// Make elements
+	Protocol *protocol;
+	NSString *key;
+	protocol = @protocol(NSCopying);
+	key = NSStringFromSelector(_cmd);
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Try to set obj conformable with nil-protocol
+	[obj setConformable:YES toProtocol:nil withKey:key];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+	
+	// Try to set obj conformable with nil-key
+	[obj setConformable:YES toProtocol:protocol withKey:nil];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+	
+	// Try to set obj conformable with empty key
+	[obj setConformable:YES toProtocol:protocol withKey:@""];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+	
+	// Set obj conformable to protocol
+	[obj setConformable:YES toProtocol:protocol withKey:key];
+	
+	// Try to set obj not-conformable with nil-protocol
+	[obj setConformable:NO toProtocol:nil withKey:key];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Try to set obj not-conformable with nil-key
+	[obj setConformable:NO toProtocol:protocol withKey:nil];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Try to set obj not-conformable with empty key
+	[obj setConformable:NO toProtocol:protocol withKey:@""];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Set obj not-conformable
+	[obj setConformable:NO toProtocol:protocol withKey:key];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+}
+
+- (void)test_setConformableToProtocolWithKeyMethodStacksKeys
+{
+	// Make elements
+	Protocol *protocol;
+	NSString *key;
+	protocol = @protocol(NSCopying);
+	key = NSStringFromSelector(_cmd);
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set obj conformable to the protocol with key
+	[obj setConformable:YES toProtocol:protocol withKey:key];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Set obj conformable to the protocol with other key
+	[obj setConformable:YES toProtocol:protocol withKey:@"OtherKey"];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Try to set obj not-conformable to the protocol
+	[obj setConformable:NO toProtocol:protocol withKey:@"OtherKey"];
+	STAssertTrue([obj conformsToProtocol:protocol], @"");
+	
+	// Set obj not-conformable to the protocol
+	[obj setConformable:NO toProtocol:protocol withKey:key];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+}
+
+- (void)test_setConformableToProtocolDoesNotStackSameKeyForAProtocol
+{
+	Protocol *protocol;
+	NSString *key;
+	protocol = @protocol(NSCopying);
+	key = NSStringFromSelector(_cmd);
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set obj conformable to the protocol
+	[obj setConformable:YES toProtocol:protocol withKey:key];
+	[obj setConformable:YES toProtocol:protocol withKey:key];
+	[obj setConformable:NO toProtocol:protocol withKey:key];
+	STAssertFalse([obj conformsToProtocol:protocol], @"");
+}
+
+- (void)test_setConformableToProtocolAllowsSameKeyForOtherProtocol
+{
+	// Decide key
+	NSString *key;
+	key = NSStringFromSelector(_cmd);
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set obj conformable to NSCopying and NSCoding
+	[obj setConformable:YES toProtocol:@protocol(NSCopying) withKey:key];
+	[obj setConformable:YES toProtocol:@protocol(NSCoding) withKey:key];
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+	
+	// Set obj not-conformable to NSCopying
+	[obj setConformable:NO toProtocol:@protocol(NSCopying) withKey:key];
+	STAssertFalse([obj conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+	
+	// Set obj not-conformable to NSCoding
+	[obj setConformable:NO toProtocol:@protocol(NSCoding) withKey:key];
+	STAssertFalse([obj conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertFalse([obj conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
 @end

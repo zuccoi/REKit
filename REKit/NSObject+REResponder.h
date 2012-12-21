@@ -9,13 +9,13 @@
 
 @interface NSObject (REResponder)
 
-// Conformance
-- (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol;
-
 // Block
 - (void)respondsToSelector:(SEL)selector withBlockName:(NSString*)nameOrNil usingBlock:(id)block;
 - (id)blockNamed:(NSString*)blockName;
 - (IMP)supermethodOfBlockNamed:(NSString*)blockName;
 - (void)removeBlockNamed:(NSString*)blockName;
+
+// Conformance
+- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(NSString*)key;
 
 @end

@@ -34,8 +34,16 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 {
 	// Check registered protocol
 	@synchronized (self) {
-		if ([[self associatedValueForKey:kProtocolsAssociationKey] containsObject:NSStringFromProtocol(aProtocol)]) {
-			return YES;
+		// Get protocols
+		NSDictionary *protocols;
+		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
+		if (protocols) {
+			// Gete keys
+			NSSet *keys;
+			keys = protocols[NSStringFromProtocol(aProtocol)];
+			if ([keys count]) {
+				return YES;
+			}
 		}
 	}
 	
@@ -239,42 +247,6 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Conformance --
-//--------------------------------------------------------------//
-
-- (void)becomeConformable:(BOOL)flag toProtocol:(Protocol*)protocol
-{
-	// Filter
-	if (!protocol) {
-		return;
-	}
-	
-	// Update REResponder_protocols
-	@synchronized (self) {
-		// Get protocolName
-		NSString *protocolName;
-		protocolName = NSStringFromProtocol(protocol);
-		
-		// Get protocols
-		NSMutableSet *protocols;
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
-		
-		// Add protocol
-		if (flag) {
-			if (!protocols) {
-				protocols = [NSMutableSet set];
-				[self associateValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			[protocols addObject:protocolName];
-		}
-		// Remove protocol
-		else {
-			[protocols removeObject:protocolName];
-		}
-	}
-}
-
-//--------------------------------------------------------------//
 #pragma mark -- Block --
 //--------------------------------------------------------------//
 
@@ -462,6 +434,64 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 			
 			// Remove blockInfo
 			[blockInfos removeObject:blockInfo];
+		}
+	}
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- Conformance --
+//--------------------------------------------------------------//
+
+- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(NSString*)key
+{
+	// Filter
+	if (!protocol || ![key length]) {
+		return;
+	}
+	
+	// Update REResponder_protocols
+	@synchronized (self) {
+		// Get elements
+		NSString *protocolName;
+		NSMutableDictionary *protocols;
+		protocolName = NSStringFromProtocol(protocol);
+		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
+		
+		// Add protocol
+		if (comformable) {
+			// Associate protocols
+			if (!protocols) {
+				protocols = [NSMutableDictionary dictionary];
+				[self associateValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
+			
+			// Get keys
+			NSMutableSet *keys;
+			keys = protocols[protocolName];
+			if (!keys) {
+				keys = [NSMutableSet set];
+				[protocols setObject:keys forKey:protocolName];
+			}
+			
+			// Add key
+			[keys addObject:key];
+		}
+		// Remove protocol
+		else {
+			// Get keys
+			NSMutableSet *keys;
+			keys = protocols[protocolName];
+			if (![keys count]) {
+				return;
+			}
+			
+			// Remove key
+			[keys removeObject:key];
+			
+			// Remove keys
+			if (![keys count]) {
+				[protocols removeObjectForKey:protocolName];
+			}
 		}
 	}
 }

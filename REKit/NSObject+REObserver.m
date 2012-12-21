@@ -39,6 +39,10 @@ NSString* const REObserverContainerKey = @"container";
 		return;
 	}
 	
+	// Get copiedKeyPath
+	NSString *copiedKeyPath;
+	copiedKeyPath = [keyPath copy];
+	
 	// Enumerate objects
 	@synchronized (self) {
 		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -47,7 +51,7 @@ NSString* const REObserverContainerKey = @"container";
 			observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
 				REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
 				REObserverContainerKey : self,
-				REObserverKeyPathKey : keyPath,
+				REObserverKeyPathKey : copiedKeyPath,
 				REObserverOptionsKey : @(options),
 			}];
 			if (context) {
@@ -68,7 +72,7 @@ NSString* const REObserverContainerKey = @"container";
 			observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
 				REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
 				REObserverContainerKey : self,
-				REObserverKeyPathKey : keyPath,
+				REObserverKeyPathKey : copiedKeyPath,
 				REObserverOptionsKey : @(options),
 			}];
 			if (context) {
@@ -165,18 +169,33 @@ NSString* const REObserverContainerKey = @"container";
 		return;
 	}
 	
+	// Get copiedKeyPath
+	NSString *copiedKeyPath;
+	copiedKeyPath = [keyPath copy];
+	
+	// Make observingInfo
+	NSMutableDictionary *observingInfo;
+	observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:self],
+		REObserverKeyPathKey : copiedKeyPath,
+		REObserverOptionsKey : @(options),
+	}];
+	if (context) {
+		observingInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
+	}
+	
+	// Make observedInfo
+	NSMutableDictionary *observedInfo;
+	observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverKeyPathKey : keyPath,
+		REObserverOptionsKey : @(options),
+	}];
+	if (context) {
+		observedInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
+	}
+	
 	@synchronized (self) {
-		// Make observingInfo
-		NSMutableDictionary *observingInfo;
-		observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-			REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:self],
-			REObserverKeyPathKey : keyPath,
-			REObserverOptionsKey : @(options),
-		}];
-		if (context) {
-			observingInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
-		}
-		
 		// Add observingInfo
 		NSMutableArray *observingInfos;
 		observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
@@ -185,17 +204,6 @@ NSString* const REObserverContainerKey = @"container";
 			[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observingInfos addObject:observingInfo];
-		
-		// Make observedInfo
-		NSMutableDictionary *observedInfo;
-		observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-			REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
-			REObserverKeyPathKey : keyPath,
-			REObserverOptionsKey : @(options),
-		}];
-		if (context) {
-			observedInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
-		}
 		
 		// Add observedInfo
 		NSMutableArray *observedInfos;
@@ -448,16 +456,18 @@ NSString* const REObserverContainerKey = @"container";
 	id observer;
 	observer = [[NSObject alloc] init];
 	
-	// Get copied block
+	// Get copied elements
 	id copiedBock;
+	NSString *copiedKeyPath;
 	copiedBock = Block_copy(block);
+	copiedKeyPath = [keyPath copy];
 	
 	@synchronized (self) {
 		// Make observingInfo
 		NSMutableDictionary *observingInfo;
 		observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
 			REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:self],
-			REObserverKeyPathKey : keyPath,
+			REObserverKeyPathKey : copiedKeyPath,
 			REObserverOptionsKey : @(options),
 			REObserverBlockKey : copiedBock,
 		}];
@@ -475,7 +485,7 @@ NSString* const REObserverContainerKey = @"container";
 		NSMutableDictionary *observedInfo;
 		observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
 			REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
-			REObserverKeyPathKey : keyPath,
+			REObserverKeyPathKey : copiedKeyPath,
 			REObserverOptionsKey : @(options),
 			REObserverBlockKey : copiedBock,
 		}];

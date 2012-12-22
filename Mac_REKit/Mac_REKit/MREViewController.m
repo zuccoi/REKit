@@ -38,7 +38,6 @@
 - (void)setView:(NSView *)view
 {
 	// Stop observing
-	[_observers makeObjectsPerformSelector:@selector(stopObserving)];
 	[_observers removeAllObjects];
 	
 	// super

@@ -63,7 +63,6 @@
 	[super viewWillDisappear:animated];
 	
 	// Stop observing
-	[_observers makeObjectsPerformSelector:@selector(stopObserving)];
 	[_observers removeAllObjects];
 }
 

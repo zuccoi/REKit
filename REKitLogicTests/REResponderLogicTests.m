@@ -29,6 +29,8 @@
 		
 		// Responds to log method dynamically
 		[obj respondsToSelector:sel withBlockName:nil usingBlock:^NSString*(id receiver) {
+//			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver.
+			NSLog(@"receiver = %@", receiver);
 			return @"block1";
 		}];
 		log = [obj performSelector:sel];
@@ -61,7 +63,8 @@
 		RETestObject *obj;
 		obj = [RETestObject testObject];
 		[obj respondsToSelector:@selector(log) withBlockName:nil usingBlock:^NSString*(id receiver) {
-//			NSLog(@"obj = %@", obj); // Causes memory leak. Use me.
+//			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver.
+			NSLog(@"receiver = %@", receiver);
 			return @"block log";
 		}];
 		log = [obj log];
@@ -577,6 +580,64 @@
 	// Call log method
 	log = [obj log];
 	STAssertEqualObjects(log, @"log", @"");
+}
+
+- (void)test_supermethodReturningScalar
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	obj.age = 10;
+	
+	// Override age method
+	[obj respondsToSelector:@selector(age) withBlockName:@"blockName" usingBlock:^NSUInteger(id receiver) {
+		NSUInteger age = 0;
+		
+		// Get original age
+		IMP supermethod;
+		if ((supermethod = [obj supermethodOfBlockNamed:@"blockName"])) {
+			age = (NSUInteger)supermethod(receiver, @selector(age));
+		}
+		
+		// Increase age
+		age++;
+		
+		return age;
+	}];
+	
+	// Get age
+	NSUInteger age;
+	age = obj.age;
+	STAssertEquals(age, (NSUInteger)11, @"");
+}
+
+- (void)test_supermethodWithArgumentReturningScalar
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	obj.age = 10;
+	
+	// Override age method
+	[obj respondsToSelector:@selector(ageAfterYears:) withBlockName:@"blockName" usingBlock:^NSUInteger(id receiver, NSUInteger years) {
+		NSUInteger age = 0;
+		
+		// Get original age
+		IMP supermethod;
+		if ((supermethod = [obj supermethodOfBlockNamed:@"blockName"])) {
+			age = (NSUInteger)supermethod(receiver, @selector(ageAfterYears:), years);
+		}
+		
+		// Increase age
+		age++;
+		
+		return age;
+	}];
+	
+	// Get age
+	NSUInteger age;
+	age = [obj ageAfterYears:3];
+	STAssertEquals(age, (NSUInteger)14, @"");
 }
 
 - (void)test_doNotChangeClassFrequently

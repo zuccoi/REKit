@@ -11,6 +11,7 @@
 
 // Property
 @property (retain, nonatomic) NSString *name;
+@property (assign, nonatomic) NSUInteger age;
 
 // Object
 + (instancetype)testObject;
@@ -18,5 +19,6 @@
 // Methods
 - (NSString*)log;
 - (NSString*)say;
+- (NSUInteger)ageAfterYears:(NSUInteger)years;
 
 @end

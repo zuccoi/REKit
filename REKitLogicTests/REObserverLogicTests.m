@@ -716,6 +716,23 @@
 	STAssertTrue([[obj observedInfos] count] == 0, @"");
 }
 
+- (void)test_stopObservingStartedByOrdinalMethodInDeallocMethod
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	@autoreleasepool {
+		// Start observing
+		id observer;
+		observer = [[[NSObject alloc] init] autorelease];
+		[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+		
+		// observer will be deallocated…
+	}
+	STAssertTrue([[obj observedInfos] count] == 0, @"");
+}
+
 - (void)test_stopBeingObservedInDeallocMethod
 {
 	__block BOOL observed = NO;
@@ -746,6 +763,25 @@
 	
 	// Release observer
 	[observer release];
+}
+
+- (void)test_stopBeingObservedStartedByOrdinalMethodInDeallocMethod
+{
+	// Make observer
+	id observer;
+	observer = [[[NSObject alloc] init] autorelease];
+	
+	@autoreleasepool {
+		// Make obj
+		RETestObject *obj;
+		obj = [RETestObject testObject];
+		
+		// Start observing
+		[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+		
+		// Observed object (obj) will be deallocated…
+	}
+	STAssertTrue([[observer observingInfos] count] == 0, @"");
 }
 
 @end

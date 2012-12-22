@@ -32,7 +32,7 @@
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Log --
+#pragma mark -- Methods --
 //--------------------------------------------------------------//
 
 - (NSString*)log
@@ -43,6 +43,11 @@
 - (NSString*)say
 {
 	return @"say";
+}
+
+- (NSUInteger)ageAfterYears:(NSUInteger)years
+{
+	return self.age + years;
 }
 
 @end

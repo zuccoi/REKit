@@ -107,6 +107,28 @@ NSString* REUUIDString()
 	}];
 }
 
+
+//--------------------------------------------------------------//
+#pragma mark -- Association --
+//--------------------------------------------------------------//
+
+- (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
+{
+	objc_setAssociatedObject(self, key, value, policy);
+}
+
+- (id)associatedValueForKey:(void*)key
+{
+	return objc_getAssociatedObject(self, key);
+}
+
+@end
+
+#pragma mark -
+
+
+@implementation NSObject (REKitPrivate)
+
 //--------------------------------------------------------------//
 #pragma mark -- Method Exchange --
 //--------------------------------------------------------------//
@@ -171,20 +193,6 @@ NSString* REUUIDString()
 		aSelector = va_arg(args, SEL);
 	}
 	va_end(args);
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Association --
-//--------------------------------------------------------------//
-
-- (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
-{
-	objc_setAssociatedObject(self, key, value, policy);
-}
-
-- (id)associatedValueForKey:(void*)key
-{
-	return objc_getAssociatedObject(self, key);
 }
 
 @end

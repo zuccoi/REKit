@@ -15,6 +15,11 @@ NSString* const REObjectDidChangeClassNotification = @"REObjectDidChangeClassNot
 NSString* const REObjectOldClassNameKey = @"REObjectOldClassNameKey";
 NSString* const REObjectNewClassNameKey = @"REObjectNewClassNameKey";
 
+// Notifications
+#if POST_DID_INIT_NOTIFICATION
+NSString* const REObjectDidInitNotification = @"REObjectDidInitNotification";
+#endif
+
 
 const char* REBlockGetObjCTypes(id _block)
 {
@@ -84,6 +89,31 @@ NSString* REUUIDString()
 
 
 @implementation NSObject (REUtil)
+
+#if POST_DID_INIT_NOTIFICATION
+- (id)REUtil_X_init
+{
+	// original
+	self = [self REUtil_X_init];
+	if (!self) {
+		return nil;
+	}
+	
+	// Post notification
+	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectDidInitNotification object:self];
+	
+	return self;
+}
++ (void)load
+{
+	@autoreleasepool {
+		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REUtil_X_" selectors:
+			@selector(init),
+			nil
+		];
+	}
+}
+#endif
 
 //--------------------------------------------------------------//
 #pragma mark -- Class Exchange --

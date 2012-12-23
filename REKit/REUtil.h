@@ -16,6 +16,11 @@ extern NSString* const REObjectDidChangeClassNotification;
 extern NSString* const REObjectOldClassNameKey;
 extern NSString* const REObjectNewClassNameKey;
 
+// Notifications
+#if POST_DID_INIT_NOTIFICATION
+extern NSString* const REObjectDidInitNotification;
+#endif
+
 
 //--------------------------------------------------------------//
 #pragma mark -- Block --

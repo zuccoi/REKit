@@ -51,29 +51,4 @@
 	STAssertEquals(oldClass, [RETestObject class], @"");
 }
 
-#if POST_DID_INIT_NOTIFICATION
-- (void)test_REObjectDidInitNotification
-{
-	__block BOOL notified = NO;
-	
-	// Observe REObjectDidInitNotification
-	[[NSNotificationCenter defaultCenter] addObserverForName:REObjectDidInitNotification object:nil queue:[NSOperationQueue currentQueue] usingBlock:^(NSNotification *note) {
-		// Get obj
-		id obj;
-		obj = [note object];
-		if ([obj class] != [RETestObject class]) {
-			return;
-		}
-		
-		// Raise notified flag
-		notified = YES;
-	}];
-	
-	// Make obj
-	RETestObject *obj;
-	obj = [RETestObject testObject];
-	STAssertTrue(notified, @"");
-}
-#endif
-
 @end

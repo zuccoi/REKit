@@ -466,7 +466,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					"POST_DID_INIT_NOTIFICATION=1",
 				);
 				INFOPLIST_FILE = "iOS_REKitLogicTests/iOS_REKitLogicTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;

@@ -471,7 +471,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					"POST_DID_INIT_NOTIFICATION=1",
 				);
 				INFOPLIST_FILE = "Mac_REKitLogicTests/Mac_REKitLogicTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.4;

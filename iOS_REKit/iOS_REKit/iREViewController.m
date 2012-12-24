@@ -17,10 +17,10 @@
 #pragma mark -- Object --
 //--------------------------------------------------------------//
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (id)initWithCoder:(NSCoder *)aDecoder
 {
 	// super
-	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+	self = [super initWithCoder:aDecoder];
 	if (!self) {
 		return nil;
 	}

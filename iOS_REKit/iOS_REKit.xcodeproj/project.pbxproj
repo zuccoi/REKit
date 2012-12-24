@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB55780E16887865003DBEAB /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EB55780D16887865003DBEAB /* MainStoryboard.storyboard */; };
 		EBA420AE167DE1A10052D11E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AD167DE1A10052D11E /* UIKit.framework */; };
 		EBA420B0167DE1A10052D11E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AF167DE1A10052D11E /* Foundation.framework */; };
 		EBA420B2167DE1A10052D11E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420B1167DE1A10052D11E /* CoreGraphics.framework */; };
@@ -14,7 +15,6 @@
 		EBA420C0167DE1A10052D11E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420BF167DE1A10052D11E /* Default.png */; };
 		EBA420C2167DE1A10052D11E /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C1167DE1A10052D11E /* Default@2x.png */; };
 		EBA420C4167DE1A10052D11E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C3167DE1A10052D11E /* Default-568h@2x.png */; };
-		EBA420CA167DE1A10052D11E /* iREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBA420C8167DE1A10052D11E /* iREViewController.xib */; };
 		EBA42103167DE1DC0052D11E /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA42102167DE1DC0052D11E /* SenTestingKit.framework */; };
 		EBA42104167DE1DC0052D11E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AD167DE1A10052D11E /* UIKit.framework */; };
 		EBA42105167DE1DC0052D11E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AF167DE1A10052D11E /* Foundation.framework */; };
@@ -43,6 +43,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EB55780D16887865003DBEAB /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard.storyboard; path = iOS_REKit/MainStoryboard.storyboard; sourceTree = "<group>"; };
 		EBA420A9167DE1A10052D11E /* iOS_REKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOS_REKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA420AD167DE1A10052D11E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EBA420AF167DE1A10052D11E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -58,7 +59,6 @@
 		EBA420C3167DE1A10052D11E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		EBA420C5167DE1A10052D11E /* iREViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iREViewController.h; sourceTree = "<group>"; };
 		EBA420C6167DE1A10052D11E /* iREViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iREViewController.m; sourceTree = "<group>"; };
-		EBA420C9167DE1A10052D11E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/iREViewController.xib; sourceTree = "<group>"; };
 		EBA42101167DE1DC0052D11E /* iOS_REKitLogicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOS_REKitLogicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA42102167DE1DC0052D11E /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		EBA42108167DE1DC0052D11E /* iOS_REKitLogicTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iOS_REKitLogicTests-Info.plist"; sourceTree = "<group>"; };
@@ -108,6 +108,7 @@
 		EBA4209E167DE1A10052D11E = {
 			isa = PBXGroup;
 			children = (
+				EB55780D16887865003DBEAB /* MainStoryboard.storyboard */,
 				EBA420B3167DE1A10052D11E /* iOS_REKit */,
 				EBA42129167DE2130052D11E /* REKit */,
 				EBA42106167DE1DC0052D11E /* iOS_REKitLogicTests */,
@@ -143,7 +144,6 @@
 				EBA420BD167DE1A10052D11E /* iREAppDelegate.m */,
 				EBA420C5167DE1A10052D11E /* iREViewController.h */,
 				EBA420C6167DE1A10052D11E /* iREViewController.m */,
-				EBA420C8167DE1A10052D11E /* iREViewController.xib */,
 				EBA420B4167DE1A10052D11E /* Supporting Files */,
 			);
 			path = iOS_REKit;
@@ -279,7 +279,7 @@
 				EBA420C0167DE1A10052D11E /* Default.png in Resources */,
 				EBA420C2167DE1A10052D11E /* Default@2x.png in Resources */,
 				EBA420C4167DE1A10052D11E /* Default-568h@2x.png in Resources */,
-				EBA420CA167DE1A10052D11E /* iREViewController.xib in Resources */,
+				EB55780E16887865003DBEAB /* MainStoryboard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,14 +354,6 @@
 				EBA420B7167DE1A10052D11E /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		EBA420C8167DE1A10052D11E /* iREViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				EBA420C9167DE1A10052D11E /* en */,
-			);
-			name = iREViewController.xib;
 			sourceTree = "<group>";
 		};
 		EBA42109167DE1DC0052D11E /* InfoPlist.strings */ = {

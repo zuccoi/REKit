@@ -10,7 +10,7 @@
 @interface MREViewController : NSViewController
 
 // Property
-@property (assign, nonatomic) IBOutlet NSTextField *label;
+@property (weak, nonatomic) IBOutlet NSTextField *label;
 
 // Action
 - (IBAction)changeBackgroundColorAction:(id)sender;

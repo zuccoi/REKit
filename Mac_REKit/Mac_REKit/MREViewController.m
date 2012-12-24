@@ -27,7 +27,7 @@
 	
 	// Create _observers
 	_observers = [NSMutableSet set];
-    
+	
 	return self;
 }
 
@@ -52,6 +52,8 @@
 	
 	// Start observing
 	id observer;
+	__weak NSTextField *label;
+	label = self.label;
 	observer = [self.view.layer addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
 		// Get new color and its components
 		CGColorRef color;
@@ -60,7 +62,7 @@
 		components = CGColorGetComponents(color);
 		
 		// Update label
-		[self.label setStringValue:[NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", components[0], components[1], components[2]]];
+		[label setStringValue:[NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", components[0], components[1], components[2]]];
 	}];
 	[_observers addObject:observer];
 }
@@ -71,6 +73,9 @@
 
 - (IBAction)changeBackgroundColorAction:(id)sender
 {
+	__weak CALayer *layer;
+	layer = self.view.layer;
+	
 	// Show alert
 	NSAlert *alert;
 	SEL selector;
@@ -89,8 +94,11 @@
 		
 		// Change backgroundColor
 		CGColorRef color;
-		color = CGColorCreateGenericRGB((float)(arc4random() % 11) / 10.0f, (float)(arc4random() % 11) / 10.0f, (float)(arc4random() % 11) / 10.0f, 1.0f);
-		self.view.layer.backgroundColor = color;
+		float (^random)() = ^{
+			return (arc4random() % 11) / 10.0f;
+		};
+		color = CGColorCreateGenericRGB(random(), random(), random(), 1.0f);
+		layer.backgroundColor = color;
 		CGColorRelease(color);
 	}];
 	[alert setDelegate:(id)alert];

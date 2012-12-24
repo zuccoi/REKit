@@ -27,7 +27,7 @@
 	
 	// Create _observers
 	_observers = [NSMutableSet set];
-    
+	
 	return self;
 }
 
@@ -37,6 +37,9 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+	// Get me
+	__weak typeof(self) me = self;
+	
 	// super
 	[super viewWillAppear:animated];
 	
@@ -51,7 +54,7 @@
 			[color getRed:&r green:&g blue:&b alpha:nil];
 			
 			// Update label
-			self.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
+			me.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
 		}];
 		[_observers addObject:observer];
 	}
@@ -72,6 +75,9 @@
 
 - (IBAction)changeBackgroundColorAction:(id)sender
 {
+	// Get me
+	__weak typeof(self) me = self;
+	
 	// Show alertView
 	UIAlertView *alertView;
 	NSString *title;
@@ -86,7 +92,10 @@
 		}
 		
 		// Change backgroundColor
-		self.view.backgroundColor = [UIColor colorWithRed:(float)(arc4random() % 11) / 10.0f green:(float)(arc4random() % 11) / 10.0f blue:(float)(arc4random() % 11) / 10.0f alpha:1.0f];
+		float (^random)() = ^{
+			return (arc4random() % 11) / 10.0f;
+		};
+		me.view.backgroundColor = [UIColor colorWithRed:random() green:random() blue:random() alpha:1.0f];
 	}];
 	alertView.delegate = alertView;
 	[alertView show];

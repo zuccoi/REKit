@@ -527,7 +527,63 @@
 	STAssertFalse(observed, @"");
 }
 
-- (void)test_observationAfterClassChange
+- (void)test_observationAfterClassChangeCausedByDynamicBlock
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Add observer for name
+	__block NSString *recognizedName = nil;
+	id observer;
+	REObserverHandler block;
+	block = ^(NSDictionary *change) {
+		recognizedName = change[NSKeyValueChangeNewKey];
+	};
+	block = Block_copy(block);
+	observer = [obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:block];
+	
+	// Add read method
+	NSString *blockName;
+	blockName = @"blockName";
+	[obj respondsToSelector:@selector(read) withBlockName:blockName usingBlock:^(id receiver) {
+		return @"Dynamic";
+	}];
+	
+	// Change name
+	obj.name = @"name";
+	//
+	STAssertEqualObjects(recognizedName, @"name", @"");
+	
+	// Check observingInfos and observedInfos
+	NSArray *observingInfos;
+	NSArray *observedInfos;
+	observingInfos = @[@{
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew),
+		REObserverBlockKey : block
+	}];
+	observedInfos = @[@{
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew),
+		REObserverBlockKey : block
+	}];
+	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
+	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
+	
+	// Remove block
+	[obj removeBlockNamed:blockName];
+	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
+	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
+	
+	// Change name
+	obj.name = @"name2";
+	STAssertEqualObjects(recognizedName, @"name2", @"");
+}
+
+- (void)test_observationAfterClassChangeCausedByOverrideBlock
 {
 	// Make obj
 	RETestObject *obj;
@@ -583,7 +639,60 @@
 	STAssertEqualObjects(recognizedName, @"name2", @"");
 }
 
-- (void)test_ordinalObservationAfterClassChange
+- (void)test_ordinalObservationAfterClassChangeCasedByDynamicBlock
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Make observer
+	id observer;
+	__block NSString *recognizedName = nil;
+	observer = [[[NSObject alloc] init] autorelease];
+	[observer respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:) withBlockName:@"blockName" usingBlock:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+		recognizedName = change[NSKeyValueChangeNewKey];
+	}];
+	[obj addObserver:observer forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
+	
+	// Override log method
+	NSString *blockName;
+	blockName = @"blockName";
+	[obj respondsToSelector:@selector(read) withBlockName:blockName usingBlock:^(id receiver) {
+		return @"Dynamic";
+	}];
+	
+	// Change name
+	obj.name = @"name";
+	//
+	STAssertEqualObjects(recognizedName, @"name", @"");
+	
+	// Check observingInfos and observedInfos
+	NSArray *observingInfos;
+	NSArray *observedInfos;
+	observingInfos = @[@{
+		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew)
+	}];
+	observedInfos = @[@{
+		REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+		REObserverKeyPathKey : @"name",
+		REObserverOptionsKey : @(NSKeyValueObservingOptionNew)
+	}];
+	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
+	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
+	
+	// Remove block
+	[obj removeBlockNamed:blockName];
+	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
+	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
+	
+	// Change name
+	obj.name = @"name2";
+	STAssertEqualObjects(recognizedName, @"name2", @"");
+}
+
+- (void)test_ordinalObservationAfterClassChangeCasedByOverrideBlock
 {
 	// Make obj
 	RETestObject *obj;

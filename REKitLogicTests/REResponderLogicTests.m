@@ -257,6 +257,29 @@
 	// Remove block2
 	[obj removeBlockNamed:@"block2"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
+	log = [obj performSelector:sel];
+	STAssertNil(log, @"");
+}
+
+- (void)test_performDummyBlock
+{
+	NSString *string = nil;
+	
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Add block1
+	[obj respondsToSelector:@selector(readThis:) withBlockName:@"block1" usingBlock:^(id receiver, NSString *string) {
+		return string;
+	}];
+	string = [obj performSelector:@selector(readThis:) withObject:@"Read"];
+	STAssertEqualObjects(string, @"Read", @"");
+	
+	// Remove block1
+	[obj removeBlockNamed:@"block1"];
+	string = [obj performSelector:@selector(readThis:) withObject:@"Read"];
+	STAssertNil(string, @"");
 }
 
 - (void)test_stackOfOverrideBlocks
@@ -389,6 +412,28 @@
 	// Call log method
 	log = [obj log];
 	STAssertEqualObjects(log, @"log", @"");
+}
+
+- (void)test_supermethodOf1stDynamicBlock
+{
+	// Make obj
+	NSObject *obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Add log method
+	[obj respondsToSelector:@selector(log) withBlockName:@"logBlock" usingBlock:^(id receiver) {
+		NSMutableString *log;
+		log = [NSMutableString string];
+		
+		IMP supermethod;
+		supermethod = [receiver supermethodOfBlockNamed:@"logBlock"];
+		STAssertNil((id)supermethod, @"");
+		
+		return @"Dynamic log";
+	}];
+	
+	// Perform log
+	[obj performSelector:@selector(log)];
 }
 
 - (void)test_supermethodOfDynamicBlock
@@ -640,7 +685,35 @@
 	STAssertEquals(age, (NSUInteger)14, @"");
 }
 
-- (void)test_doNotChangeClassFrequently
+- (void)test_doNotChangeClassFrequentlyWithDynamicBlockManagement
+{
+	// Make obj
+	NSObject *obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Add log method
+	[obj respondsToSelector:@selector(log) withBlockName:@"logBlock" usingBlock:^(id receiver) {
+		return @"Dynamic log";
+	}];
+	STAssertTrue([obj class] != [RETestObject class], @"");
+	
+	// Record new class
+	Class newClass;
+	newClass = [obj class];
+	
+	// Add say method
+	[obj respondsToSelector:@selector(say) withBlockName:@"sayBlock" usingBlock:^(id receiver) {
+		return @"Dynamic say";
+	}];
+	STAssertEquals([obj class], newClass, @"");
+	
+	// Remove blocks
+	[obj removeBlockNamed:@"logBlock"];
+	[obj removeBlockNamed:@"sayBlock"];
+	STAssertEquals([obj class], newClass, @"");
+}
+
+- (void)test_doNotChangeClassFrequentlyWithOverrideBlockManagement
 {
 	// Make obj
 	RETestObject *obj;

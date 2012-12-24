@@ -22,6 +22,11 @@ static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignat
 static NSString* const kBlockInfoBlockKey = @"block";
 static NSString* const kBlockInfoBlockNameKey = @"blockName";
 
+// kDummyBlock
+static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
+	return nil;
+};
+
 
 @implementation NSObject (REResponder)
 
@@ -42,120 +47,24 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
-	// original
-	if ([self REResponder_X_respondsToSelector:aSelector]) {
-		return YES;
-	}
-	
-	// Check registered selector
+	// Check blockInfos
+	NSMutableArray *blockInfos;
 	NSString *selectorName;
 	selectorName = NSStringFromSelector(aSelector);
-	return ([[self associatedValueForKey:kBlocksAssociationKey][selectorName] count] > 0);
-}
-
-- (NSMethodSignature*)REResponder_X_methodSignatureForSelector:(SEL)aSelector
-{
-	// Get selectorName
-	NSString *selectorName;
-	selectorName = NSStringFromSelector(aSelector);
-	
-	// Check registered selector
-	@synchronized (self) {
-		NSMutableArray *blockInfos;
-		blockInfos = [self associatedValueForKey:kBlocksAssociationKey][selectorName];
-		if (blockInfos) {
-			return [blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey];
+	blockInfos = [self associatedValueForKey:kBlocksAssociationKey][selectorName];
+	if (blockInfos) {
+		if ([blockInfos count]) {
+			return YES;
 		}
+		
+		// Check originalMethod
+		IMP originalMethod;
+		originalMethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], NSSelectorFromString(selectorName)));
+		return (originalMethod != nil);
 	}
 	
 	// original
-	return [self REResponder_X_methodSignatureForSelector:aSelector];
-}
-
-- (void)REResponder_X_forwardInvocation:(NSInvocation*)invocation
-{
-	// Get selectorName
-	NSString *selectorName;
-	selectorName = NSStringFromSelector([invocation selector]);
-	
-	// Handle registered selector
-	@synchronized (self) {
-		// Get blockInfo
-		NSDictionary *blockInfo;
-		blockInfo = [[self associatedValueForKey:kBlocksAssociationKey][selectorName] lastObject];
-		if (!blockInfo) {
-			goto ORIGINAL;
-		}
-		
-		// Get elements
-		id block;
-		NSMethodSignature *methodSignature;
-		NSUInteger argc;
-		block = blockInfo[kBlockInfoBlockKey];
-		if (!block) {
-			goto ORIGINAL;
-		}
-		methodSignature = [invocation methodSignature];
-		argc = [methodSignature numberOfArguments];
-		
-		// Make blockInvocation
-		NSInvocation *blockInvocation;
-		const char *argType;
-		NSUInteger length;
-		void *argBuffer;
-		NSData *argument;
-		blockInvocation = [NSInvocation invocationWithMethodSignature:[NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)]];
-		[blockInvocation setTarget:block];
-		{
-			argType = [methodSignature getArgumentTypeAtIndex:0];
-			NSGetSizeAndAlignment(argType, &length, NULL);
-			
-			argBuffer = malloc(length);
-			[invocation getArgument:argBuffer atIndex:0];
-			
-			argument = [NSData dataWithBytesNoCopy:argBuffer length:length];
-			[blockInvocation setArgument:(void*)[argument bytes] atIndex:1];
-		}
-		for (NSInteger i = 2; i < argc; i++) {
-			// Get argType and length
-			argType = [methodSignature getArgumentTypeAtIndex:i];
-			NSGetSizeAndAlignment(argType, &length, NULL);
-			
-			// Prepare argBuffer
-			argBuffer = malloc(length);
-			[invocation getArgument:argBuffer atIndex:i];
-			
-			// Add argument
-			argument = [NSData dataWithBytesNoCopy:argBuffer length:length];
-			[blockInvocation setArgument:(void*)[argument bytes] atIndex:i];
-		}
-		
-		// Invoke blockInvocation
-		[blockInvocation invokeUsingIMP:REBlockGetImplementation(block)];
-		
-		// Set return value to invocation
-		NSUInteger returnLength;
-		returnLength = [methodSignature methodReturnLength];
-		if (returnLength > 0) {
-			// Get return value
-			void *returnBuffer;
-			returnBuffer = malloc(returnLength);
-			[blockInvocation getReturnValue:returnBuffer];
-			
-			// Set return value
-			NSData *returnData;
-			static void *returnDataKey;
-			returnData = [NSData dataWithBytesNoCopy:returnBuffer length:returnLength];
-			[invocation setReturnValue:(void*)returnData.bytes];
-			[invocation associateValue:returnData forKey:&returnDataKey policy:OBJC_ASSOCIATION_RETAIN];
-		}
-		
-		return;
-	}
-	
-	// original
-	ORIGINAL:
-	[self REResponder_X_forwardInvocation:invocation];
+	return [self REResponder_X_respondsToSelector:aSelector];
 }
 
 - (void)REResponder_X_dealloc
@@ -186,10 +95,7 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 		// Exchange instance methods
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
 			@selector(conformsToProtocol:),
-			@selector(methodForSelector:),
 			@selector(respondsToSelector:),
-			@selector(methodSignatureForSelector:),
-			@selector(forwardInvocation:),
 			@selector(dealloc),
 			nil
 		];
@@ -222,7 +128,7 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 		}];
 	}
 	
-	// Nullify inout arguments
+	// Nullify arguments
 	if (!blockInfo) {
 		if (blockInfos) {
 			*blockInfos = nil;
@@ -297,9 +203,8 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
-		// Replace method
-		if ([self REResponder_X_respondsToSelector:selector]) {
-			// Become subclass
+		// Become subclass
+		if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
 			if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
 				// Update _number
 				static NSDecimalNumber *_number = nil;
@@ -320,16 +225,15 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 				originalClass = [self class];
 				className = [NSString stringWithFormat:@"%@%@_%@", kClassNamePrefix, [_number stringValue], NSStringFromClass([self class])];
 				subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
-				class_addMethod(subclass, selector, NULL, [objCTypes UTF8String]);
 				objc_registerClassPair(subclass);
 				[self willChangeClass:subclass];
 				object_setClass(self, subclass);
 				[self didChangeClass:originalClass];
 			}
-			
-			// Replace method
-			class_replaceMethod([self class], selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
 		}
+		
+		// Replace method
+		class_replaceMethod([self class], selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
 		
 		// Add blockInfo to blockInfos
 		NSDictionary *blockInfo;
@@ -369,16 +273,14 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
 		NSString *selectorName;
-		SEL selector;
 		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
-		selector = NSSelectorFromString(selectorName);
 		if (blockInfo) {
 			// Check index of blockInfo
 			NSUInteger index;
 			index = [blockInfos indexOfObject:blockInfo];
 			if (index == 0) {
 				// supermethod is superclass's instance method
-				supermethod = [[[self class] superclass] instanceMethodForSelector:selector];
+				supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], NSSelectorFromString(selectorName)));
 			}
 			else {
 				// supermethod is superblock's IMP
@@ -395,21 +297,23 @@ static NSString* const kBlockInfoBlockNameKey = @"blockName";
 - (void)removeBlockNamed:(NSString*)blockName
 {
 	@synchronized (self) {
-		// Get blockInfo and blockInfos
+		// Get elements
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
 		NSString *selectorName;
-		SEL selector;
 		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
-		selector = NSSelectorFromString(selectorName);
 		if (blockInfo && blockInfos) {
-			// Check existance of original method
-			if ([self REResponder_X_respondsToSelector:selector]) {
-				if (blockInfo == [blockInfos lastObject]) {
-					// Replace method
-					IMP supermethod;
-					supermethod = [self supermethodOfBlockNamed:blockInfo[kBlockInfoBlockNameKey]];
-					class_replaceMethod([self class], selector, supermethod, [[[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes] UTF8String]);
+			// Replace method
+			if (blockInfo == [blockInfos lastObject]) {
+				SEL selector;
+				IMP supermethod;
+				selector = NSSelectorFromString(selectorName);
+				supermethod = [self supermethodOfBlockNamed:blockInfo[kBlockInfoBlockNameKey]];
+				if (supermethod) {
+					class_replaceMethod([self class], selector, supermethod, REBlockGetObjCTypes(blockInfo[kBlockInfoBlockKey]));
+				}
+				else {
+					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), REBlockGetObjCTypes(kDummyBlock));
 				}
 			}
 			

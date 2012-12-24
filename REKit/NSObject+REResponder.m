@@ -16,11 +16,11 @@
 static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kBlocksAssociationKey = @"REResponder_blocks";
+static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 
 // Keys for blockInfo
 static NSString* const kBlockInfoBlockKey = @"block";
 static NSString* const kBlockInfoBlockNameKey = @"blockName";
-static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 
 
 @implementation NSObject (REResponder)
@@ -61,10 +61,10 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 	
 	// Check registered selector
 	@synchronized (self) {
-		NSDictionary *blockInfo;
-		blockInfo = [[self associatedValueForKey:kBlocksAssociationKey][selectorName] lastObject];
-		if (blockInfo) {
-			return blockInfo[kBlockInfoMethodSignatureKey];
+		NSMutableArray *blockInfos;
+		blockInfos = [self associatedValueForKey:kBlocksAssociationKey][selectorName];
+		if (blockInfos) {
+			return [blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey];
 		}
 	}
 	
@@ -293,6 +293,7 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 			
 			// Make blockInfos
 			blockInfos = [NSMutableArray array];
+			[blockInfos associateValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
@@ -335,7 +336,6 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 		blockInfo = @{
 			kBlockInfoBlockKey : Block_copy(block),
 			kBlockInfoBlockNameKey : [blockName copy],
-			kBlockInfoMethodSignatureKey : methodSignature,
 		};
 		[blockInfos addObject:blockInfo];
 	}
@@ -409,7 +409,7 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 					// Replace method
 					IMP supermethod;
 					supermethod = [self supermethodOfBlockNamed:blockInfo[kBlockInfoBlockNameKey]];
-					class_replaceMethod([self class], selector, supermethod, [[blockInfo[kBlockInfoMethodSignatureKey] objCTypes] UTF8String]);
+					class_replaceMethod([self class], selector, supermethod, [[[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes] UTF8String]);
 				}
 			}
 			

@@ -366,7 +366,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			}
 			
 			// Add key
-			[keys addObject:[key copy]];
+			[keys addObject:[[key copy] autorelease]];
 		}
 		// Remove key
 		else {

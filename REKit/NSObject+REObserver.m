@@ -41,7 +41,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Get copiedKeyPath
 	NSString *copiedKeyPath;
-	copiedKeyPath = [keyPath copy];
+	copiedKeyPath = [[keyPath copy] autorelease];
 	
 	// Enumerate objects
 	@synchronized (self) {
@@ -171,7 +171,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Get copiedKeyPath
 	NSString *copiedKeyPath;
-	copiedKeyPath = [keyPath copy];
+	copiedKeyPath = [[keyPath copy] autorelease];
 	
 	// Make observingInfo
 	NSMutableDictionary *observingInfo;
@@ -460,7 +460,7 @@ NSString* const REObserverContainerKey = @"container";
 	id copiedBock;
 	NSString *copiedKeyPath;
 	copiedBock = Block_copy(block);
-	copiedKeyPath = [keyPath copy];
+	copiedKeyPath = [[keyPath copy] autorelease];
 	
 	@synchronized (self) {
 		// Make observingInfo

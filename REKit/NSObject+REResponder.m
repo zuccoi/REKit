@@ -155,7 +155,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	// Get blockName
 	NSString *blockName;
 	if ([name length]) {
-		blockName = name;
+		blockName = [[name copy] autorelease];
 	}
 	else {
 		blockName = REUUIDString();
@@ -239,7 +239,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		NSDictionary *blockInfo;
 		blockInfo = @{
 			kBlockInfoBlockKey : Block_copy(block),
-			kBlockInfoBlockNameKey : [blockName copy],
+			kBlockInfoBlockNameKey : blockName,
 		};
 		[blockInfos addObject:blockInfo];
 	}

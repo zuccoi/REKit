@@ -16,7 +16,6 @@
 static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kBlocksAssociationKey = @"REResponder_blocks";
-static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
 // Keys for blockInfo
 static NSString* const kBlockInfoBlockKey = @"block";
@@ -299,13 +298,6 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 		
 		// Replace method
 		if ([self REResponder_X_respondsToSelector:selector]) {
-			// Associate originalMethod with blockInfos
-			if (![blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey]) {
-				IMP originalMethod;
-				originalMethod = [self methodForSelector:selector];
-				[blockInfos associateValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			
 			// Become subclass
 			if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
 				// Update _number
@@ -411,10 +403,8 @@ static NSString* const kBlockInfoMethodSignatureKey = @"methodSignature";
 		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
 		selector = NSSelectorFromString(selectorName);
 		if (blockInfo && blockInfos) {
-			// Check existance of originalMethod
-			IMP originalMethod;
-			originalMethod = [[blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey] pointerValue];
-			if (originalMethod) {
+			// Check existance of original method
+			if ([self REResponder_X_respondsToSelector:selector]) {
 				if (blockInfo == [blockInfos lastObject]) {
 					// Replace method
 					IMP supermethod;

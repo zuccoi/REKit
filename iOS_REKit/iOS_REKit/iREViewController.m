@@ -58,6 +58,23 @@
 		}];
 		[_observers addObject:observer];
 	}
+	
+	// Update views
+	[self updateViews:animated];
+}
+
+- (void)updateViews:(BOOL)animated
+{
+	UIBarButtonItem *item;
+	SEL selector;
+	selector = @selector(addAction:);
+	item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:nil action:selector];
+	[item respondsToSelector:selector withBlockName:nil usingBlock:^(id receiver, id sender) {
+		// Do something…
+		NSLog(@"%s", __PRETTY_FUNCTION__);
+	}];
+	item.target = item;
+	self.navigationItem.rightBarButtonItem = item;
 }
 
 - (void)viewWillDisappear:(BOOL)animated

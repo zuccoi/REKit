@@ -143,6 +143,16 @@ NSString* REUUIDString()
 	method_exchangeImplementations(originalMethod, newMethod);
 }
 
++ (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
+{
+	// Exchange
+	Method originalMethod;
+	Method newMethod;
+	originalMethod = class_getInstanceMethod(self, originalSelector);
+	newMethod = class_getInstanceMethod(self, newSelector);
+	method_exchangeImplementations(originalMethod, newMethod);
+}
+
 + (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION
 {
 	// Enumerate selectors
@@ -162,16 +172,6 @@ NSString* REUUIDString()
 		aSelector = va_arg(args, SEL);
 	}
 	va_end(args);
-}
-
-+ (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
-{
-	// Exchange
-	Method originalMethod;
-	Method newMethod;
-	originalMethod = class_getInstanceMethod(self, originalSelector);
-	newMethod = class_getInstanceMethod(self, newSelector);
-	method_exchangeImplementations(originalMethod, newMethod);
 }
 
 + (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION

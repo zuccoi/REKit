@@ -67,6 +67,35 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	return [self REResponder_X_respondsToSelector:aSelector];
 }
 
+- (void)REResponder_X_dealloc
+{
+	// Remove protocols
+	[self associateValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	
+	// Remove blocks
+	NSMutableDictionary *blocks;
+	blocks = [self associatedValueForKey:kBlocksAssociationKey];
+	[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+		while ([blockInfos count]) {
+			NSDictionary *blockInfo;
+			blockInfo = [blockInfos lastObject];
+			[self removeBlockForSelector:NSSelectorFromString(selectorName) forKey:blockInfo[kBockInfoKeyKey]];
+		}
+	}];
+	[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	
+	// Dispose class
+	if ([NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
+		Class class;
+		class = [self class];
+		object_setClass(self, [self superclass]);
+		objc_disposeClassPair(class);
+	}
+	
+	// original
+	[self REResponder_X_dealloc];
+}
+
 + (void)load
 {
 	@autoreleasepool {
@@ -74,6 +103,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
+			@selector(dealloc),
 			nil
 		];
 	}
@@ -284,6 +314,11 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), REBlockGetObjCTypes(kDummyBlock));
 				}
 			}
+			
+			// Remove block
+			id block;
+			block = blockInfo[kBlockInfoBlockKey];
+			imp_removeBlock(imp_implementationWithBlock(block));
 			
 			// Remove blockInfo
 			[blockInfos removeObject:blockInfo];

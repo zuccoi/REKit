@@ -90,6 +90,10 @@
 		// Make obj
 		id obj;
 		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			// Do something…
+			receiver = receiver;
+		}];
 		[obj respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
 //			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver instead.
 			
@@ -117,6 +121,9 @@
 		// Make obj
 		RETestObject *obj;
 		obj = [RETestObject testObject];
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			return @"Overridden log";
+		}];
 		[obj respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
 //			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver instead.
 			

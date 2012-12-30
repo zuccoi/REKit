@@ -17,80 +17,121 @@
 
 - (void)test_respondsToUnimplementedMethod
 {
-	__block BOOL deallocated = NO;
+	SEL sel = @selector(log);
+	NSString *log;
 	
-	@autoreleasepool {
-		id obj;
-		SEL sel = @selector(log);
-		NSString *log;
-		
-		// Make obj
-		obj = [[[NSObject alloc] init] autorelease];
-		
-		// Responds to log method dynamically
-		[obj respondsToSelector:sel withKey:nil usingBlock:^NSString*(id receiver) {
-//			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver.
-			NSLog(@"receiver = %@", receiver);
-			return @"block1";
-		}];
-		log = [obj performSelector:sel];
-		STAssertEqualObjects(log, @"block1", @"");
-		
-		// Override dealloc method to check deallocation
-		[obj respondsToSelector:@selector(dealloc) withKey:@"dealloc" usingBlock:^(id receiver) {
-			// super
-			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"dealloc"])) {
-				supermethod(receiver, @selector(dealloc));
-			}
-			
-			// Raise deallocated
-			deallocated = YES;
-		}];
-	}
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
 	
-	// Check deallocated
-	STAssertTrue(deallocated, @"");
+	// Responds to log method dynamically
+	[obj respondsToSelector:sel withKey:nil usingBlock:^NSString*(id receiver) {
+		return @"block";
+	}];
+	log = [obj performSelector:sel];
+	STAssertEqualObjects(log, @"block", @"");
 }
 
 - (void)test_overrideHardcodedMethod
 {
+	// You can override hardcoded method
+	NSString *log;
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^NSString*(id receiver) {
+		return @"Overridden log";
+	}];
+	log = [obj log];
+	STAssertEqualObjects(log, @"Overridden log", @"");
+}
+
+- (void)test_dynamicBlockDoesNotAffectOtherInstances
+{
+	// Make obj and otherObj
+	id obj;
+	id otherObj;
+	obj = [[[NSObject alloc] init] autorelease];
+	otherObj = [[[NSObject alloc] init] autorelease];
+	
+	// Add dynamic block to obj
+	[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+		return @"Dynamic log";
+	}];
+	
+	// Check
+	STAssertFalse([otherObj respondsToSelector:@selector(log)], @"");
+}
+
+- (void)test_overrideBlockDoesNotAffectOtherInstances
+{
+	NSString *string;
+	
+	// Make obj and otherObj
+	RETestObject *obj;
+	RETestObject *otherObj;
+	obj = [RETestObject testObject];
+	otherObj = [RETestObject testObject];
+	
+	// Override log method of obj
+	[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+		return @"Overridden log";
+	}];
+	
+	// Make other obj
+	string = [otherObj log];
+	STAssertEquals(string, @"log", @"");
+}
+
+- (void)test_receiverHavingDynamicBlockIsDeallocated
+{
 	__block BOOL deallocated = NO;
-	SEL sel;
 	
 	@autoreleasepool {
-		// You can override hardcoded method
-		NSString *log;
-		RETestObject *obj;
-		obj = [RETestObject testObject];
-		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^NSString*(id receiver) {
-//			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver.
-			NSLog(@"receiver = %@", receiver);
-			return @"block log";
-		}];
-		log = [obj log];
-		STAssertEqualObjects(log, @"block log", @"");
-		
-		// The override doesn't affect other instances
-		NSString *log2;
-		RETestObject *obj2;
-		obj2 = [RETestObject testObject];
-		log2 = [obj2 log];
-		STAssertEqualObjects(log2, @"log", @"");
-		
-		// Override dealloc method to check deallocation
-		[obj respondsToSelector:(sel = @selector(dealloc)) withKey:@"dealloc" usingBlock:^(id receiver) {
+		// Make obj
+		id obj;
+		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+//			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver instead.
+			
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"dealloc"])) {
-				supermethod(receiver, sel);
+			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+				supermethod(receiver, @selector(dealloc));
 			}
 			
-			// Raise deallocated
+			
+			// Raise deallocated flag
 			deallocated = YES;
 		}];
 	}
 	
+	// Check
+	STAssertTrue(deallocated, @"");
+}
+
+- (void)test_receiverHavingOverrideBlockIsDeallocated
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Make obj
+		RETestObject *obj;
+		obj = [RETestObject testObject];
+		[obj respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+//			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver instead.
+			
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+			
+			// Raise deallocated flag
+			deallocated = YES;
+		}];
+	}
+	
+	// Check
 	STAssertTrue(deallocated, @"");
 }
 
@@ -162,6 +203,81 @@
 	
 	// Check
 	STAssertTrue(released, @"");
+}
+
+- (void)test_unfortunatelyContextIsNotDeallocated
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Make context
+		id context;
+		context = [[[NSObject alloc] init] autorelease];
+		[context respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+			
+			// Raise deallocated flag
+			deallocated = YES;
+		}];
+		
+		// Make obj
+		id obj;
+		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			// Use context in block
+			NSLog(@"context = %@", context);
+		}];
+	}
+	
+	// Check
+	STAssertFalse(deallocated, @"");
+}
+
+- (void)test_autoreleasingContextIsDeallocated
+{
+	__block BOOL deallocated = NO;
+	SEL sel;
+	sel = NSSelectorFromString(@"dealloc");
+	
+	@autoreleasepool {
+		// Make obj
+		id obj;
+		obj = [[NSObject alloc] init];
+		
+		@autoreleasepool {
+			// Make context
+			__autoreleasing id context;
+			context = [[[NSObject alloc] init] autorelease];
+			[context respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+				// super
+				IMP supermethod;
+				if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+					supermethod(receiver, sel);
+				}
+				
+				// Raise deallocated flag
+				deallocated = YES;
+			}];
+			
+			// Add log block
+			[obj respondsToSelector:@selector(log) withKey:@"key" usingBlock:^(id receiver) {
+				NSLog(@"context = %@", context);
+			}];
+			
+			// Log
+			[obj performSelector:@selector(log)];
+		}
+		
+		// Log
+		[obj performSelector:@selector(log)];
+	}
+	
+	// Check
+	STAssertTrue(deallocated, @"");
 }
 
 - (void)test_allowArguments

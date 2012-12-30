@@ -34,6 +34,9 @@
 		EBA4217E167DFFFA0052D11E /* REResponderLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42158167DE2B80052D11E /* REResponderLogicTests.m */; };
 		EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215A167DE2B80052D11E /* RETestObject.m */; };
 		EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */; };
+		EBBF661A169040FB00B66BCE /* REResponderARCLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */; };
+		EBBF661B169040FB00B66BCE /* REResponderARCLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */; };
+		EBBF661E1690418500B66BCE /* REResponderARCLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBEC4FF81681B72000E94925 /* MREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBEC4FF61681B72000E94925 /* MREViewController.m */; };
 		EBEC4FF91681B72000E94925 /* MREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBEC4FF71681B72000E94925 /* MREViewController.xib */; };
 /* End PBXBuildFile section */
@@ -72,6 +75,8 @@
 		EBA4215A167DE2B80052D11E /* RETestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RETestObject.m; path = ../../REKitLogicTests/RETestObject.m; sourceTree = "<group>"; };
 		EBA4215B167DE2B80052D11E /* REUtilLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REUtilLogicTests.h; path = ../../REKitLogicTests/REUtilLogicTests.h; sourceTree = "<group>"; };
 		EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REUtilLogicTests.m; path = ../../REKitLogicTests/REUtilLogicTests.m; sourceTree = "<group>"; };
+		EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = file; name = REResponderARCLogicTests.h; path = ../../REKitLogicTests/REResponderARCLogicTests.h; sourceTree = "<group>"; };
+		EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = file; name = REResponderARCLogicTests.m; path = ../../REKitLogicTests/REResponderARCLogicTests.m; sourceTree = "<group>"; };
 		EBEC4FF51681B72000E94925 /* MREViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MREViewController.h; sourceTree = "<group>"; };
 		EBEC4FF61681B72000E94925 /* MREViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MREViewController.m; sourceTree = "<group>"; };
 		EBEC4FF71681B72000E94925 /* MREViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MREViewController.xib; sourceTree = "<group>"; };
@@ -169,6 +174,8 @@
 			children = (
 				EBA42155167DE2B80052D11E /* REObserverLogicTests.h */,
 				EBA42156167DE2B80052D11E /* REObserverLogicTests.m */,
+				EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */,
+				EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */,
 				EBA42157167DE2B80052D11E /* REResponderLogicTests.h */,
 				EBA42158167DE2B80052D11E /* REResponderLogicTests.m */,
 				EBA42159167DE2B80052D11E /* RETestObject.h */,
@@ -290,6 +297,8 @@
 				EBA42121167DE1F20052D11E /* InfoPlist.strings in Resources */,
 				EBA4215D167DE2B80052D11E /* REObserverLogicTests.h in Resources */,
 				EBA4215E167DE2B80052D11E /* REObserverLogicTests.m in Resources */,
+				EBBF661A169040FB00B66BCE /* REResponderARCLogicTests.h in Resources */,
+				EBBF661B169040FB00B66BCE /* REResponderARCLogicTests.m in Resources */,
 				EBA4215F167DE2B80052D11E /* REResponderLogicTests.h in Resources */,
 				EBA42160167DE2B80052D11E /* REResponderLogicTests.m in Resources */,
 				EBA42161167DE2B80052D11E /* RETestObject.h in Resources */,
@@ -336,6 +345,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EBA4217D167DFFFA0052D11E /* REObserverLogicTests.m in Sources */,
+				EBBF661E1690418500B66BCE /* REResponderARCLogicTests.m in Sources */,
 				EBA4217E167DFFFA0052D11E /* REResponderLogicTests.m in Sources */,
 				EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */,
 				EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */,

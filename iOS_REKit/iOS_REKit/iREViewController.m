@@ -58,23 +58,6 @@
 		}];
 		[_observers addObject:observer];
 	}
-	
-	// Update views
-	[self updateViews:animated];
-}
-
-- (void)updateViews:(BOOL)animated
-{
-	UIBarButtonItem *item;
-	SEL selector;
-	selector = @selector(addAction:);
-	item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:nil action:selector];
-	[item respondsToSelector:selector withBlockName:nil usingBlock:^(id receiver, id sender) {
-		// Do something…
-		NSLog(@"%s", __PRETTY_FUNCTION__);
-	}];
-	item.target = item;
-	self.navigationItem.rightBarButtonItem = item;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -102,7 +85,7 @@
 	title = @"Change Background Color?";
 	message = @"This alert view's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature.";
 	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
-	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withBlockName:nil usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withKey:nil usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
 		// Cancel
 		if (buttonIndex == 0) {
 			return;

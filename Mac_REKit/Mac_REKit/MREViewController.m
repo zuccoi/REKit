@@ -86,7 +86,7 @@
 	[alert setInformativeText:@"This alert's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature."];
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
-	[alert respondsToSelector:selector withBlockName:nil usingBlock:^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
+	[alert respondsToSelector:selector withKey:nil usingBlock:^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
 		// Cancel
 		if (returnCode == NSAlertSecondButtonReturn) {
 			return;

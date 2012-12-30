@@ -10,12 +10,12 @@
 @interface NSObject (REResponder)
 
 // Block
-- (void)respondsToSelector:(SEL)selector withBlockName:(NSString*)nameOrNil usingBlock:(id)block;
-- (id)blockNamed:(NSString*)blockName;
-- (IMP)supermethodOfBlockNamed:(NSString*)blockName;
-- (void)removeBlockNamed:(NSString*)blockName;
+- (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block;
+- (id)blockForSelector:(SEL)selector forKey:(id)key;
+- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key;
+- (void)removeBlockForSelector:(SEL)selector forKey:(id)key;
 
 // Conformance
-- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(NSString*)key;
+- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(id)key;
 
 @end

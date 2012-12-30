@@ -20,7 +20,7 @@ static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignat
 
 // Keys for blockInfo
 static NSString* const kBlockInfoBlockKey = @"block";
-static NSString* const kBlockInfoBlockNameKey = @"blockName";
+static NSString* const kBockInfoKeyKey = @"key";
 
 // kDummyBlock
 static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
@@ -67,28 +67,6 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	return [self REResponder_X_respondsToSelector:aSelector];
 }
 
-- (void)REResponder_X_dealloc
-{
-	// Release protocols
-	[self associateValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-	
-	// Release blocks
-	NSArray *blockNames;
-	NSMutableDictionary *blocks;
-	blocks = [self associatedValueForKey:kBlocksAssociationKey];
-	if ([blocks count]) {
-		blockNames = [[blocks allValues] valueForKey:kBlockInfoBlockNameKey];
-		blockNames = [blockNames valueForKeyPath:@"@unionOfArrays.self"];
-		[blockNames enumerateObjectsUsingBlock:^(NSString *blockName, NSUInteger idx, BOOL *stop) {
-			[self removeBlockNamed:blockName];
-		}];
-		[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-	}
-	
-	// original
-	[self REResponder_X_dealloc];
-}
-
 + (void)load
 {
 	@autoreleasepool {
@@ -96,7 +74,6 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
-			@selector(dealloc),
 			nil
 		];
 	}
@@ -106,35 +83,21 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 #pragma mark -- Property --
 //--------------------------------------------------------------//
 
-- (NSDictionary*)REResponder_blockInfoWithBlockName:(NSString*)blockName blockInfos:(NSMutableArray**)blockInfos selectorName:(NSString**)selectorName
+- (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector forKey:(id)key blockInfos:(NSMutableArray**)outBlockInfos
 {
 	// Get blockInfo
 	__block NSDictionary *blockInfo = nil;
 	@synchronized (self) {
-		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *aStop) {
-			[aBlockInfos enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSDictionary *bBlockInfo, NSUInteger bIdx, BOOL *bStop) {
-				if ([bBlockInfo[kBlockInfoBlockNameKey] isEqualToString:blockName]) {
-					blockInfo = bBlockInfo;
-					if (blockInfos) {
-						*blockInfos = aBlockInfos;
-					}
-					if (selectorName) {
-						*selectorName = aSelectorName;
-					}
-					*aStop = YES;
-					*bStop = YES;
-				}
-			}];
+		NSMutableArray *blockInfos;
+		blockInfos = [self associatedValueForKey:kBlocksAssociationKey][NSStringFromSelector(selector)];
+		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stop) {
+			if ([aBlockInfo[kBockInfoKeyKey] isEqual:key]) {
+				blockInfo = aBlockInfo;
+				*stop = YES;
+			}
 		}];
-	}
-	
-	// Nullify arguments
-	if (!blockInfo) {
-		if (blockInfos) {
-			*blockInfos = nil;
-		}
-		if (selectorName) {
-			*selectorName = nil;
+		if (outBlockInfos) {
+			*outBlockInfos = blockInfos;
 		}
 	}
 	
@@ -145,21 +108,16 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 #pragma mark -- Block --
 //--------------------------------------------------------------//
 
-- (void)respondsToSelector:(SEL)selector withBlockName:(NSString*)name usingBlock:(id)block
+- (void)respondsToSelector:(SEL)selector withKey:(id)inKey usingBlock:(id)block
 {
 	// Filter
 	if (!selector || !block) {
 		return;
 	}
 	
-	// Get blockName
-	NSString *blockName;
-	if ([name length]) {
-		blockName = [[name copy] autorelease];
-	}
-	else {
-		blockName = REUUIDString();
-	}
+	// Get key
+	id key;
+	key = (inKey != nil ? inKey : REUUIDString());
 	
 	// Get selectorName
 	NSString *selectorName;
@@ -176,12 +134,12 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 	methodSignature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
 	if (!methodSignature) {
-		NSLog(@"Failed to get signature for block named %@", blockName);
+		NSLog(@"Failed to get signature for key %@", key);
 		return;
 	}
 	
 	// Update blocks
-	[self removeBlockNamed:name];
+	[self removeBlockForSelector:selector forKey:key];
 	@synchronized (self) {
 		// Get blocks
 		NSMutableDictionary *blocks;
@@ -237,32 +195,40 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		
 		// Add blockInfo to blockInfos
 		NSDictionary *blockInfo;
+		id copiedBlock;
+		copiedBlock = Block_copy(block);
 		blockInfo = @{
-			kBlockInfoBlockKey : Block_copy(block),
-			kBlockInfoBlockNameKey : blockName,
+			kBlockInfoBlockKey : copiedBlock,
+			kBockInfoKeyKey : key,
 		};
+		Block_release(copiedBlock);
 		[blockInfos addObject:blockInfo];
 	}
 }
 
-- (id)blockNamed:(NSString*)blockName
+- (id)blockForSelector:(SEL)selector forKey:(id)key
 {
+	// Filter
+	if (!selector || !key) {
+		return nil;
+	}
+	
 	// Get block
 	id block;
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:nil selectorName:nil];
+		blockInfo = [self REResponder_blockInfoForSelector:selector forKey:key blockInfos:nil];
 		block = blockInfo[kBlockInfoBlockKey];
 	}
 	
 	return block;
 }
 
-- (IMP)supermethodOfBlockNamed:(NSString *)blockName
+- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key
 {
 	// Filter
-	if (![blockName length]) {
+	if (!selector || !key) {
 		return NULL;
 	}
 	
@@ -272,15 +238,14 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		NSString *selectorName;
-		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
+		blockInfo = [self REResponder_blockInfoForSelector:selector forKey:key blockInfos:&blockInfos];
 		if (blockInfo) {
 			// Check index of blockInfo
 			NSUInteger index;
 			index = [blockInfos indexOfObject:blockInfo];
 			if (index == 0) {
 				// supermethod is superclass's instance method
-				supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], NSSelectorFromString(selectorName)));
+				supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
 			}
 			else {
 				// supermethod is superblock's IMP
@@ -294,34 +259,30 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	return supermethod;
 }
 
-- (void)removeBlockNamed:(NSString*)blockName
+- (void)removeBlockForSelector:(SEL)selector forKey:(id)key
 {
+	// Filter
+	if (!selector || !key) {
+		return;
+	}
+	
+	// Remove
 	@synchronized (self) {
 		// Get elements
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		NSString *selectorName;
-		blockInfo = [self REResponder_blockInfoWithBlockName:blockName blockInfos:&blockInfos  selectorName:&selectorName];
+		blockInfo = [self REResponder_blockInfoForSelector:selector forKey:key blockInfos:&blockInfos];
 		if (blockInfo && blockInfos) {
 			// Replace method
 			if (blockInfo == [blockInfos lastObject]) {
-				SEL selector;
 				IMP supermethod;
-				selector = NSSelectorFromString(selectorName);
-				supermethod = [self supermethodOfBlockNamed:blockInfo[kBlockInfoBlockNameKey]];
+				supermethod = [self supermethodOfBlockForSelector:selector forKey:key];
 				if (supermethod) {
 					class_replaceMethod([self class], selector, supermethod, REBlockGetObjCTypes(blockInfo[kBlockInfoBlockKey]));
 				}
 				else {
 					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), REBlockGetObjCTypes(kDummyBlock));
 				}
-			}
-			
-			// Release block
-			id block;
-			block = blockInfo[kBlockInfoBlockKey];
-			if (block) {
-				Block_release(block);
 			}
 			
 			// Remove blockInfo
@@ -334,10 +295,10 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 #pragma mark -- Conformance --
 //--------------------------------------------------------------//
 
-- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(NSString*)key
+- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(id)key
 {
 	// Filter
-	if (!protocol || ![key length]) {
+	if (!protocol || !key) {
 		return;
 	}
 	
@@ -366,7 +327,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			}
 			
 			// Add key
-			[keys addObject:[[key copy] autorelease]];
+			[keys addObject:key];
 		}
 		// Remove key
 		else {

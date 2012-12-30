@@ -26,6 +26,10 @@ NSString* const REObserverBlockKey = @"block";
 NSString* const REObserverContainerKey = @"container";
 
 
+//--------------------------------------------------------------//
+#pragma mark -- NSArray --
+//--------------------------------------------------------------//
+
 @implementation NSArray (REObserver)
 
 //--------------------------------------------------------------//
@@ -96,6 +100,11 @@ NSString* const REObserverContainerKey = @"container";
 
 - (void)REObserver_X_removeObserver:(NSObject *)observer fromObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath
 {
+	// Filter
+	if (!observer || ![indexes count] || ![keyPath length]) {
+		return;
+	}
+	
 	@synchronized (self) {
 		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 			// Get observingInfos
@@ -111,13 +120,6 @@ NSString* const REObserverContainerKey = @"container";
 				if ([observingInfo[REObserverObservedObjectPointerValueKey] pointerValue] == obj
 					&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
 				){
-					// Release block
-					id block;
-					block = observingInfo[REObserverBlockKey];
-					if (block) {
-						Block_release(block);
-					}
-					
 					// Remove observingInfo
 					[observingInfos removeObject:observingInfo];
 				}
@@ -155,6 +157,10 @@ NSString* const REObserverContainerKey = @"container";
 
 #pragma mark -
 
+
+//--------------------------------------------------------------//
+#pragma mark -- NSObject --
+//--------------------------------------------------------------//
 
 @implementation NSObject (REObserver)
 
@@ -248,6 +254,11 @@ NSString* const REObserverContainerKey = @"container";
 
 - (void)REObserver_X_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath
 {
+	// Filter
+	if (!observer || ![keyPath length]) {
+		return;
+	}
+	
 	@synchronized (self) {
 		// Get observingInfos
 		NSMutableArray *observingInfos;
@@ -263,13 +274,6 @@ NSString* const REObserverContainerKey = @"container";
 				&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
 				&& (observingInfo[REObserverContainerKey] || observingInfo[REObserverContextPointerValueKey] == nil)
 			){
-				// Release block
-				id block;
-				block = observingInfo[REObserverBlockKey];
-				if (block) {
-					Block_release(block);
-				}
-				
 				// Remove observingInfo
 				[observingInfos removeObject:observingInfo];
 			}
@@ -293,6 +297,11 @@ NSString* const REObserverContainerKey = @"container";
 
 - (void)REObserver_X_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath context:(void*)context
 {
+	// Filter
+	if (!observer || ![keyPath length]) {
+		return;
+	}
+	
 	if (context) {
 		@synchronized (self) {
 			// Get observingInfos
@@ -309,13 +318,6 @@ NSString* const REObserverContainerKey = @"container";
 					&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
 					&& (observingInfo[REObserverContainerKey] || [observingInfo[REObserverContextPointerValueKey] pointerValue] == context)
 				){
-					// Release block
-					id block;
-					block = observingInfo[REObserverBlockKey];
-					if (block) {
-						Block_release(block);
-					}
-					
 					// Remove observingInfo
 					[observedInfos removeObject:observingInfo];
 					[observingInfos removeObject:observingInfo];
@@ -499,6 +501,9 @@ NSString* const REObserverContainerKey = @"container";
 		}
 		[observedInfos addObject:observedInfo];
 	}
+	
+	// Release copiedBlock
+	Block_release(copiedBock);
 	
 	// Add observer to self using original implementation
 	[self REObserver_X_addObserver:observer forKeyPath:keyPath options:options context:nil];

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		EB55780E16887865003DBEAB /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EB55780D16887865003DBEAB /* MainStoryboard.storyboard */; };
-		EB55781616887B89003DBEAB /* iRETableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB55781516887B89003DBEAB /* iRETableViewController.m */; };
 		EBA420AE167DE1A10052D11E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AD167DE1A10052D11E /* UIKit.framework */; };
 		EBA420B0167DE1A10052D11E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AF167DE1A10052D11E /* Foundation.framework */; };
 		EBA420B2167DE1A10052D11E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420B1167DE1A10052D11E /* CoreGraphics.framework */; };
@@ -45,8 +44,6 @@
 
 /* Begin PBXFileReference section */
 		EB55780D16887865003DBEAB /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard.storyboard; path = iOS_REKit/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		EB55781416887B89003DBEAB /* iRETableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iRETableViewController.h; sourceTree = "<group>"; };
-		EB55781516887B89003DBEAB /* iRETableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iRETableViewController.m; sourceTree = "<group>"; };
 		EBA420A9167DE1A10052D11E /* iOS_REKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOS_REKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA420AD167DE1A10052D11E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EBA420AF167DE1A10052D11E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -145,8 +142,6 @@
 			children = (
 				EBA420BC167DE1A10052D11E /* iREAppDelegate.h */,
 				EBA420BD167DE1A10052D11E /* iREAppDelegate.m */,
-				EB55781416887B89003DBEAB /* iRETableViewController.h */,
-				EB55781516887B89003DBEAB /* iRETableViewController.m */,
 				EBA420C5167DE1A10052D11E /* iREViewController.h */,
 				EBA420C6167DE1A10052D11E /* iREViewController.m */,
 				EBA420B4167DE1A10052D11E /* Supporting Files */,
@@ -333,7 +328,6 @@
 				EBA42131167DE2130052D11E /* NSObject+REObserver.m in Sources */,
 				EBA42133167DE2130052D11E /* NSObject+REResponder.m in Sources */,
 				EBA42135167DE2130052D11E /* REUtil.m in Sources */,
-				EB55781616887B89003DBEAB /* iRETableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

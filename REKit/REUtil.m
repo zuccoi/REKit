@@ -16,6 +16,10 @@ NSString* const REObjectOldClassNameKey = @"REObjectOldClassNameKey";
 NSString* const REObjectNewClassNameKey = @"REObjectNewClassNameKey";
 
 
+//--------------------------------------------------------------//
+#pragma mark -- Block --
+//--------------------------------------------------------------//
+
 const char* REBlockGetObjCTypes(id _block)
 {
 	// Get descriptor of block
@@ -41,19 +45,9 @@ void* REBlockGetImplementation(id block)
 #pragma mark -
 
 
-NSString* REUUIDString()
-{
-	CFUUIDRef uuid;
-	NSString* uuidString;
-	uuid = CFUUIDCreate(NULL);
-	uuidString = (NSString*)CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
-	CFRelease(uuid);
-	
-	return uuidString;
-}
-
-#pragma mark -
-
+//--------------------------------------------------------------//
+#pragma mark -- NSMethodSignature --
+//--------------------------------------------------------------//
 
 @implementation NSMethodSignature (REUtil)
 
@@ -83,11 +77,11 @@ NSString* REUUIDString()
 #pragma mark -
 
 
-@implementation NSObject (REUtil)
+//--------------------------------------------------------------//
+#pragma mark -- NSObject --
+//--------------------------------------------------------------//
 
-//--------------------------------------------------------------//
-#pragma mark -- Class Exchange --
-//--------------------------------------------------------------//
+@implementation NSObject (REUtil)
 
 - (void)willChangeClass:(Class)toClass
 {
@@ -107,11 +101,6 @@ NSString* REUUIDString()
 	}];
 }
 
-
-//--------------------------------------------------------------//
-#pragma mark -- Association --
-//--------------------------------------------------------------//
-
 - (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
 {
 	objc_setAssociatedObject(self, key, value, policy);
@@ -127,11 +116,11 @@ NSString* REUUIDString()
 #pragma mark -
 
 
-@implementation NSObject (REKitPrivate)
+//--------------------------------------------------------------//
+#pragma mark -- NSObject (REKitPrivate) --
+//--------------------------------------------------------------//
 
-//--------------------------------------------------------------//
-#pragma mark -- Method Exchange --
-//--------------------------------------------------------------//
+@implementation NSObject (REKitPrivate)
 
 + (void)exchangeClassMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
 {
@@ -196,3 +185,21 @@ NSString* REUUIDString()
 }
 
 @end
+
+#pragma mark -
+
+
+//--------------------------------------------------------------//
+#pragma mark -- NSString --
+//--------------------------------------------------------------//
+
+NSString* REUUIDString()
+{
+	CFUUIDRef uuid;
+	NSString* uuidString;
+	uuid = CFUUIDCreate(NULL);
+	uuidString = (NSString*)CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+	CFRelease(uuid);
+	
+	return uuidString;
+}

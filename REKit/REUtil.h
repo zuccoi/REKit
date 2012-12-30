@@ -54,9 +54,9 @@ extern void* REBlockGetImplementation(id block);
 #pragma mark -
 
 
-extern NSString* REUUIDString();
-
-#pragma mark -
+//--------------------------------------------------------------//
+#pragma mark -- NSInvocation --
+//--------------------------------------------------------------//
 
 
 @interface NSInvocation (REUtil)
@@ -66,6 +66,10 @@ extern NSString* REUUIDString();
 #pragma mark -
 
 
+//--------------------------------------------------------------//
+#pragma mark -- NSMethodSignature --
+//--------------------------------------------------------------//
+
 @interface NSMethodSignature (REUtil)
 - (NSString*)objCTypes;
 - (NSString*)description;
@@ -73,6 +77,10 @@ extern NSString* REUUIDString();
 
 #pragma mark -
 
+
+//--------------------------------------------------------------//
+#pragma mark -- NSObject --
+//--------------------------------------------------------------//
 
 @interface NSObject (REUtil)
 
@@ -89,6 +97,10 @@ extern NSString* REUUIDString();
 #pragma mark -
 
 
+//--------------------------------------------------------------//
+#pragma mark -- NSObject (REKitPrivate) --
+//--------------------------------------------------------------//
+
 @interface NSObject (REKitPrivate)
 
 // Method Exchange
@@ -98,3 +110,14 @@ extern NSString* REUUIDString();
 + (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
 
 @end
+
+#pragma mark -
+
+
+//--------------------------------------------------------------//
+#pragma mark -- NSString --
+//--------------------------------------------------------------//
+
+#define RE_FUNC @(__PRETTY_FUNCTION__)
+#define RE_LINE [NSString stringWithFormat:@"%s-%i", __PRETTY_FUNCTION__, __LINE__]
+extern NSString* REUUIDString();

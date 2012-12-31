@@ -84,11 +84,23 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}];
 	[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 	
-	// Dispose class
-	if ([NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
+	// Dispose classes
+	NSString *className;
+	className = NSStringFromClass([self class]);
+	if ([className hasPrefix:kClassNamePrefix]) {
+		// Dispose NSKVONotifying subclass
+		Class kvoClass;
+		kvoClass = NSClassFromString([NSString stringWithFormat:@"NSKVONotifying_%@", className]);
+		if (kvoClass) {
+			objc_disposeClassPair(kvoClass);
+		}
+		
+		// Dispose class
 		Class class;
 		class = [self class];
+		[self willChangeClass:[self superclass]];
 		object_setClass(self, [self superclass]);
+		[self didChangeClass:class];
 		objc_disposeClassPair(class);
 	}
 	

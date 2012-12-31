@@ -117,6 +117,5 @@ extern void* REBlockGetImplementation(id block);
 #pragma mark -- NSString --
 //--------------------------------------------------------------//
 
-#define RE_FUNC @(__PRETTY_FUNCTION__)
-#define RE_LINE [NSString stringWithFormat:@"%s-%i", __PRETTY_FUNCTION__, __LINE__]
+#define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __PRETTY_FUNCTION__, __LINE__]
 extern NSString* REUUIDString();

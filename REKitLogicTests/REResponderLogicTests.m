@@ -214,21 +214,23 @@
 
 - (void)test_unfortunatelyContextIsNotDeallocated
 {
-	__block BOOL deallocated = NO;
+	__block BOOL isContextDeallocated = NO;
+	__block BOOL isObjDeallocated = NO;
+	SEL dealloc = @selector(dealloc);
 	
 	@autoreleasepool {
 		// Make context
 		id context;
 		context = [[[NSObject alloc] init] autorelease];
-		[context respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+		[context respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
-				supermethod(receiver, @selector(dealloc));
+			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+				supermethod(receiver, dealloc);
 			}
 			
 			// Raise deallocated flag
-			deallocated = YES;
+			isContextDeallocated = YES;
 		}];
 		
 		// Make obj
@@ -238,36 +240,58 @@
 			// Use context in block
 			NSLog(@"context = %@", context);
 		}];
+		[obj respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+				supermethod(receiver, dealloc);
+			}
+			
+			// Raise isObjDeallocated
+			isObjDeallocated = YES;
+		}];
 	}
 	
 	// Check
-	STAssertFalse(deallocated, @"");
+	STAssertFalse(isContextDeallocated, @"");
+	STAssertTrue(isObjDeallocated, @"");
 }
 
-- (void)test_autoreleasingContextIsDeallocated
+- (void)test_unfortunatelyAutoreleasingContextIsNotDeallocated
 {
-	__block BOOL deallocated = NO;
-	SEL sel;
-	sel = NSSelectorFromString(@"dealloc");
+	__block BOOL isContextDeallocated = NO;
+	__block BOOL isObjDeallocated = NO;
+	SEL dealloc;
+	dealloc = NSSelectorFromString(@"dealloc");
 	
 	@autoreleasepool {
 		// Make obj
 		id obj;
-		obj = [[NSObject alloc] init];
+		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+				supermethod(receiver, dealloc);
+			}
+			
+			// Raise isObjDeallocated
+			isObjDeallocated = YES;
+		}];
 		
 		@autoreleasepool {
 			// Make context
 			__autoreleasing id context;
 			context = [[[NSObject alloc] init] autorelease];
-			[context respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+			[context respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
 				// super
 				IMP supermethod;
-				if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
-					supermethod(receiver, sel);
+				if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+					supermethod(receiver, dealloc);
 				}
 				
 				// Raise deallocated flag
-				deallocated = YES;
+				isContextDeallocated = YES;
 			}];
 			
 			// Add log block
@@ -281,6 +305,55 @@
 		
 		// Log
 		[obj performSelector:@selector(log)];
+	}
+	
+	// Check
+	STAssertFalse(isContextDeallocated, @"");
+	STAssertTrue(isObjDeallocated, @"");
+}
+
+- (void)test_associatedContextIsDeallocated
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Make obj
+		id obj;
+		obj = [[[NSObject alloc] init] autorelease];
+		
+		@autoreleasepool {
+			// Make context
+			RETestObject *context;
+			SEL dealloc;
+			dealloc = NSSelectorFromString(@"dealloc");
+			context = [RETestObject testObject];
+			[context respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+				// super
+				IMP supermethod;
+				if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"kye"])) {
+					supermethod(receiver, dealloc);
+				}
+				
+				// Raise deallocated flag
+				deallocated = YES;
+			}];
+			
+			// Associate context
+			[obj associateValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
+			
+			// Add log block
+			[obj respondsToSelector:@selector(log) withKey:@"key" usingBlock:^(id receiver) {
+				id ctx;
+				ctx = [receiver associatedValueForKey:@"context"];
+				NSLog(@"ctx = %@", ctx);
+			}];
+			
+			// Call log method
+			STAssertNoThrow([obj performSelector:@selector(log)], @"");
+		}
+		
+		// Call log method
+		STAssertNoThrow([obj performSelector:@selector(log)], @"");
 	}
 	
 	// Check

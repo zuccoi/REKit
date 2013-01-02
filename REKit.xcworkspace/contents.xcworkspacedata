@@ -5,6 +5,9 @@
       location = "group:REKit"
       name = "REKit">
       <FileRef
+         location = "group:REKit.h">
+      </FileRef>
+      <FileRef
          location = "group:NSObject+REObserver.h">
       </FileRef>
       <FileRef
@@ -15,9 +18,6 @@
       </FileRef>
       <FileRef
          location = "group:NSObject+REResponder.m">
-      </FileRef>
-      <FileRef
-         location = "group:REKit.h">
       </FileRef>
       <FileRef
          location = "group:REUtil.h">

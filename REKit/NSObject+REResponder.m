@@ -206,24 +206,12 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		// Become subclass
 		if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
 			if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
-				// Update _number
-				static NSDecimalNumber *_number = nil;
-				if (!_number) {
-					_number = [[NSDecimalNumber one] retain];
-				}
-				else {
-					NSDecimalNumber *number;
-					number = [_number decimalNumberByAdding:[NSDecimalNumber one]];
-					[_number release];
-					_number = [number retain];
-				}
-				
 				// Become subclass
 				Class originalClass;
 				Class subclass;
 				NSString *className;
 				originalClass = [self class];
-				className = [NSString stringWithFormat:@"%@%@_%@", kClassNamePrefix, [_number stringValue], NSStringFromClass([self class])];
+				className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass([self class])];
 				subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 				objc_registerClassPair(subclass);
 				[self willChangeClass:subclass];

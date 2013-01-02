@@ -939,4 +939,70 @@
 	STAssertTrue(released, @"");
 }
 
+- (void)test_observingInfosAreDeallocated
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Make obj
+		RETestObject *obj;
+		obj = [RETestObject testObject];
+		
+		// Strt observing
+		id observer;
+		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+			// Do something
+		}];
+		
+		// Override dealloc method of observingInfos
+		SEL sel = @selector(dealloc);
+		[[observer observingInfos] respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+			// supermethod
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+				supermethod(receiver, sel);
+			}
+			
+			// Raise deallocated flag
+			deallocated = YES;
+		}];
+	}
+	
+	// Check
+	STAssertTrue(deallocated, @"");
+}
+
+- (void)test_observedInfosAreDeallocated
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Make obj
+		RETestObject *obj;
+		obj = [RETestObject testObject];
+		
+		// Strt observing
+		id observer;
+		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
+			// Do something
+		}];
+		
+		// Override dealloc method of observedInfos
+		SEL sel = @selector(dealloc);
+		[[obj observedInfos] respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+			// supermethod
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+				supermethod(receiver, sel);
+			}
+			
+			// Raise deallocated flag
+			deallocated = YES;
+		}];
+	}
+	
+	// Check
+	STAssertTrue(deallocated, @"");
+}
+
 @end

@@ -45,6 +45,11 @@
 	return @"say";
 }
 
+- (void)sayHello
+{
+	NSLog(@"Hello");
+}
+
 - (NSUInteger)ageAfterYears:(NSUInteger)years
 {
 	return self.age + years;

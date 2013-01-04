@@ -7,6 +7,10 @@
 #import <Foundation/Foundation.h>
 
 
+// REVoidIMP
+typedef void (*REVoidIMP)(id, SEL, ...);
+
+
 @interface NSObject (REResponder)
 
 // Block

@@ -18,7 +18,7 @@ extern NSString* const REObjectNewClassNameKey;
 
 
 //--------------------------------------------------------------//
-#pragma mark -- Block --
+#pragma mark   Block
 //--------------------------------------------------------------//
 
 // BlockDescriptor
@@ -51,34 +51,28 @@ enum {
 extern const char* REBlockGetObjCTypes(id block);
 extern void* REBlockGetImplementation(id block);
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSInvocation --
+#pragma mark - NSInvocation
 //--------------------------------------------------------------//
 
 @interface NSInvocation (REUtil)
 - (void)invokeUsingIMP:(IMP)imp;
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSMethodSignature --
+#pragma mark - NSMethodSignature
 //--------------------------------------------------------------//
 
 @interface NSMethodSignature (REUtil)
-- (NSString*)objCTypes;
+- (const char*)objCTypes;
 - (NSString*)description;
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSObject --
+#pragma mark - NSObject
 //--------------------------------------------------------------//
 
 @interface NSObject (REUtil)
@@ -93,11 +87,9 @@ extern void* REBlockGetImplementation(id block);
 
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSObject (REKitPrivate) --
+#pragma mark - NSObject (REKitPrivate)
 //--------------------------------------------------------------//
 
 @interface NSObject (REKitPrivate)
@@ -110,11 +102,9 @@ extern void* REBlockGetImplementation(id block);
 
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSString --
+#pragma mark - NSString
 //--------------------------------------------------------------//
 
 #define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __PRETTY_FUNCTION__, __LINE__]

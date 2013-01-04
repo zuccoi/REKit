@@ -27,7 +27,7 @@ NSString* const REObserverContainerKey = @"container";
 
 
 //--------------------------------------------------------------//
-#pragma mark -- NSArray --
+#pragma mark NSArray
 //--------------------------------------------------------------//
 
 @implementation NSArray (REObserver)
@@ -155,11 +155,9 @@ NSString* const REObserverContainerKey = @"container";
 
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSObject --
+#pragma mark - NSObject
 //--------------------------------------------------------------//
 
 @implementation NSObject (REObserver)

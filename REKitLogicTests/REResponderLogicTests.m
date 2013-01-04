@@ -172,6 +172,64 @@
 	STAssertTrue(deallocated, @"");
 }
 
+- (void)test_unfortunatelyKeyOfBlockIsNotDeallocatedIfItWasUsedInBlock
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Prepare key
+		id key;
+		key = [[[NSObject alloc] init] autorelease];
+		[key respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+			
+			deallocated = YES;
+		}];
+		
+		// Make obj
+		RETestObject *obj;
+		obj = [RETestObject testObject];
+		[obj respondsToSelector:@selector(log) withKey:key usingBlock:^(id receiver) {
+			// supermethod
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(log) forKey:key])) {
+				supermethod(receiver, @selector(log));
+			}
+			
+			// Do something
+			receiver = receiver;
+		}];
+	}
+	
+	STAssertFalse(deallocated, @"");
+}
+
+- (void)test_doNotPassReceiverToKeyArgument
+{
+	__block BOOL deallocated = NO;
+	
+	@autoreleasepool {
+		// Make obj
+		id obj;
+		SEL dealloc = @selector(dealloc);
+		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:dealloc withKey:obj usingBlock:^(id receiver) {
+			// supermethod
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:receiver])) {
+				supermethod(receiver, dealloc);
+			}
+		}];
+	}
+	
+	// Check
+	STAssertFalse(deallocated, @"");
+}
+
 - (void)test_blockIsReleased
 {
 	SEL sel;
@@ -981,6 +1039,48 @@
 	NSUInteger age;
 	age = [obj ageAfterYears:3];
 	STAssertEquals(age, (NSUInteger)14, @"");
+}
+
+- (void)test_supermethodReturningStructure
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	obj.rect = CGRectMake(10.0f, 20.0f, 30.0f, 40.0f);
+	
+	// Override rect method
+	[obj respondsToSelector:@selector(rect) withKey:@"key" usingBlock:^(id receiver) {
+		// Get original rect
+		CGRect rect;
+		typedef CGRect (*RectIMP)(id, SEL, ...);
+		RectIMP supermethod;
+		if ((supermethod = (RectIMP)[receiver supermethodOfBlockForSelector:@selector(rect) forKey:@"key"])) {
+			rect = supermethod(receiver, @selector(rect));
+		}
+		
+		// Inset rect
+		return CGRectInset(rect, 3.0f, 6.0f);
+	}];
+	
+	// Get rect
+	CGRect rect;
+	rect = obj.rect;
+	STAssertEquals(rect, CGRectMake(13.0f, 26.0f, 24.0f, 28.0f), @"");
+}
+
+- (void)test_supermethodReturningVoid
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	[obj respondsToSelector:@selector(sayHello) withKey:@"key" usingBlock:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(sayHello) forKey:@"key"])) {
+			supermethod(receiver, @selector(sayHello));
+		}
+	}];
+	[obj sayHello];
 }
 
 - (void)test_doNotChangeClassFrequentlyWithDynamicBlockManagement

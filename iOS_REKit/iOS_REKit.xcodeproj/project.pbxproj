@@ -37,6 +37,9 @@
 		EBA42172167DFE280052D11E /* REResponderLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42148167DE2A30052D11E /* REResponderLogicTests.m */; };
 		EBA42173167DFE280052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4214A167DE2A30052D11E /* RETestObject.m */; };
 		EBA42174167DFE280052D11E /* REUtilLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4214C167DE2A30052D11E /* REUtilLogicTests.m */; };
+		EBA9D0EC16945A0300C290A1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA9D0EB16945A0300C290A1 /* QuartzCore.framework */; };
+		EBA9D0EE16947EB900C290A1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420B1167DE1A10052D11E /* CoreGraphics.framework */; };
+		EBA9D0F016954C7100C290A1 /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = EBA9D0EF16954C7100C290A1 /* sample.png */; };
 		EBBF6616169040EC00B66BCE /* REResponderARCLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBBF6614169040EC00B66BCE /* REResponderARCLogicTests.h */; };
 		EBBF6617169040EC00B66BCE /* REResponderARCLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBBF6615169040EC00B66BCE /* REResponderARCLogicTests.m */; };
 		EBBF661D1690416B00B66BCE /* REResponderARCLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBF6615169040EC00B66BCE /* REResponderARCLogicTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
@@ -82,6 +85,8 @@
 		EBA4214A167DE2A30052D11E /* RETestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RETestObject.m; path = ../../REKitLogicTests/RETestObject.m; sourceTree = "<group>"; };
 		EBA4214B167DE2A30052D11E /* REUtilLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REUtilLogicTests.h; path = ../../REKitLogicTests/REUtilLogicTests.h; sourceTree = "<group>"; };
 		EBA4214C167DE2A30052D11E /* REUtilLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REUtilLogicTests.m; path = ../../REKitLogicTests/REUtilLogicTests.m; sourceTree = "<group>"; };
+		EBA9D0EB16945A0300C290A1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		EBA9D0EF16954C7100C290A1 /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sample.png; sourceTree = "<group>"; };
 		EBBF6614169040EC00B66BCE /* REResponderARCLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REResponderARCLogicTests.h; path = ../../REKitLogicTests/REResponderARCLogicTests.h; sourceTree = "<group>"; };
 		EBBF6615169040EC00B66BCE /* REResponderARCLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REResponderARCLogicTests.m; path = ../../REKitLogicTests/REResponderARCLogicTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -91,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBA9D0EC16945A0300C290A1 /* QuartzCore.framework in Frameworks */,
 				EBA420AE167DE1A10052D11E /* UIKit.framework in Frameworks */,
 				EBA420B0167DE1A10052D11E /* Foundation.framework in Frameworks */,
 				EBA420B2167DE1A10052D11E /* CoreGraphics.framework in Frameworks */,
@@ -101,6 +107,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBA9D0EE16947EB900C290A1 /* CoreGraphics.framework in Frameworks */,
 				EBA42103167DE1DC0052D11E /* SenTestingKit.framework in Frameworks */,
 				EBA42104167DE1DC0052D11E /* UIKit.framework in Frameworks */,
 				EBA42105167DE1DC0052D11E /* Foundation.framework in Frameworks */,
@@ -137,6 +144,7 @@
 				EBA420AD167DE1A10052D11E /* UIKit.framework */,
 				EBA420AF167DE1A10052D11E /* Foundation.framework */,
 				EBA420B1167DE1A10052D11E /* CoreGraphics.framework */,
+				EBA9D0EB16945A0300C290A1 /* QuartzCore.framework */,
 				EBA42102167DE1DC0052D11E /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
@@ -181,6 +189,7 @@
 				EBA4214A167DE2A30052D11E /* RETestObject.m */,
 				EBA4214B167DE2A30052D11E /* REUtilLogicTests.h */,
 				EBA4214C167DE2A30052D11E /* REUtilLogicTests.m */,
+				EBA9D0EF16954C7100C290A1 /* sample.png */,
 				EBA42107167DE1DC0052D11E /* Supporting Files */,
 			);
 			path = iOS_REKitLogicTests;
@@ -305,6 +314,7 @@
 				EBA42152167DE2A30052D11E /* RETestObject.m in Resources */,
 				EBA42153167DE2A30052D11E /* REUtilLogicTests.h in Resources */,
 				EBA42154167DE2A30052D11E /* REUtilLogicTests.m in Resources */,
+				EBA9D0F016954C7100C290A1 /* sample.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +469,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",

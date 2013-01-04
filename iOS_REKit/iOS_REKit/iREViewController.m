@@ -4,6 +4,7 @@
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
+#import <QuartzCore/QuartzCore.h>
 #import "REKit.h"
 #import "iREViewController.h"
 
@@ -11,6 +12,9 @@
 @implementation iREViewController
 {
 	NSMutableSet *_observers;
+	CADisplayLink *_displayLink;
+	id _keyboardWillShowNotificationObserver;
+	CGRect _keyboardFrame;
 }
 
 //--------------------------------------------------------------//
@@ -28,7 +32,55 @@
 	// Create _observers
 	_observers = [NSMutableSet set];
 	
+	// Manage _keyboardWillShowNotificationObserver
+	[self _manageKeyboardWillShowNotificationObserver];
+	
 	return self;
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- KeyboardWillShowNotificationObserver --
+//--------------------------------------------------------------//
+
+- (void)_manageKeyboardWillShowNotificationObserver
+{
+	SEL sel = NULL;
+	NSString *key = @(__PRETTY_FUNCTION__);
+	
+	#pragma mark └ [self viewWillAppear:]
+	[self respondsToSelector:(sel = @selector(viewWillAppear:)) withKey:key usingBlock:^(id receiver, BOOL animated) {
+		// super
+		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfBlockForSelector:sel forKey:key])) {
+			supermethod(receiver, sel, animated);
+		}
+		
+		// Start observing
+		if (_keyboardWillShowNotificationObserver) {
+			return;
+		}
+		_keyboardWillShowNotificationObserver = [[NSNotificationCenter defaultCenter]
+			addObserverForName:UIKeyboardWillShowNotification
+			object:nil
+			queue:[NSOperationQueue mainQueue]
+			usingBlock:^(NSNotification *note) {
+				// Do something…
+			}
+		];
+	}];
+	
+	#pragma mark └ [self viewDidDisappear:]
+	[self respondsToSelector:(sel = @selector(viewDidDisappear:)) withKey:key usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfBlockForSelector:sel forKey:key])) {
+			supermethod(receiver, sel, animated);
+		}
+		
+		// Stop observing
+		[[NSNotificationCenter defaultCenter] removeObserver:_keyboardWillShowNotificationObserver];
+		_keyboardWillShowNotificationObserver = nil;
+	}];
 }
 
 //--------------------------------------------------------------//

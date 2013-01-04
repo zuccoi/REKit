@@ -305,20 +305,26 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		if (blockInfo && blockInfos) {
 			// Replace method
 			if (blockInfo == [blockInfos lastObject]) {
+				// Get objCTypes
+				const char *objCTypes;
+				objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
+				
 				IMP supermethod;
 				supermethod = [self supermethodOfBlockForSelector:selector forKey:key];
 				if (supermethod) {
-					class_replaceMethod([self class], selector, supermethod, REBlockGetObjCTypes(blockInfo[kBlockInfoBlockKey]));
+					class_replaceMethod([self class], selector, supermethod, objCTypes);
 				}
 				else {
-					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), REBlockGetObjCTypes(kDummyBlock));
+					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), objCTypes);
 				}
 			}
 			
 			// Remove block
 			id block;
 			block = blockInfo[kBlockInfoBlockKey];
-			imp_removeBlock(imp_implementationWithBlock(block));
+			if (CFGetRetainCount(block) == 1) {
+				imp_removeBlock(imp_implementationWithBlock(block));
+			}
 			
 			// Remove blockInfo
 			[blockInfos removeObject:blockInfo];

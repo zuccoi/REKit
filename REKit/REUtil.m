@@ -21,7 +21,7 @@ NSString* const REObjectNewClassNameKey = @"REObjectNewClassNameKey";
 
 
 //--------------------------------------------------------------//
-#pragma mark -- Block --
+#pragma mark Block
 //--------------------------------------------------------------//
 
 const char* REBlockGetObjCTypes(id _block)
@@ -46,16 +46,14 @@ void* REBlockGetImplementation(id block)
 	return ((struct Block*)block)->invoke;
 }
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSMethodSignature --
+#pragma mark - NSMethodSignature
 //--------------------------------------------------------------//
 
 @implementation NSMethodSignature (REUtil)
 
-- (NSString*)objCTypes
+- (const char*)objCTypes
 {
 	NSMutableString *objCTypes;
 	objCTypes = [NSMutableString string];
@@ -64,25 +62,23 @@ void* REBlockGetImplementation(id block)
 		[objCTypes appendString:[NSString stringWithCString:[self getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
 	}
 	
-	return objCTypes;
+	return [objCTypes UTF8String];
 }
 
 - (NSString*)description
 {
 	NSMutableString *description;
 	description = [NSMutableString string];
-	[description appendFormat:@"<%@: %p> %@", NSStringFromClass([self class]), self, [self objCTypes]];
+	[description appendFormat:@"<%@: %p> %s", NSStringFromClass([self class]), self, [self objCTypes]];
 	
 	return description;
 }
 
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSObject --
+#pragma mark - NSObject
 //--------------------------------------------------------------//
 
 @implementation NSObject (REUtil)
@@ -117,11 +113,9 @@ void* REBlockGetImplementation(id block)
 
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSObject (REKitPrivate) --
+#pragma mark - NSObject (REKitPrivate)
 //--------------------------------------------------------------//
 
 @implementation NSObject (REKitPrivate)
@@ -190,11 +184,9 @@ void* REBlockGetImplementation(id block)
 
 @end
 
-#pragma mark -
-
 
 //--------------------------------------------------------------//
-#pragma mark -- NSString --
+#pragma mark - NSString
 //--------------------------------------------------------------//
 
 NSString* REUUIDString()

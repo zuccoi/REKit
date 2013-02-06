@@ -908,10 +908,10 @@
 			// Do nothing…
 		};
 		block = Block_copy(block);
-		[(id)block respondsToSelector:@selector(release) withKey:@"key" usingBlock:^(id receiver) {
-			// super
+		[(id)block respondsToSelector:@selector(release) withKey:nil usingBlock:^(id receiver) {
+			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(release) forKey:@"key"])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(release));
 			}
 			
@@ -956,10 +956,10 @@
 		
 		// Override dealloc method of observingInfos
 		SEL sel = @selector(dealloc);
-		[[observer observingInfos] respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+		[[observer observingInfos] respondsToSelector:sel withKey:nil usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, sel);
 			}
 			
@@ -989,10 +989,10 @@
 		
 		// Override dealloc method of observedInfos
 		SEL sel = @selector(dealloc);
-		[[obj observedInfos] respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+		[[obj observedInfos] respondsToSelector:sel withKey:nil usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, sel);
 			}
 			

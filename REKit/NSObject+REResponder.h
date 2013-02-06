@@ -8,7 +8,7 @@
 
 
 // REVoidIMP
-typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
+typedef void (*REVoidIMP)(id, SEL, ...);
 
 
 @interface NSObject (REResponder)
@@ -16,7 +16,7 @@ typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
 // Block
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block;
 - (id)blockForSelector:(SEL)selector forKey:(id)key;
-- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key; // Test >>>
+- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key;
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key;
 
 // Current Block

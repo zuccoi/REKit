@@ -48,7 +48,7 @@
 	
 	#pragma mark └ [self viewWillAppear:]
 	[self respondsToSelector:(sel = @selector(viewWillAppear:)) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-		// super
+		// supermethod
 		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
 		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
 			supermethod(receiver, sel, animated);

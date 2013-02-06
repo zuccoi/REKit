@@ -310,40 +310,6 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	return block;
 }
 
-- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key
-{
-	// Filter
-	if (!selector || !key) {
-		return NULL;
-	}
-	
-	// Get supermethod
-	IMP supermethod = NULL;
-	@synchronized (self) {
-		// Get blockInfo
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoForSelector:selector forKey:key blockInfos:&blockInfos];
-		if (blockInfo) {
-			// Check index of blockInfo
-			NSUInteger index;
-			index = [blockInfos indexOfObject:blockInfo];
-			if (index == 0) {
-				// supermethod is superclass's instance method
-				supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
-			}
-			else {
-				// supermethod is superblock's IMP
-				id superblock;
-				superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
-				supermethod = imp_implementationWithBlock(superblock);
-			}
-		}
-	}
-	
-	return supermethod;
-}
-
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key
 {
 	// Filter
@@ -364,8 +330,22 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 				const char *objCTypes;
 				objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 				
-				IMP supermethod;
-				supermethod = [self supermethodOfBlockForSelector:selector forKey:key];
+				// Get supermethod
+				IMP supermethod = NULL;
+				NSUInteger index;
+				index = [blockInfos indexOfObject:blockInfo];
+				if (index == 0) {
+					// supermethod is superclass's instance method
+					supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
+				}
+				else {
+					// supermethod is superblock's IMP
+					id superblock;
+					superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
+					supermethod = imp_implementationWithBlock(superblock);
+				}
+				
+				// Replace method
 				if (supermethod) {
 					class_replaceMethod([self class], selector, supermethod, objCTypes);
 				}

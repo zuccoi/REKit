@@ -16,7 +16,6 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 // Block
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block;
 - (id)blockForSelector:(SEL)selector forKey:(id)key;
-- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key;
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key;
 
 // Current Block

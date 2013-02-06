@@ -21,7 +21,7 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 
 // Current Block
 - (id)currentBlock;
-- (IMP)supermethod;
+- (IMP)supermethodOfCurrentBlock;
 - (void)removeCurrentBlock;
 
 // Conformance

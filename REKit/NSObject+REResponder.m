@@ -411,7 +411,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	return currentBlock;
 }
 
-- (IMP)supermethod
+- (IMP)supermethodOfCurrentBlock
 {
 	// Get imp of current block
 	IMP imp;

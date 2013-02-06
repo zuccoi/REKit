@@ -99,7 +99,7 @@
 			
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -129,7 +129,7 @@
 			
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -153,7 +153,7 @@
 		[key respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -183,7 +183,7 @@
 		[key respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -196,7 +196,7 @@
 		[obj respondsToSelector:@selector(log) withKey:key usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(log));
 			}
 			
@@ -223,7 +223,7 @@
 		[obj respondsToSelector:dealloc withKey:obj usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, dealloc);
 			}
 		}];
@@ -253,7 +253,7 @@
 		[block respondsToSelector:(sel = @selector(release)) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, sel);
 			}
 			
@@ -286,7 +286,7 @@
 		[context respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, dealloc);
 			}
 			
@@ -304,7 +304,7 @@
 		[obj respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, dealloc);
 			}
 			
@@ -332,7 +332,7 @@
 		[obj respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, dealloc);
 			}
 			
@@ -347,7 +347,7 @@
 			[context respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 				// super
 				IMP supermethod;
-				if ((supermethod = [receiver supermethod])) {
+				if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 					supermethod(receiver, dealloc);
 				}
 				
@@ -391,7 +391,7 @@
 			[context respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 				// super
 				IMP supermethod;
-				if ((supermethod = [receiver supermethod])) {
+				if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 					supermethod(receiver, dealloc);
 				}
 				
@@ -781,7 +781,7 @@
 		log = [NSMutableString string];
 		
 		IMP supermethod;
-		supermethod = [receiver supermethod];
+		supermethod = [receiver supermethodOfCurrentBlock];
 		STAssertNil((id)supermethod, @"");
 		
 		return @"Dynamic log";
@@ -808,7 +808,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -830,7 +830,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -852,7 +852,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -902,7 +902,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -924,7 +924,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -946,7 +946,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -997,7 +997,7 @@
 		
 		// Get original age
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			age = (NSUInteger)supermethod(receiver, @selector(age));
 		}
 		
@@ -1028,7 +1028,7 @@
 		
 		// Get original age
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			age = (NSUInteger)supermethod(receiver, sel, years);
 		}
 		
@@ -1057,7 +1057,7 @@
 		CGRect rect;
 		typedef CGRect (*RectIMP)(id, SEL, ...);
 		RectIMP supermethod;
-		if ((supermethod = (RectIMP)[receiver supermethod])) {
+		if ((supermethod = (RectIMP)[receiver supermethodOfCurrentBlock])) {
 			rect = supermethod(receiver, @selector(rect));
 		}
 		
@@ -1079,7 +1079,7 @@
 	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethod])) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			supermethod(receiver, @selector(sayHello));
 		}
 	}];
@@ -1285,7 +1285,7 @@
 		[key respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethod])) {
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			

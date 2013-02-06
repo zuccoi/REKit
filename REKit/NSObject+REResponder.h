@@ -8,21 +8,21 @@
 
 
 // REVoidIMP
-typedef void (*REVoidIMP)(id, SEL, ...);
+typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
 
 
 @interface NSObject (REResponder)
 
 // Block
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block;
-- (id)blockForSelector:(SEL)selector forKey:(id)key; // Needed ?????
-- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key; // Delete >>>
+- (id)blockForSelector:(SEL)selector forKey:(id)key;
+- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key; // Test >>>
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key;
 
 // Current Block
-- (id)currentBlock;
+- (id)currentBlock; // Test >>>
 - (IMP)supermethodOfCurrentBlock;
-- (void)removeCurrentBlock;
+- (void)removeCurrentBlock; // Test >>>
 
 // Conformance
 - (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(id)key;

@@ -45,13 +45,12 @@
 - (void)_manageKeyboardWillShowNotificationObserver
 {
 	SEL sel = NULL;
-	NSString *key = @(__PRETTY_FUNCTION__);
 	
 	#pragma mark └ [self viewWillAppear:]
-	[self respondsToSelector:(sel = @selector(viewWillAppear:)) withKey:key usingBlock:^(id receiver, BOOL animated) {
+	[self respondsToSelector:(sel = @selector(viewWillAppear:)) withKey:nil usingBlock:^(id receiver, BOOL animated) {
 		// super
 		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfBlockForSelector:sel forKey:key])) {
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
 			supermethod(receiver, sel, animated);
 		}
 		
@@ -70,10 +69,10 @@
 	}];
 	
 	#pragma mark └ [self viewDidDisappear:]
-	[self respondsToSelector:(sel = @selector(viewDidDisappear:)) withKey:key usingBlock:^(id receiver, BOOL animated) {
+	[self respondsToSelector:(sel = @selector(viewDidDisappear:)) withKey:nil usingBlock:^(id receiver, BOOL animated) {
 		// supermethod
 		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfBlockForSelector:sel forKey:key])) {
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
 			supermethod(receiver, sel, animated);
 		}
 		

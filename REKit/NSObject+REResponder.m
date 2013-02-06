@@ -4,6 +4,8 @@
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
+#import <dlfcn.h>
+#import "execinfo.h"
 #import "NSObject+REResponder.h"
 #import "REUtil.h"
 
@@ -20,7 +22,7 @@ static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignat
 
 // Keys for blockInfo
 static NSString* const kBlockInfoBlockKey = @"block";
-static NSString* const kBockInfoKeyKey = @"key";
+static NSString* const kBlockInfoKeyKey = @"key";
 
 // kDummyBlock
 static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
@@ -79,7 +81,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		while ([blockInfos count]) {
 			NSDictionary *blockInfo;
 			blockInfo = [blockInfos lastObject];
-			[self removeBlockForSelector:NSSelectorFromString(selectorName) forKey:blockInfo[kBockInfoKeyKey]];
+			[self removeBlockForSelector:NSSelectorFromString(selectorName) forKey:blockInfo[kBlockInfoKeyKey]];
 		}
 	}];
 	[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -122,7 +124,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Property --
+#pragma mark -- Util --
 //--------------------------------------------------------------//
 
 - (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector forKey:(id)key blockInfos:(NSMutableArray**)outBlockInfos
@@ -133,7 +135,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		NSMutableArray *blockInfos;
 		blockInfos = [self associatedValueForKey:kBlocksAssociationKey][NSStringFromSelector(selector)];
 		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stop) {
-			if ([aBlockInfo[kBockInfoKeyKey] isEqual:key]) {
+			if ([aBlockInfo[kBlockInfoKeyKey] isEqual:key]) {
 				blockInfo = aBlockInfo;
 				*stop = YES;
 			}
@@ -144,6 +146,59 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 	
 	return blockInfo;
+}
+
+- (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
+{
+	// Get blockInfo
+	__block NSDictionary *blockInfo = nil;
+	@synchronized (self) {
+		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
+			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
+				if (REBlockGetImplementation(aBlockInfo[kBlockInfoBlockKey]) == imp) {
+					blockInfo = aBlockInfo;
+					*stopB = YES;
+				}
+			}];
+			if (blockInfo) {
+				if (outSelector) {
+					*outSelector = NSSelectorFromString(aSelectorName);
+				}
+				if (outBlockInfos) {
+					*outBlockInfos = aBlockInfos;
+				}
+				*stopA = YES;
+			}
+		}];
+	}
+	
+	return blockInfo;
+}
+
+- (IMP)REResponder_implementationWithBacktraceDepth:(int)depth
+{
+	// Get trace
+	int num;
+	void *trace[depth + 1];
+	num = backtrace(trace, (depth + 1));
+	if (num < (depth + 1)) {
+		return NULL;
+	}
+	
+	// Get imp
+	IMP imp;
+	Dl_info callerInfo;
+	if (!dladdr(trace[depth], &callerInfo)) {
+		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
+		return NULL;
+	}
+	imp = callerInfo.dli_saddr;
+	if (!imp) {
+		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
+		return NULL;
+	}
+	
+	return imp;
 }
 
 //--------------------------------------------------------------//
@@ -229,7 +284,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		copiedBlock = Block_copy(block);
 		blockInfo = @{
 			kBlockInfoBlockKey : copiedBlock,
-			kBockInfoKeyKey : key,
+			kBlockInfoKeyKey : key,
 		};
 		Block_release(copiedBlock);
 		[blockInfos addObject:blockInfo];
@@ -330,6 +385,90 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			[blockInfos removeObject:blockInfo];
 		}
 	}
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- Current Block --
+//--------------------------------------------------------------//
+
+- (id)currentBlock
+{
+	// Get imp of current block
+	IMP imp;
+	imp = [self REResponder_implementationWithBacktraceDepth:2];
+	if (!imp) {
+		return nil;
+	}
+	
+	// Get currentBlock
+	id currentBlock = nil;
+	@synchronized (self) {
+		NSDictionary *blockInfo;
+		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:nil];
+		currentBlock = REBlockGetImplementation(blockInfo[kBlockInfoBlockKey]);
+	}
+	
+	return currentBlock;
+}
+
+- (IMP)supermethod
+{
+	// Get imp of current block
+	IMP imp;
+	imp = [self REResponder_implementationWithBacktraceDepth:2];
+	if (!imp) {
+		return NULL;
+	}
+	
+	// Get supermethod
+	IMP supermethod = NULL;
+	@synchronized (self) {
+		// Get elements
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		SEL selector;
+		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+		if (!blockInfo || !blockInfos || !selector) {
+			return NULL;
+		}
+		
+		// Check index of blockInfo
+		NSUInteger index;
+		index = [blockInfos indexOfObject:blockInfo];
+		if (index == 0) {
+			// supermethod is superclass's instance method
+			supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
+		}
+		else {
+			// supermethod is superblock's IMP
+			id superblock;
+			superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
+			supermethod = imp_implementationWithBlock(superblock);
+		}
+	}
+	
+	return supermethod;
+}
+
+- (void)removeCurrentBlock
+{
+	// Get imp of current block
+	IMP imp;
+	imp = [self REResponder_implementationWithBacktraceDepth:2];
+	if (!imp) {
+		return;
+	}
+	
+	// Get elements
+	NSDictionary *blockInfo;
+	SEL selector;
+	blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
+	if (!blockInfo || !selector) {
+		return;
+	}
+	
+	// Call removeBlockForSelector:forKey:
+	[self removeBlockForSelector:selector forKey:blockInfo[kBlockInfoKeyKey]];
 }
 
 //--------------------------------------------------------------//

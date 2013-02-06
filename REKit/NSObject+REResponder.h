@@ -15,9 +15,14 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 
 // Block
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block;
-- (id)blockForSelector:(SEL)selector forKey:(id)key;
-- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key;
+- (id)blockForSelector:(SEL)selector forKey:(id)key; // Needed ?????
+- (IMP)supermethodOfBlockForSelector:(SEL)selector forKey:(id)key; // Delete >>>
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key;
+
+// Current Block
+- (id)currentBlock;
+- (IMP)supermethod;
+- (void)removeCurrentBlock;
 
 // Conformance
 - (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(id)key;

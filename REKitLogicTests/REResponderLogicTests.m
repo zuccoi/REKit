@@ -94,12 +94,12 @@
 			// Do something…
 			receiver = receiver;
 		}];
-		[obj respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+		[obj respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 //			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver instead.
 			
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -124,12 +124,12 @@
 		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
 			return @"Overridden log";
 		}];
-		[obj respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+		[obj respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 //			NSLog(@"obj = %@", obj); // Causes retain cycle. Use receiver instead.
 			
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -150,10 +150,10 @@
 		// Prepare key
 		id key;
 		key = [[[NSObject alloc] init] autorelease];
-		[key respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+		[key respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -180,10 +180,10 @@
 		// Prepare key
 		id key;
 		key = [[[NSObject alloc] init] autorelease];
-		[key respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+		[key respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			
@@ -196,9 +196,12 @@
 		[obj respondsToSelector:@selector(log) withKey:key usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(log) forKey:key])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, @selector(log));
 			}
+			
+			// Log key
+			NSLog(@"key = %@", key);
 			
 			// Do something
 			receiver = receiver;
@@ -220,7 +223,7 @@
 		[obj respondsToSelector:dealloc withKey:obj usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:receiver])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, dealloc);
 			}
 		}];
@@ -250,7 +253,7 @@
 		[block respondsToSelector:(sel = @selector(release)) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, sel);
 			}
 			
@@ -280,10 +283,10 @@
 		// Make context
 		id context;
 		context = [[[NSObject alloc] init] autorelease];
-		[context respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+		[context respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, dealloc);
 			}
 			
@@ -298,10 +301,10 @@
 			// Use context in block
 			NSLog(@"context = %@", context);
 		}];
-		[obj respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+		[obj respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, dealloc);
 			}
 			
@@ -326,10 +329,10 @@
 		// Make obj
 		id obj;
 		obj = [[[NSObject alloc] init] autorelease];
-		[obj respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+		[obj respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, dealloc);
 			}
 			
@@ -341,10 +344,10 @@
 			// Make context
 			__autoreleasing id context;
 			context = [[[NSObject alloc] init] autorelease];
-			[context respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+			[context respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 				// super
 				IMP supermethod;
-				if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"key"])) {
+				if ((supermethod = [receiver supermethod])) {
 					supermethod(receiver, dealloc);
 				}
 				
@@ -353,7 +356,7 @@
 			}];
 			
 			// Add log block
-			[obj respondsToSelector:@selector(log) withKey:@"key" usingBlock:^(id receiver) {
+			[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
 				NSLog(@"context = %@", context);
 			}];
 			
@@ -385,10 +388,10 @@
 			SEL dealloc;
 			dealloc = NSSelectorFromString(@"dealloc");
 			context = [RETestObject testObject];
-			[context respondsToSelector:dealloc withKey:@"key" usingBlock:^(id receiver) {
+			[context respondsToSelector:dealloc withKey:nil usingBlock:^(id receiver) {
 				// super
 				IMP supermethod;
-				if ((supermethod = [receiver supermethodOfBlockForSelector:dealloc forKey:@"kye"])) {
+				if ((supermethod = [receiver supermethod])) {
 					supermethod(receiver, dealloc);
 				}
 				
@@ -773,12 +776,12 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add log method
-	[obj respondsToSelector:sel withKey:@"logBlock" usingBlock:^(id receiver) {
+	[obj respondsToSelector:sel withKey:nil usingBlock:^(id receiver) {
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
 		IMP supermethod;
-		supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"logBlock"];
+		supermethod = [receiver supermethod];
 		STAssertNil((id)supermethod, @"");
 		
 		return @"Dynamic log";
@@ -805,7 +808,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"block1"])) {
+		if ((supermethod = [receiver supermethod])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -827,7 +830,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"block2"])) {
+		if ((supermethod = [receiver supermethod])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -849,7 +852,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"block3"])) {
+		if ((supermethod = [receiver supermethod])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -899,7 +902,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"block1"])) {
+		if ((supermethod = [receiver supermethod])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -921,7 +924,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"block2"])) {
+		if ((supermethod = [receiver supermethod])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -943,7 +946,7 @@
 		
 		// Append super's log
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"block3"])) {
+		if ((supermethod = [receiver supermethod])) {
 			[log appendString:supermethod(receiver, sel)];
 		}
 		
@@ -989,12 +992,12 @@
 	obj.age = 10;
 	
 	// Override age method
-	[obj respondsToSelector:(sel = @selector(age)) withKey:@"key" usingBlock:^NSUInteger(id receiver) {
+	[obj respondsToSelector:(sel = @selector(age)) withKey:nil usingBlock:^NSUInteger(id receiver) {
 		NSUInteger age = 0;
 		
 		// Get original age
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+		if ((supermethod = [receiver supermethod])) {
 			age = (NSUInteger)supermethod(receiver, @selector(age));
 		}
 		
@@ -1020,12 +1023,12 @@
 	obj.age = 10;
 	
 	// Override age method
-	[obj respondsToSelector:(sel = @selector(ageAfterYears:)) withKey:@"key" usingBlock:^NSUInteger(id receiver, NSUInteger years) {
+	[obj respondsToSelector:(sel = @selector(ageAfterYears:)) withKey:nil usingBlock:^NSUInteger(id receiver, NSUInteger years) {
 		NSUInteger age = 0;
 		
 		// Get original age
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:sel forKey:@"key"])) {
+		if ((supermethod = [receiver supermethod])) {
 			age = (NSUInteger)supermethod(receiver, sel, years);
 		}
 		
@@ -1049,12 +1052,12 @@
 	obj.rect = CGRectMake(10.0f, 20.0f, 30.0f, 40.0f);
 	
 	// Override rect method
-	[obj respondsToSelector:@selector(rect) withKey:@"key" usingBlock:^(id receiver) {
+	[obj respondsToSelector:@selector(rect) withKey:nil usingBlock:^(id receiver) {
 		// Get original rect
 		CGRect rect;
 		typedef CGRect (*RectIMP)(id, SEL, ...);
 		RectIMP supermethod;
-		if ((supermethod = (RectIMP)[receiver supermethodOfBlockForSelector:@selector(rect) forKey:@"key"])) {
+		if ((supermethod = (RectIMP)[receiver supermethod])) {
 			rect = supermethod(receiver, @selector(rect));
 		}
 		
@@ -1073,10 +1076,10 @@
 	// Make obj
 	RETestObject *obj;
 	obj = [RETestObject testObject];
-	[obj respondsToSelector:@selector(sayHello) withKey:@"key" usingBlock:^(id receiver) {
+	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(sayHello) forKey:@"key"])) {
+		if ((supermethod = [receiver supermethod])) {
 			supermethod(receiver, @selector(sayHello));
 		}
 	}];
@@ -1279,10 +1282,10 @@
 		// Prepare key
 		id key;
 		key = [[[NSObject alloc] init] autorelease];
-		[key respondsToSelector:@selector(dealloc) withKey:@"key" usingBlock:^(id receiver) {
+		[key respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfBlockForSelector:@selector(dealloc) forKey:@"key"])) {
+			if ((supermethod = [receiver supermethod])) {
 				supermethod(receiver, @selector(dealloc));
 			}
 			

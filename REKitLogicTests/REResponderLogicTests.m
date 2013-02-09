@@ -1086,6 +1086,23 @@
 	[obj sayHello];
 }
 
+- (void)test_removeBlockForSelector_forKey
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Add log method
+	[obj respondsToSelector:@selector(log) withKey:@"key" usingBlock:^(id receiver) {
+		// Do something
+	}];
+	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
+	
+	// Remove block
+	[obj removeBlockForSelector:@selector(log) forKey:@"key"];
+	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
+}
+
 - (void)test_removeCurrentBlock
 {
 	// Make obj

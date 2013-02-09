@@ -371,26 +371,6 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 #pragma mark -- Current Block --
 //--------------------------------------------------------------//
 
-- (id)currentBlock
-{
-	// Get imp of current block
-	IMP imp;
-	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	if (!imp) {
-		return nil;
-	}
-	
-	// Get currentBlock
-	id currentBlock = nil;
-	@synchronized (self) {
-		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:nil];
-		currentBlock = REBlockGetImplementation(blockInfo[kBlockInfoBlockKey]);
-	}
-	
-	return currentBlock;
-}
-
 - (IMP)supermethodOfCurrentBlock
 {
 	// Get imp of current block

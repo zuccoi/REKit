@@ -19,9 +19,8 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key;
 
 // Current Block
-- (id)currentBlock; // Test >>>
 - (IMP)supermethodOfCurrentBlock;
-- (void)removeCurrentBlock; // Test >>>
+- (void)removeCurrentBlock;
 
 // Conformance
 - (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(id)key;

@@ -1086,6 +1086,24 @@
 	[obj sayHello];
 }
 
+- (void)test_removeCurrentBlock
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Add log method
+	[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+		// Remove currentBlock
+		[receiver removeCurrentBlock];
+	}];
+	
+	// Check
+	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
+	[obj performSelector:@selector(log)];
+	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
+}
+
 - (void)test_doNotChangeClassFrequentlyWithDynamicBlockManagement
 {
 	// Make obj

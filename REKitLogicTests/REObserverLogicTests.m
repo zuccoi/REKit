@@ -574,7 +574,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(read) forKey:key];
+	[obj removeBlockForSelector:@selector(read) withKey:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -630,7 +630,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) forKey:key];
+	[obj removeBlockForSelector:@selector(log) withKey:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -683,7 +683,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(read) forKey:key];
+	[obj removeBlockForSelector:@selector(read) withKey:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -736,7 +736,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) forKey:key];
+	[obj removeBlockForSelector:@selector(log) withKey:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -790,7 +790,7 @@
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj0 removeBlockForSelector:@selector(log) forKey:@"key"];
+	[obj0 removeBlockForSelector:@selector(log) withKey:@"key"];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	

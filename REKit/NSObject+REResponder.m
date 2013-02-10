@@ -82,7 +82,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			while ([blockInfos count]) {
 				NSDictionary *blockInfo;
 				blockInfo = [blockInfos lastObject];
-				[self removeBlockForSelector:NSSelectorFromString(selectorName) forKey:blockInfo[kBlockInfoKeyKey]];
+				[self removeBlockForSelector:NSSelectorFromString(selectorName) withKey:blockInfo[kBlockInfoKeyKey]];
 			}
 		}];
 		[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -129,7 +129,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 #pragma mark -- Util --
 //--------------------------------------------------------------//
 
-- (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector forKey:(id)key blockInfos:(NSMutableArray**)outBlockInfos
+- (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector withKey:(id)key blockInfos:(NSMutableArray**)outBlockInfos
 {
 	// Get blockInfo
 	__block NSDictionary *blockInfo = nil;
@@ -238,7 +238,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 	
 	// Update blocks
-	[self removeBlockForSelector:selector forKey:key];
+	[self removeBlockForSelector:selector withKey:key];
 	@synchronized (self) {
 		// Get blocks
 		NSMutableDictionary *blocks;
@@ -293,7 +293,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 }
 
-- (BOOL)hasBlockForSelector:(SEL)selector forKey:(id)key
+- (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key
 {
 	// Filter
 	if (!selector || !key) {
@@ -305,14 +305,14 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoForSelector:selector forKey:key blockInfos:nil];
+		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:nil];
 		block = blockInfo[kBlockInfoBlockKey];
 	}
 	
 	return (block != nil);
 }
 
-- (void)removeBlockForSelector:(SEL)selector forKey:(id)key
+- (void)removeBlockForSelector:(SEL)selector withKey:(id)key
 {
 	// Filter
 	if (!selector || !key) {
@@ -324,7 +324,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		// Get elements
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoForSelector:selector forKey:key blockInfos:&blockInfos];
+		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:&blockInfos];
 		if (blockInfo && blockInfos) {
 			// Replace method
 			if (blockInfo == [blockInfos lastObject]) {
@@ -430,7 +430,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 	
 	// Call removeBlockForSelector:forKey:
-	[self removeBlockForSelector:selector forKey:blockInfo[kBlockInfoKeyKey]];
+	[self removeBlockForSelector:selector withKey:blockInfo[kBlockInfoKeyKey]];
 }
 
 //--------------------------------------------------------------//

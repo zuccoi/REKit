@@ -89,7 +89,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		
 		// Dispose classes
 		NSString *className;
-		className = NSStringFromClass([self class]);
+		className = [NSString stringWithUTF8String:class_getName([self class])];
 		if ([className hasPrefix:kClassNamePrefix]) {
 			// Dispose NSKVONotifying subclass
 			Class kvoClass;

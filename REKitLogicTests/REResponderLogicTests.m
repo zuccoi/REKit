@@ -249,7 +249,13 @@
 		
 		// Get block
 		id block;
-		block = [obj blockForSelector:sel forKey:@"key"];
+		NSDictionary *blockInfo;
+		SEL sel;
+		IMP imp;
+		sel = @selector(REResponder_blockInfoForSelector:forKey:blockInfos:);
+		imp = [obj methodForSelector:sel];
+		blockInfo = imp(obj, sel, @selector(log), @"key", nil);
+		block = blockInfo[@"block"];
 		[block respondsToSelector:(sel = @selector(release)) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;
@@ -469,23 +475,22 @@
 	STAssertEquals(rect, CGRectMake(10.0f, 20.0f, 30.0f, 40.0f), @"");
 }
 
-- (void)test_blockKey
+- (void)test_hasBlockForSelector_forKey
 {
-	SEL sel;
-	
-	// Make block
-	void (^block)(id);
-	block = ^(id receiver) {
-		// Do something
-	};
-	
-	// Add block with key
+	// Make obj
 	id obj;
 	obj = [[[NSObject alloc] init] autorelease];
-	[obj respondsToSelector:(sel = @selector(doSomething)) withKey:@"key" usingBlock:block];
 	
-	// Check block for key
-	STAssertEqualObjects(block, [obj blockForSelector:sel forKey:@"key"], @"");
+	// Add log block
+	[obj respondsToSelector:@selector(log) withKey:@"key" usingBlock:^(id receiver) {
+		// Do something
+		receiver = receiver;
+	}];
+	STAssertTrue([obj hasBlockForSelector:@selector(log) forKey:@"key"], @"");
+	
+	// Remove log block
+	[obj removeBlockForSelector:@selector(log) forKey:@"key"];
+	STAssertTrue(![obj hasBlockForSelector:@selector(log) forKey:@"key"], @"");
 }
 
 - (void)test_stackBlockPerSelector

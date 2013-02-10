@@ -291,11 +291,11 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 }
 
-- (id)blockForSelector:(SEL)selector forKey:(id)key
+- (BOOL)hasBlockForSelector:(SEL)selector forKey:(id)key
 {
 	// Filter
 	if (!selector || !key) {
-		return nil;
+		return NO;
 	}
 	
 	// Get block
@@ -307,7 +307,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		block = blockInfo[kBlockInfoBlockKey];
 	}
 	
-	return block;
+	return (block != nil);
 }
 
 - (void)removeBlockForSelector:(SEL)selector forKey:(id)key

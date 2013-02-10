@@ -71,39 +71,41 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 
 - (void)REResponder_X_dealloc
 {
-	// Remove protocols
-	[self associateValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-	
-	// Remove blocks
-	NSMutableDictionary *blocks;
-	blocks = [self associatedValueForKey:kBlocksAssociationKey];
-	[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
-		while ([blockInfos count]) {
-			NSDictionary *blockInfo;
-			blockInfo = [blockInfos lastObject];
-			[self removeBlockForSelector:NSSelectorFromString(selectorName) forKey:blockInfo[kBlockInfoKeyKey]];
-		}
-	}];
-	[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-	
-	// Dispose classes
-	NSString *className;
-	className = NSStringFromClass([self class]);
-	if ([className hasPrefix:kClassNamePrefix]) {
-		// Dispose NSKVONotifying subclass
-		Class kvoClass;
-		kvoClass = NSClassFromString([NSString stringWithFormat:@"NSKVONotifying_%@", className]);
-		if (kvoClass) {
-			objc_disposeClassPair(kvoClass);
-		}
+	@autoreleasepool {
+		// Remove protocols
+		[self associateValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		
-		// Dispose class
-		Class class;
-		class = [self class];
-		[self willChangeClass:[self superclass]];
-		object_setClass(self, [self superclass]);
-		[self didChangeClass:class];
-		objc_disposeClassPair(class);
+		// Remove blocks
+		NSMutableDictionary *blocks;
+		blocks = [self associatedValueForKey:kBlocksAssociationKey];
+		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+			while ([blockInfos count]) {
+				NSDictionary *blockInfo;
+				blockInfo = [blockInfos lastObject];
+				[self removeBlockForSelector:NSSelectorFromString(selectorName) forKey:blockInfo[kBlockInfoKeyKey]];
+			}
+		}];
+		[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		
+		// Dispose classes
+		NSString *className;
+		className = NSStringFromClass([self class]);
+		if ([className hasPrefix:kClassNamePrefix]) {
+			// Dispose NSKVONotifying subclass
+			Class kvoClass;
+			kvoClass = NSClassFromString([NSString stringWithFormat:@"NSKVONotifying_%@", className]);
+			if (kvoClass) {
+				objc_disposeClassPair(kvoClass);
+			}
+			
+			// Dispose class
+			Class class;
+			class = [self class];
+			[self willChangeClass:[self superclass]];
+			object_setClass(self, [self superclass]);
+			[self didChangeClass:class];
+			objc_disposeClassPair(class);
+		}
 	}
 	
 	// original

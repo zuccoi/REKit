@@ -68,6 +68,7 @@
 		}
 		
 		// Stop observing
+		[_observer stopObserving];
 		_observer = nil;
 	}];
 }

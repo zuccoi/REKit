@@ -10,7 +10,7 @@
 
 @implementation MREViewController
 {
-	NSMutableSet *_observers;
+	__block id _observer;
 }
 
 //--------------------------------------------------------------//
@@ -25,10 +25,44 @@
 		return nil;
 	}
 	
-	// Create _observers
-	_observers = [NSMutableSet set];
+	// Manage _observer
+	[self _manageObserver];
 	
 	return self;
+}
+
+- (void)_manageObserver
+{
+	// Get me
+	__block typeof(self) me = self;
+	
+	#pragma mark └ [self setView:]
+	[self respondsToSelector:@selector(setView:) withKey:nil usingBlock:^(id receiver, NSView *view) {
+		// Stop observing
+		[_observer stopObserving];
+		_observer = nil;
+		
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(setView:), view);
+		}
+		
+		// Start observing
+		if (!view) {
+			return;
+		}
+		_observer = [self.view.layer addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
+			// Get new color and its components
+			CGColorRef color;
+			const CGFloat *components;
+			color = (__bridge CGColorRef)(change[NSKeyValueChangeNewKey]);
+			components = CGColorGetComponents(color);
+			
+			// Update label
+			[me.label setStringValue:[NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", components[0], components[1], components[2]]];
+		}];
+	}];
 }
 
 //--------------------------------------------------------------//
@@ -37,11 +71,13 @@
 
 - (void)setView:(NSView *)view
 {
-	// Stop observing
-	[_observers removeAllObjects];
-	
 	// super
 	[super setView:view];
+	
+	// Filter
+	if (!view) {
+		return;
+	}
 	
 	// Configure view
 	CGColorRef color;
@@ -49,22 +85,6 @@
 	color = CGColorCreateGenericRGB(0.8f, 0.8f, 0.8f, 1.0f);
 	self.view.layer.backgroundColor = color;
 	CGColorRelease(color);
-	
-	// Start observing
-	id observer;
-	__weak NSTextField *label;
-	label = self.label;
-	observer = [self.view.layer addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
-		// Get new color and its components
-		CGColorRef color;
-		const CGFloat *components;
-		color = (__bridge CGColorRef)(change[NSKeyValueChangeNewKey]);
-		components = CGColorGetComponents(color);
-		
-		// Update label
-		[label setStringValue:[NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", components[0], components[1], components[2]]];
-	}];
-	[_observers addObject:observer];
 }
 
 //--------------------------------------------------------------//
@@ -73,8 +93,8 @@
 
 - (IBAction)changeBackgroundColorAction:(id)sender
 {
-	__weak CALayer *layer;
-	layer = self.view.layer;
+	// Get me
+	__block typeof(self) me = self;
 	
 	// Show alert
 	NSAlert *alert;
@@ -98,7 +118,7 @@
 			return (arc4random() % 11) / 10.0f;
 		};
 		color = CGColorCreateGenericRGB(random(), random(), random(), 1.0f);
-		layer.backgroundColor = color;
+		me.view.layer.backgroundColor = color;
 		CGColorRelease(color);
 	}];
 	[alert setDelegate:(id)alert];

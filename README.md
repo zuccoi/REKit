@@ -21,12 +21,14 @@ REResponder provides ability to add/override methods at instance level. Details 
 ### <a id="AddingMethodsDynamically"></a>Adding methods dynamically
 You can add methods to arbitrary instance dynamically using Block. To do so, you use `-respondsToSelector:withKey:usingBlock:` method. For example, `NSObject` doesn't have `-sayHello` method, but you can add it as below:
 
-	id obj;
-	obj = [[NSObject alloc] init];
-	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
-		NSLog(@"Hello World!");
-	}];
-	[obj performSelector:@selector(sayHello)]; // Hello World!
+```objective-c
+id obj;
+obj = [[NSObject alloc] init];
+[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
+	NSLog(@"Hello World!");
+}];
+[obj performSelector:@selector(sayHello)]; // Hello World!
+```
 
 It is applied to `obj` only, and it doesn't affect to the other instances.
 
@@ -34,13 +36,15 @@ It is applied to `obj` only, and it doesn't affect to the other instances.
 ### <a id="OverridingMethodsDyamically"></a>Overriding methods dynamically
 You can override methods of arbitrary instance dynamically using Block. Same as "[Adding methods dynamically](#AddingMethodsDynamically)", you use `-respondsToSelector:withKey:usingBlock:` method. For example, if you have MyObject class logs "No!" in `-sayHello` method, you can override it to log "Hello World!":
 
-	MyObject *obj;
-	obj = [[MyObject alloc] init];
-	// [obj sayHello]; // No!	
-	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
-		NSLog(@"Hello World!");
-	}];
-	[obj sayHello]; // Hello World!
+```objective-c
+MyObject *obj;
+obj = [[MyObject alloc] init];
+// [obj sayHello]; // No!	
+[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
+	NSLog(@"Hello World!");
+}];
+[obj sayHello]; // Hello World!
+```
 
 It is applied to `obj` only, and it doesn't affect to the other instances.
 
@@ -48,27 +52,31 @@ It is applied to `obj` only, and it doesn't affect to the other instances.
 ### <a id="ReceiverArgument"></a>The receiver argument of Block
 As you can see above, `receiver` argument is necessary for Block. The `receier` argument is receiver of `-respondsToSelector:withKey:usingBlock:` method. It doesn't cause retain cycle even if you use `receiver` in the Block, so go ahead:
 
-	id obj;
-	obj = [[NSObject alloc] init];
-	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
-		// NSLog(@"obj = %@", obj); // Causes retain cycle! Use receiver instead.
-		NSLog(@"receiver = %@", receiver);
-	}];
-	[obj performSelector:@selector(sayHello)];
+```objective-c
+id obj;
+obj = [[NSObject alloc] init];
+[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
+	// NSLog(@"obj = %@", obj); // Causes retain cycle! Use receiver instead.
+	NSLog(@"receiver = %@", receiver);
+}];
+[obj performSelector:@selector(sayHello)];
+```
 
 
 ### Block with arguments and/or return value
 REResponder supports Block with arguments and/or return value. When you want to add or override method with arguments, list the arguments following `receiver` argument:
 
-	UIAlertView *alertView;
-	// …
-	[alertView
-		respondsToSelector:@selector(alertViewShouldEnableFirstOtherButton:)
-		withKey:nil
-		usingBlock:^(id receiver, UIAlertView *alertView) {
-			return NO;
-		}
-	];
+```objective-c
+UIAlertView *alertView;
+// …
+[alertView
+	respondsToSelector:@selector(alertViewShouldEnableFirstOtherButton:)
+	withKey:nil
+	usingBlock:^(id receiver, UIAlertView *alertView) {
+		return NO;
+	}
+];
+```
 
 
 ### Manages Block with key
@@ -84,31 +92,36 @@ An instance stacks Blocks per selector. The last added (upper most) Block is the
 ### <a id="InvokingSupermethod"></a>Invoking supermethod
 You can invoke supermethod - implementation of Block under the current Block, or hard-coded implementation - using `-supermethodOfCurrentBlock` method:
 
-	[obj respondsToSelector:@selector(description) withKey:nil usingBlock:^(id receiver) {
-		// Make description…
-		NSMutableString *description;
-		description = [NSMutableString string];
-		
-		// Append original description
-		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-			[description appendString:supermethod(receiver, @selector(description))];
-		}
-		
-		// Customize description…
-		
-		return description;
-	}];
+```objective-c
+[obj respondsToSelector:@selector(description) withKey:nil usingBlock:^(id receiver) {
+	// Make description…
+	NSMutableString *description;
+	description = [NSMutableString string];
+	
+	// Append original description
+	IMP supermethod;
+	if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+		[description appendString:supermethod(receiver, @selector(description))];
+	}
+	
+	// Customize description…
+	
+	return description;
+}];
+```
+
 
 The supermethod needs receiver and selector arguments at least. If the selector has arguments, list them following selector argument.
 
 Cast supermethod if it's needed. For example, below is a cast of supermethod which returns CGRect:
 
-	typedef CGRect (*RectIMP)(id, SEL, ...);
-	RectIMP supermethod;
-	if ((supermethod = (RectIMP)[receiver supermethodOfCurrentBlock])) {
-		rect = supermethod(receiver, @selector(rect));
-	}
+```objective-c
+typedef CGRect (*RectIMP)(id, SEL, ...);
+RectIMP supermethod;
+if ((supermethod = (RectIMP)[receiver supermethodOfCurrentBlock])) {
+	rect = supermethod(receiver, @selector(rect));
+}
+```
 
 
 ### <a id="Examples"></a>Efficient Examples
@@ -120,35 +133,41 @@ A class using delegation pattern keeps reusability by excluding application cont
 
 The code fragments below illustrate how you can set `alertView` itself as the delegate to `alertView`:
 
-	UIAlertView *alertView;
-	alertView = [[UIAlertView alloc]
-		initWithTitle:@"title"
-		message:@"message"
-		delegate:nil
-		cancelButtonTitle:@"Cancel"
-		otherButtonTitles:@"OK", nil
-	];
-	[alertView
-		respondsToSelector:@selector(alertView:didDismissWithButtonIndex:)
-		withKey:nil
-		usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
-			// Do something…
-		}
-	];
-	alertView.delegate = alertView;
+```objective-c
+UIAlertView *alertView;
+alertView = [[UIAlertView alloc]
+	initWithTitle:@"title"
+	message:@"message"
+	delegate:nil
+	cancelButtonTitle:@"Cancel"
+	otherButtonTitles:@"OK", nil
+];
+[alertView
+	respondsToSelector:@selector(alertView:didDismissWithButtonIndex:)
+	withKey:nil
+	usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+		// Do something…
+	}
+];
+alertView.delegate = alertView;
+```
+
 
 The code fragments below illustrate how you can set `animation` itself as the delegate to `animation`:
 
-	CABasicAnimation *animation;
-	// …
-	[animation
-		respondsToSelector:@selector(animationDidStop:finished:)
-		withKey:nil
-		usingBlock:^(id receiver, CABasicAnimation *animation, BOOL finished) {
-			// Do something…
-		}
-	];
-	animation.delegate = animation;
+```objective-c
+CABasicAnimation *animation;
+// …
+[animation
+	respondsToSelector:@selector(animationDidStop:finished:)
+	withKey:nil
+	usingBlock:^(id receiver, CABasicAnimation *animation, BOOL finished) {
+		// Do something…
+	}
+];
+animation.delegate = animation;
+```
+
 
 Pros:
 
@@ -160,123 +179,131 @@ Pros:
 #### Target itself
 For target/action paradigm, you can use similar technique described in "[Delegate itself](#DelegateItself)". The code fragments below adds button - whose target is button itself - to `UICollectionViewCell`:
 
-	UIButton *button;
-	// …
-	[button respondsToSelector:@selector(buttonAction) withKey:@"key" usingBlock:^(id receiver) {
-		// Do something…
-	}];
-	[button addTarget:button action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
-	[cell.contentView addSubview:button];
+```objective-c
+UIButton *button;
+// …
+[button respondsToSelector:@selector(buttonAction) withKey:@"key" usingBlock:^(id receiver) {
+	// Do something…
+}];
+[button addTarget:button action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
+[cell.contentView addSubview:button];
+```
 
 
 #### Mock object in UnitTest
 REResponder is also useful for UnitTest. The code fragments below check whether delegate method of `BalloonController` is called, using mock object:
 
-	__block BOOL called = NO;
-	
-	// Make mock
-	id mock;
-	mock = [[NSObject alloc] init];
-	[mock
-		respondsToSelector:@selector(balloonControllerDidDismissBalloon:)
-		withKey:nil
-		usingBlock:^(id receiver, BalloonController *balloonController) {
-			called = YES;
-		}
-	];
-	balloonController.delegate = mock;
-	
-	// Dismiss balloon
-	[balloonController dismissBalloonAnimated:NO];
-	STAssertTrue(called, @"");
+```objective-c
+__block BOOL called = NO;
+
+// Make mock
+id mock;
+mock = [[NSObject alloc] init];
+[mock
+	respondsToSelector:@selector(balloonControllerDidDismissBalloon:)
+	withKey:nil
+	usingBlock:^(id receiver, BalloonController *balloonController) {
+		called = YES;
+	}
+];
+balloonController.delegate = mock;
+
+// Dismiss balloon
+[balloonController dismissBalloonAnimated:NO];
+STAssertTrue(called, @"");
+```
 
 
 #### Stub out high-cost process in UnitTest
 The code fragments below stub out download process of AccountManager, then test view controller of account-view:
 
-	// Load sample image
-	__weak UIImage *sampleImage;
-	NSString *sampleImagePath;
-	sampleImagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"sample" ofType:@"png"];
-	sampleImage = [UIImage imageWithContentsOfFile:sampleImagePath];
-	
-	// Stub out download process
-	[[AccountManager sharedManager]
-		respondsToSelector:@selector(downloadProfileImageWithCompletion:)
-		withKey:@"key"
-		usingBlock:^(id receiver, void (^completion)(UIImage*, NSError*)) {
-			completion(sampleImage, nil);
-		}
-	];
-	
-	// Call thumbnailButtonAction which causes download of profile image
-	[acccountViewController thumbnailButtonAction];
-	STAssertEqualObjects(accountViewController.profileImageView.image, sampleImage, @"");
-	
-	// Remove block
-	[[AccountManager sharedManager] removeBlockForSelector:@selector(downloadProfileImageWithCompletion:) forKey:@"key"];
+```objective-c
+// Load sample image
+__weak UIImage *sampleImage;
+NSString *sampleImagePath;
+sampleImagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"sample" ofType:@"png"];
+sampleImage = [UIImage imageWithContentsOfFile:sampleImagePath];
+
+// Stub out download process
+[[AccountManager sharedManager]
+	respondsToSelector:@selector(downloadProfileImageWithCompletion:)
+	withKey:@"key"
+	usingBlock:^(id receiver, void (^completion)(UIImage*, NSError*)) {
+		completion(sampleImage, nil);
+	}
+];
+
+// Call thumbnailButtonAction which causes download of profile image
+[acccountViewController thumbnailButtonAction];
+STAssertEqualObjects(accountViewController.profileImageView.image, sampleImage, @"");
+
+// Remove block
+[[AccountManager sharedManager] removeBlockForSelector:@selector(downloadProfileImageWithCompletion:) forKey:@"key"];
+```
 
 
 #### Gather code fragments
 REResponder helps you to gather related code fragments into one place. For example, if you want to add code fragments about `UIKeyboardWillShowNotification`, you can gather them into `-_manageKeyboardWillShowNotificationObserver` method like below:
 
-	- (id)initWithCoder:(NSCoder *)aDecoder
-	{
-		// super
-		self = [super initWithCoder:aDecoder];
-		if (!self) {
-			return nil;
-		}
-		
-		// Manage _keyboardWillShowNotificationObserver
-		[self _manageKeyboardWillShowNotificationObserver];
-		
-		return self;
+```objective-c
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+	// super
+	self = [super initWithCoder:aDecoder];
+	if (!self) {
+		return nil;
 	}
 	
-	- (void)_manageKeyboardWillShowNotificationObserver
-	{
-		__block id observer;
-		observer = _keyboardWillShowNotificationObserver;
+	// Manage _keyboardWillShowNotificationObserver
+	[self _manageKeyboardWillShowNotificationObserver];
+	
+	return self;
+}
+
+- (void)_manageKeyboardWillShowNotificationObserver
+{
+	__block id observer;
+	observer = _keyboardWillShowNotificationObserver;
+	
+	#pragma mark └ [self viewWillAppear:]
+	[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(viewWillAppear:), animated);
+		}
 		
-		#pragma mark └ [self viewWillAppear:]
-		[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-			// supermethod
-			REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
-			if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(viewWillAppear:), animated);
-			}
-			
-			// Start observing
-			if (!observer) {
-				observer = [[NSNotificationCenter defaultCenter]
-					addObserverForName:UIKeyboardWillShowNotification
-					object:nil
-					queue:[NSOperationQueue mainQueue]
-					usingBlock:^(NSNotification *note) {
-						// Do something…
-					}
-				];
-			}
-		}];
+		// Start observing
+		if (!observer) {
+			observer = [[NSNotificationCenter defaultCenter]
+				addObserverForName:UIKeyboardWillShowNotification
+				object:nil
+				queue:[NSOperationQueue mainQueue]
+				usingBlock:^(NSNotification *note) {
+					// Do something…
+				}
+			];
+		}
+	}];
+	
+	#pragma mark └ [self viewDidDisappear:]
+	[self respondsToSelector:@selector(viewDidDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(viewDidDisappear:), animated);
+		}
 		
-		#pragma mark └ [self viewDidDisappear:]
-		[self respondsToSelector:@selector(viewDidDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-			// supermethod
-			REVoidIMP supermethod;
-			if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(viewDidDisappear:), animated);
-			}
-			
-			// Stop observing
-			[[NSNotificationCenter defaultCenter] removeObserver:observer];
-			observer = nil;
-		}];
-	}
+		// Stop observing
+		[[NSNotificationCenter defaultCenter] removeObserver:observer];
+		observer = nil;
+	}];
+}
+```
 
 
 ### REResponder known issues
-a. #### Class is changed
+a. <b>Class is changed</b><br />
 When you add/override methods, the instance becomes an instance of class named "REResponder_UUID_OriginalClassName". It turned out that it breaks relationships of KVO. The problem has been fixed already, but some other problems can happen. If the problems happen, cope with them using `-willChangeClass:` and `-didChangeClass:`, or `REObjectWillChangeClassNotification` and `REObjectDidChangeClassNotification`.
 
 
@@ -294,10 +321,13 @@ REObserver provides:
 ### <a id="KVOWithBlock"></a>Blocks compatible method for KVO
 REObserver provides `-addObserverForKeyPath:options:usingBlock:` method. You can pass a block to be executed when the value is changed:
 
-	id observer;
-	observer = [obj addObserverForKeyPath:@"someKeyPath" options:0 usingBlock:^(NSDictionary *change) {
-		// Do something…
-	}];
+```objective-c
+id observer;
+observer = [obj addObserverForKeyPath:@"someKeyPath" options:0 usingBlock:^(NSDictionary *change) {
+	// Do something…
+}];
+```
+
 
 Pros:
 
@@ -309,37 +339,42 @@ Pros:
 ### <a id="StopObservingSimply"></a>Simple method to stop observing
 You can stop observing with `-stopObserving` method:
 
-	[observer stopObserving];
+```objective-c
+[observer stopObserving];
+```
+
 
 With code above, `observer` stops all observations. There is no need to remember observed object, keyPath, and context.
 
 ### <a id="AutomaticObservationStop"></a>Automatic observation stop system
 When observed object or observing object is released, REObserver stops related observations automatically. It solves problems below (Below is Non-ARC code):
 
-	- (void)problem1
-	{
-		UIView *view;
-		view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
-		@autoreleasepool {
-			id observer;
-			observer = [[[NSObject alloc] init] autorelease];
-			[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
-		}
-		NSLog(@"observationInfo = %@", (id)[view observationInfo]); // view is observed by zombie!
-		view.backgroundColor = [UIColor redColor]; // Crash!
-	}
-
-	- (void)problem2
-	{
+```objective-c
+- (void)problem1
+{
+	UIView *view;
+	view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+	@autoreleasepool {
 		id observer;
 		observer = [[[NSObject alloc] init] autorelease];
-		@autoreleasepool {
-			UIView *view;
-			view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
-			[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
-		}
-		// observer is observing zombie!
+		[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
 	}
+	NSLog(@"observationInfo = %@", (id)[view observationInfo]); // view is observed by zombie!
+	view.backgroundColor = [UIColor redColor]; // Crash!
+}
+
+- (void)problem2
+{
+	id observer;
+	observer = [[[NSObject alloc] init] autorelease];
+	@autoreleasepool {
+		UIView *view;
+		view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+		[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
+	}
+	// observer is observing zombie!
+}
+```
 
 
 ## Availability

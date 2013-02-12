@@ -9,7 +9,7 @@ REKit
 
 　REKit 特に REResponder は、Blocks の潜在能力を GCD とはまた違った形で引き出すものだ。REResponder は、ランタイムでインスタンスを再設計する能力をプログラマに与える。具体的には、インスタンスにメソッドを追加したり、インスタンスのメソッドを上書きすることを可能にする。REKit もまた、iOS, OS X の世界に大きな変化をもたらす可能性を持っている。
 
-　REKit は、[SpliTron](http://appstore.com/splitron "SpliTron") という iPhone アプリで実際に使用されており、開発効率の向上、保守性の向上に貢献した。それにより、SpliTron は数度の仕様変更にも迅速に対応し、チームはユーザイクスペリエンスの向上に注力することができた。
+　REKit は、[SpliTron](http://www.webtron.jp/jp/splitron/ "SpliTron") という iPhone アプリで実際に使用されており、開発効率の向上、保守性の向上に貢献した。それにより、SpliTron は数度の仕様変更にも迅速に対応し、チームはユーザイクスペリエンスの向上に注力することができた。
 
 　今後 REKit が多くの開発で採用され、iOS, OS X の世界に寄与できることを願っている。
 

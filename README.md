@@ -9,7 +9,7 @@ Blocks and GCD (Grand Central Dispatch), caused a great change in the iOS, OS X 
 
 REKit (especially REResponder) brings out Blocks latent ability in a different way with GCD. REResponder provides ability to reconstruct instances. To be concrete, it provides ability to add/override methods at instance level. REKit can also cause great change.
 
-REKit was used in iPhone app : [SpliTron](http://appstore.com/splitron "SpliTron"). REKit improved the development efficiency and maintainability. Thereby, SpliTron overcame some specification changes. REKit made the project team to focus on user experience.
+REKit was used in iPhone app : [SpliTron](http://www.webtron.jp/splitron/ "SpliTron"). REKit improved the development efficiency and maintainability. Thereby, SpliTron overcame some specification changes. REKit made the project team to focus on user experience.
 
 REKit hopes to contribute to the iOS, OS X world.
 

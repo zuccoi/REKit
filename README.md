@@ -303,7 +303,7 @@ REResponder helps you to gather related code fragments into one place. For examp
 
 
 ### REResponder known issues
-a. <b>Class is changed</b><br />
+a. **Class is changed**<br />
 When you add/override methods, the instance becomes an instance of class named "REResponder_UUID_OriginalClassName". It turned out that it breaks relationships of KVO. The problem has been fixed already, but some other problems can happen. If the problems happen, cope with them using `-willChangeClass:` and `-didChangeClass:`, or `REObjectWillChangeClassNotification` and `REObjectDidChangeClassNotification`.
 
 

@@ -44,41 +44,41 @@
 
 - (void)_manageKeyboardWillShowNotificationObserver
 {
-	SEL sel = NULL;
+	__block id obserer;
+	obserer = _keyboardWillShowNotificationObserver;
 	
 	#pragma mark └ [self viewWillAppear:]
-	[self respondsToSelector:(sel = @selector(viewWillAppear:)) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+	[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
 		// supermethod
 		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
 		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel, animated);
+			supermethod(receiver, @selector(viewWillAppear:), animated);
 		}
 		
 		// Start observing
-		if (_keyboardWillShowNotificationObserver) {
-			return;
+		if (!obserer) {
+			obserer = [[NSNotificationCenter defaultCenter]
+				addObserverForName:UIKeyboardWillShowNotification
+				object:nil
+				queue:[NSOperationQueue mainQueue]
+				usingBlock:^(NSNotification *note) {
+					// Do something…
+				}
+			];
 		}
-		_keyboardWillShowNotificationObserver = [[NSNotificationCenter defaultCenter]
-			addObserverForName:UIKeyboardWillShowNotification
-			object:nil
-			queue:[NSOperationQueue mainQueue]
-			usingBlock:^(NSNotification *note) {
-				// Do something…
-			}
-		];
 	}];
 	
 	#pragma mark └ [self viewDidDisappear:]
-	[self respondsToSelector:(sel = @selector(viewDidDisappear:)) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+	[self respondsToSelector:@selector(viewDidDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
 		// supermethod
 		REVoidIMP supermethod;
 		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel, animated);
+			supermethod(receiver, @selector(viewDidDisappear:), animated);
 		}
 		
 		// Stop observing
-		[[NSNotificationCenter defaultCenter] removeObserver:_keyboardWillShowNotificationObserver];
-		_keyboardWillShowNotificationObserver = nil;
+		[[NSNotificationCenter defaultCenter] removeObserver:obserer];
+		obserer = nil;
 	}];
 }
 
@@ -88,6 +88,8 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+// ?????
+NSLog(@"%s", __PRETTY_FUNCTION__);
 	// Get me
 	__weak typeof(self) me = self;
 	
@@ -118,6 +120,14 @@
 	
 	// Stop observing
 	[_observers removeAllObjects];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+// ?????
+NSLog(@"%s", __PRETTY_FUNCTION__);
+	// super
+	[super viewDidDisappear:animated];
 }
 
 //--------------------------------------------------------------//

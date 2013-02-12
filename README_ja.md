@@ -20,12 +20,14 @@ REKit
 ### <a id="AddingMethodsDynamically"></a>動的メソッド実装
 　REResponder は、Block を使った動的メソッド実装を可能にする。それには `-respondsToSelector:withKey:usingBlock:` メソッドを使用する。例えば `NSObject` には `-sayHello` というメソッドはないが、以下のようにすると動的に実装することができる：
 
-	id obj;
-	obj = [[NSObject alloc] init];
-	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
-		NSLog(@"Hello World!");
-	}];
-	[obj performSelector:@selector(sayHello)]; // Hello World!
+```objective-c
+id obj;
+obj = [[NSObject alloc] init];
+[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
+	NSLog(@"Hello World!");
+}];
+[obj performSelector:@selector(sayHello)]; // Hello World!
+```
 
 　この動的メソッド実装は、`obj` インスタンスだけに適用され、他のインスタンスには影響しない。
 
@@ -33,13 +35,15 @@ REKit
 ### <a id="OverridingMethodsDynamically"></a>動的メソッド上書き
 　REResponder は、Block を使った動的メソッド上書きを可能にする。[動的メソッド実装](#AddingMethodsDynamically) のときと同じく `-respondsToSelector:withKey:usingBlock:` メソッドを使用する。例えば `-sayHello` を呼び出すと "No!" をログる MyObject クラスのインスタンスがあったとする。以下のようにすると、"Hello World!" がログられるように上書きすることができる：
 
-	MyObject *obj;
-	obj = [[MyObject alloc] init];
-	// [obj sayHello]; // No!	
-	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
-		NSLog(@"Hello World!");
-	}];
-	[obj sayHello]; // Hello World!
+```objective-c
+MyObject *obj;
+obj = [[MyObject alloc] init];
+// [obj sayHello]; // No!	
+[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
+	NSLog(@"Hello World!");
+}];
+[obj sayHello]; // Hello World!
+```
 
 　動的メソッド上書きも、`obj` だけに適用され、他のインスタンスには影響しない。
 
@@ -47,28 +51,30 @@ REKit
 ### <a id="ReceiverArgument"></a>Block の receiver 引数
 　これまでの例で見てきた通り、 `-respondsToSelector:withKey:usingBlock:` の Block には receiver 引数が必須だ。この receiver には、`-respondsToSelector:withKey:usingBlock:` メソッドを呼び出したときのレシーバが入る。Block の中で使っても循環参照を引き起こさないので、自由に使うことができる：
 
-	id obj;
-	obj = [[NSObject alloc] init];
-	[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
-		// NSLog(@"obj = %@", obj); // Causes retain cycle! Use receiver instead.
-		NSLog(@"receiver = %@", receiver);
-	}];
-	[obj performSelector:@selector(sayHello)];
-
+```objective-c
+id obj;
+obj = [[NSObject alloc] init];
+[obj respondsToSelector:@selector(sayHello) withKey:nil usingBlock:^(id receiver) {
+	// NSLog(@"obj = %@", obj); // Causes retain cycle! Use receiver instead.
+	NSLog(@"receiver = %@", receiver);
+}];
+[obj performSelector:@selector(sayHello)];
+```
 
 ### 引数や返り値を持つメソッドもサポートする
 　REResponder は引数や返り値を持つメソッドもサポートする。引数を持つメソッドを動的に実装／上書きをする場合、Block の引数には、Block に必須な receiver 引数に続けてメソッドの引数をリストする：
 
-	UIAlertView *alertView;
-	// …
-	[alertView
-		respondsToSelector:@selector(alertViewShouldEnableFirstOtherButton:)
-		withKey:nil
-		usingBlock:^(id receiver, UIAlertView *alertView) {
-			return NO;
-		}
-	];
-
+```objective-c
+UIAlertView *alertView;
+// …
+[alertView
+	respondsToSelector:@selector(alertViewShouldEnableFirstOtherButton:)
+	withKey:nil
+	usingBlock:^(id receiver, UIAlertView *alertView) {
+		return NO;
+	}
+];
+```
 
 ### Block をキーで管理する
 　Block にはキーを割り当てることができ、後々、そのキーによって Block を管理することができる。Block にキーを割り当てるには、`-respondsToSelector:withKey:usingBlock:` の key 引数に任意のオブジェクトを渡す。Block の有無は `-hasBlockForSelecor:withKey:` で確認できる。Block の削除は `-removeBlockForSelector:withKey:` で行える。
@@ -83,32 +89,35 @@ REKit
 ### <a id="InvokingSupermethod"></a>supermethod の呼び出し
 　ある Block の下にスタックされている Block の実装、あるいはハードコーディングされた実装は、`-supermethodOfCurrentBlock` で取得し、実行することができる：
 
-	[obj respondsToSelector:@selector(description) withKey:nil usingBlock:^(id receiver) {
-		// Make description…
-		NSMutableString *description;
-		description = [NSMutableString string];
-		
-		// Append original description
-		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-			[description appendString:supermethod(receiver, @selector(description))];
-		}
-		
-		// Customize description…
-		
-		return description;
-	}];
+```objective-c
+[obj respondsToSelector:@selector(description) withKey:nil usingBlock:^(id receiver) {
+	// Make description…
+	NSMutableString *description;
+	description = [NSMutableString string];
+	
+	// Append original description
+	IMP supermethod;
+	if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+		[description appendString:supermethod(receiver, @selector(description))];
+	}
+	
+	// Customize description…
+	
+	return description;
+}];
+```
 
 　supermethod に渡す引数には、レシーバとセレクタが必須で、セレクタが引数を持っている場合はその後に続ける。
 
 　supermethod の返り値が id 以外の場合は、IMP をキャストする。以下は返り値が CGRect の場合のキャストである：
 
-	typedef CGRect (*RectIMP)(id, SEL, ...);
-	RectIMP supermethod;
-	if ((supermethod = (RectIMP)[receiver supermethodOfCurrentBlock])) {
-		rect = supermethod(receiver, @selector(rect));
-	}
-
+```objective-c
+typedef CGRect (*RectIMP)(id, SEL, ...);
+RectIMP supermethod;
+if ((supermethod = (RectIMP)[receiver supermethodOfCurrentBlock])) {
+	rect = supermethod(receiver, @selector(rect));
+}
+```
 
 ### <a id="Examples"></a>活用例
 　REResponder の活用例を幾つか紹介する。
@@ -119,35 +128,39 @@ REKit
 
 　以下は、UIAlertView の delegate に alertView 自身を設定する例である：
 
-	UIAlertView *alertView;
-	alertView = [[UIAlertView alloc]
-		initWithTitle:@"title"
-		message:@"message"
-		delegate:nil
-		cancelButtonTitle:@"Cancel"
-		otherButtonTitles:@"OK", nil
-	];
-	[alertView
-		respondsToSelector:@selector(alertView:didDismissWithButtonIndex:)
-		withKey:nil
-		usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
-			// Do something…
-		}
-	];
-	alertView.delegate = alertView;
+```objective-c
+UIAlertView *alertView;
+alertView = [[UIAlertView alloc]
+	initWithTitle:@"title"
+	message:@"message"
+	delegate:nil
+	cancelButtonTitle:@"Cancel"
+	otherButtonTitles:@"OK", nil
+];
+[alertView
+	respondsToSelector:@selector(alertView:didDismissWithButtonIndex:)
+	withKey:nil
+	usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+		// Do something…
+	}
+];
+alertView.delegate = alertView;
+```
 
 　他にも、CAAnimation の delegate に animation 自身を設定するなどが考えられる：
 
-	CABasicAnimation *animation;
-	// …
-	[animation
-		respondsToSelector:@selector(animationDidStop:finished:)
-		withKey:nil
-		usingBlock:^(id receiver, CABasicAnimation *animation, BOOL finished) {
-			// Do something…
-		}
-	];
-	animation.delegate = animation;
+```objective-c
+CABasicAnimation *animation;
+// …
+[animation
+	respondsToSelector:@selector(animationDidStop:finished:)
+	withKey:nil
+	usingBlock:^(id receiver, CABasicAnimation *animation, BOOL finished) {
+		// Do something…
+	}
+];
+animation.delegate = animation;
+```
 
 　この新しいパターンを使用すると、時間的に隔絶されたコードもまとめて書けるので保守性が向上する。また、普通のデリゲートパターンを使用したときに往々にして必要な、「どのオブジェクトのデリゲートメソッドが呼ばれたのか」を判別する手間もなくなる。デリゲートメソッドが呼ばれるときにデリゲートオブジェクトがゾンビになっているとクラッシュする問題を気にしなくてよくなるという利点もある。
 
@@ -157,120 +170,127 @@ REKit
 
 　以下のコードでは、タップされたときに何をするのかまでを指定したボタンを `UICollectionViewCell` に追加している：
 
-	UIButton *button;
-	// …
-	[button respondsToSelector:@selector(buttonAction) withKey:@"key" usingBlock:^(id receiver) {
-		// Do something…
-	}];
-	[button addTarget:button action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
-	[cell.contentView addSubview:button];
-
+```objective-c
+UIButton *button;
+// …
+[button respondsToSelector:@selector(buttonAction) withKey:@"key" usingBlock:^(id receiver) {
+	// Do something…
+}];
+[button addTarget:button action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
+[cell.contentView addSubview:button];
+```
 
 #### UnitTest で、モックオブジェクトを用意する
 　REResponder は UnitTest でも威力を発揮する。以下のコードでは、BalloonController のデリゲートメソッドが呼ばれるかどうかを、モックオブジェクトを用意してテストしている：
 
-	__block BOOL called = NO;
-	
-	// Make mock
-	id mock;
-	mock = [[NSObject alloc] init];
-	[mock
-		respondsToSelector:@selector(balloonControllerDidDismissBalloon:)
-		withKey:nil
-		usingBlock:^(id receiver, BalloonController *balloonController) {
-			called = YES;
-		}
-	];
-	balloonController.delegate = mock;
-	
-	// Dismiss balloon
-	[balloonController dismissBalloonAnimated:NO];
-	STAssertTrue(called, @"");
+```objective-c
+__block BOOL called = NO;
+
+// Make mock
+id mock;
+mock = [[NSObject alloc] init];
+[mock
+	respondsToSelector:@selector(balloonControllerDidDismissBalloon:)
+	withKey:nil
+	usingBlock:^(id receiver, BalloonController *balloonController) {
+		called = YES;
+	}
+];
+balloonController.delegate = mock;
+
+// Dismiss balloon
+[balloonController dismissBalloonAnimated:NO];
+STAssertTrue(called, @"");
+```
 
 
 #### UnitTest で、ハイコストな処理をスタブ化する
 　以下のコードでは、プロフィール画像をダウンロードする AccountManager をスタブ化して、アカウント画面のビューコントローラをテストしている：
 
-	// Load sample image
-	__weak UIImage *sampleImage;
-	NSString *sampleImagePath;
-	sampleImagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"sample" ofType:@"png"];
-	sampleImage = [UIImage imageWithContentsOfFile:sampleImagePath];
-	
-	// Stub out download process
-	[[AccountManager sharedManager]
-		respondsToSelector:@selector(downloadProfileImageWithCompletion:)
-		withKey:@"key"
-		usingBlock:^(id receiver, void (^completion)(UIImage*, NSError*)) {
-			completion(sampleImage, nil);
-		}
-	];
-	
-	// Call thumbnailButtonAction which causes download of profile image
-	[acccountViewController thumbnailButtonAction];
-	STAssertEqualObjects(accountViewController.profileImageView.image, sampleImage, @"");
-	
-	// Remove block
-	[[AccountManager sharedManager] removeBlockForSelector:@selector(downloadProfileImageWithCompletion:) forKey:@"key"];
+```objective-c
+// Load sample image
+__weak UIImage *sampleImage;
+NSString *sampleImagePath;
+sampleImagePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"sample" ofType:@"png"];
+sampleImage = [UIImage imageWithContentsOfFile:sampleImagePath];
+
+// Stub out download process
+[[AccountManager sharedManager]
+	respondsToSelector:@selector(downloadProfileImageWithCompletion:)
+	withKey:@"key"
+	usingBlock:^(id receiver, void (^completion)(UIImage*, NSError*)) {
+		completion(sampleImage, nil);
+	}
+];
+
+// Call thumbnailButtonAction which causes download of profile image
+[acccountViewController thumbnailButtonAction];
+STAssertEqualObjects(accountViewController.profileImageView.image, sampleImage, @"");
+
+// Remove block
+[[AccountManager sharedManager] removeBlockForSelector:@selector(downloadProfileImageWithCompletion:) forKey:@"key"];
+```
 
 
 #### 関心／機能をまとめる
 　
 　REResponder は、関心／機能を一ヵ所にまとめる助けをする。以下のコードでは、`UIKeyboardWillShowNotification` の監視開始／終了を `-_manageKeyboardWillShowNotificationObserver`メソッドにまとめている：
 
-	- (id)initWithCoder:(NSCoder *)aDecoder
-	{
-		// super
-		self = [super initWithCoder:aDecoder];
-		if (!self) {
-			return nil;
-		}
-		
-		// Manage _keyboardWillShowNotificationObserver
-		[self _manageKeyboardWillShowNotificationObserver];
-		
-		return self;
+```objective-c
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+	// super
+	self = [super initWithCoder:aDecoder];
+	if (!self) {
+		return nil;
 	}
 	
-	- (void)_manageKeyboardWillShowNotificationObserver
-	{
-		__block id observer;
-		observer = _keyboardWillShowNotificationObserver;
+	// Manage _keyboardWillShowNotificationObserver
+	[self _manageKeyboardWillShowNotificationObserver];
+	
+	return self;
+}
+
+- (void)_manageKeyboardWillShowNotificationObserver
+{
+	__block id observer;
+	observer = _keyboardWillShowNotificationObserver;
+	
+	#pragma mark └ [self viewWillAppear:]
+	[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(viewWillAppear:), animated);
+		}
 		
-		#pragma mark └ [self viewWillAppear:]
-		[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-			// supermethod
-			REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
-			if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(viewWillAppear:), animated);
-			}
-			
-			// Start observing
-			if (!observer) {
-				observer = [[NSNotificationCenter defaultCenter]
-					addObserverForName:UIKeyboardWillShowNotification
-					object:nil
-					queue:[NSOperationQueue mainQueue]
-					usingBlock:^(NSNotification *note) {
-						// Do something…
-					}
-				];
-			}
-		}];
+		// Start observing
+		if (!observer) {
+			observer = [[NSNotificationCenter defaultCenter]
+				addObserverForName:UIKeyboardWillShowNotification
+				object:nil
+				queue:[NSOperationQueue mainQueue]
+				usingBlock:^(NSNotification *note) {
+					// Do something…
+				}
+			];
+		}
+	}];
+	
+	#pragma mark └ [self viewDidDisappear:]
+	[self respondsToSelector:@selector(viewDidDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(viewDidDisappear:), animated);
+		}
 		
-		#pragma mark └ [self viewDidDisappear:]
-		[self respondsToSelector:@selector(viewDidDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-			// supermethod
-			REVoidIMP supermethod;
-			if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(viewDidDisappear:), animated);
-			}
-			
-			// Stop observing
-			[[NSNotificationCenter defaultCenter] removeObserver:observer];
-			observer = nil;
-		}];
-	}
+		// Stop observing
+		[[NSNotificationCenter defaultCenter] removeObserver:observer];
+		observer = nil;
+	}];
+}
+```
 
 
 ### REResponder - 既知の問題
@@ -293,10 +313,12 @@ REObserver は、KVO (Key-Value Observing) に以下の機能を付加する NSO
 ### <a id="KVOWithBlock"></a>Block を使って KVO を実現する機能
 　REObserver を使うと、監視を開始すると同時に、通知が来た時に行う処理を Block で指定できるようになる：
 
-	id observer;
-	observer = [obj addObserverForKeyPath:@"someKeyPath" options:0 usingBlock:^(NSDictionary *change) {
-		// Do something…
-	}];
+```objective-c
+id observer;
+observer = [obj addObserverForKeyPath:@"someKeyPath" options:0 usingBlock:^(NSDictionary *change) {
+	// Do something…
+}];
+```
 
 以下のメリットがある：
 
@@ -308,37 +330,41 @@ REObserver は、KVO (Key-Value Observing) に以下の機能を付加する NSO
 ### <a id="StopObservingSimply"></a>監視停止を簡潔にする機能
 　REObserver を使うと、監視の停止は `-stopObserving` メソッドを呼び出すだけになる：
 
-	[observer stopObserving];
+```objective-c
+[observer stopObserving];
+```
 
 　これで `observer` はすべての監視を停止する。監視されているオブジェクト、キーパス、コンテキストたちを覚えておかなくても監視を停止することができるので簡潔だ。
 
 ### <a id="AutomaticObservationStop"></a>自動で監視を停止する機能
 　REObserver は、監視しているオブジェクト／監視されているオブジェクトいずれかが解放される際、関連する監視を自動で停止する。以下のコードに見るような、ゾンビから監視されたりゾンビを監視する問題がなくなる (以下は非 ARC コード)：
 
-	- (void)problem1
-	{
-		UIView *view;
-		view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
-		@autoreleasepool {
-			id observer;
-			observer = [[[NSObject alloc] init] autorelease];
-			[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
-		}
-		NSLog(@"observationInfo = %@", (id)[view observationInfo]); // view is observed by zombie!
-		view.backgroundColor = [UIColor redColor]; // Crash!
-	}
-
-	- (void)problem2
-	{
+```objective-c
+- (void)problem1
+{
+	UIView *view;
+	view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+	@autoreleasepool {
 		id observer;
 		observer = [[[NSObject alloc] init] autorelease];
-		@autoreleasepool {
-			UIView *view;
-			view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
-			[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
-		}
-		// observer is observing zombie!
+		[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
 	}
+	NSLog(@"observationInfo = %@", (id)[view observationInfo]); // view is observed by zombie!
+	view.backgroundColor = [UIColor redColor]; // Crash!
+}
+
+- (void)problem2
+{
+	id observer;
+	observer = [[[NSObject alloc] init] autorelease];
+	@autoreleasepool {
+		UIView *view;
+		view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+		[view addObserver:observer forKeyPath:@"backgroundColor" options:0 context:nil];
+	}
+	// observer is observing zombie!
+}
+```
 
 
 ## 動作環境

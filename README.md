@@ -229,16 +229,17 @@ sampleImage = [UIImage imageWithContentsOfFile:sampleImagePath];
 	respondsToSelector:@selector(downloadProfileImageWithCompletion:)
 	withKey:@"key"
 	usingBlock:^(id receiver, void (^completion)(UIImage*, NSError*)) {
+		// Execute completion block with sampleImage
 		completion(sampleImage, nil);
+		
+		// Remove current block
+		[receiver removeCurrentBlock];
 	}
 ];
 
 // Call thumbnailButtonAction which causes download of profile image
 [acccountViewController thumbnailButtonAction];
 STAssertEqualObjects(accountViewController.profileImageView.image, sampleImage, @"");
-
-// Remove block
-[[AccountManager sharedManager] removeBlockForSelector:@selector(downloadProfileImageWithCompletion:) forKey:@"key"];
 ```
 
 

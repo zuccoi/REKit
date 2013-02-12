@@ -294,7 +294,7 @@ STAssertEqualObjects(accountViewController.profileImageView.image, sampleImage, 
 
 
 ### REResponder - 既知の問題
-a. #### クラスが掏り替る
+a. **クラスが掏り替る**<br />
 　REResponder を使って動的メソッド実装／上書きをした場合、そのインスタンスのクラスは "REResponder_UUID_オリジナルのクラス名" というサブクラスに掏り替わる。この掏り替わりによって、KVO の「監視している／監視されている」関係が崩れることが分かった。この問題には対処したが、他にも問題があるかもしれない。問題が起きた場合は、NSObject に加えた `-willChangeClass:` と `-didChangeClass:`、或は `REObjectWillChangeClassNotification` と `REObjectDidChangeClassNotification` で対処してほしい。
 
 

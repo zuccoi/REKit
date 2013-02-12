@@ -4,7 +4,6 @@
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
-#import <QuartzCore/QuartzCore.h>
 #import "REKit.h"
 #import "iREViewController.h"
 
@@ -12,9 +11,6 @@
 @implementation iREViewController
 {
 	NSMutableSet *_observers;
-	CADisplayLink *_displayLink;
-	id _keyboardWillShowNotificationObserver;
-	CGRect _keyboardFrame;
 }
 
 //--------------------------------------------------------------//
@@ -32,54 +28,7 @@
 	// Create _observers
 	_observers = [NSMutableSet set];
 	
-	// Manage _keyboardWillShowNotificationObserver
-	[self _manageKeyboardWillShowNotificationObserver];
-	
 	return self;
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- KeyboardWillShowNotificationObserver --
-//--------------------------------------------------------------//
-
-- (void)_manageKeyboardWillShowNotificationObserver
-{
-	__block id obserer;
-	obserer = _keyboardWillShowNotificationObserver;
-	
-	#pragma mark └ [self viewWillAppear:]
-	[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-		// supermethod
-		REVoidIMP supermethod; // REVoidIMP is defined like this: typedef void (*REVoidIMP)(id, SEL, ...);
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, @selector(viewWillAppear:), animated);
-		}
-		
-		// Start observing
-		if (!obserer) {
-			obserer = [[NSNotificationCenter defaultCenter]
-				addObserverForName:UIKeyboardWillShowNotification
-				object:nil
-				queue:[NSOperationQueue mainQueue]
-				usingBlock:^(NSNotification *note) {
-					// Do something…
-				}
-			];
-		}
-	}];
-	
-	#pragma mark └ [self viewDidDisappear:]
-	[self respondsToSelector:@selector(viewDidDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, @selector(viewDidDisappear:), animated);
-		}
-		
-		// Stop observing
-		[[NSNotificationCenter defaultCenter] removeObserver:obserer];
-		obserer = nil;
-	}];
 }
 
 //--------------------------------------------------------------//
@@ -88,8 +37,6 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-// ?????
-NSLog(@"%s", __PRETTY_FUNCTION__);
 	// Get me
 	__weak typeof(self) me = self;
 	
@@ -120,14 +67,6 @@ NSLog(@"%s", __PRETTY_FUNCTION__);
 	
 	// Stop observing
 	[_observers removeAllObjects];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-// ?????
-NSLog(@"%s", __PRETTY_FUNCTION__);
-	// super
-	[super viewDidDisappear:animated];
 }
 
 //--------------------------------------------------------------//

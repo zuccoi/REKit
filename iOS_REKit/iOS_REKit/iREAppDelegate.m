@@ -5,7 +5,6 @@
 */
 
 #import "iREAppDelegate.h"
-#import "iREViewController.h"
 
 
 @implementation iREAppDelegate

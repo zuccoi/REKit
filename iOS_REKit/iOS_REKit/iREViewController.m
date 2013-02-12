@@ -10,7 +10,7 @@
 
 @implementation iREViewController
 {
-	NSMutableSet *_observers;
+	__block id _observer;
 }
 
 //--------------------------------------------------------------//
@@ -25,48 +25,51 @@
 		return nil;
 	}
 	
-	// Create _observers
-	_observers = [NSMutableSet set];
+	// Manage _observer
+	[self _manageObserver];
 	
 	return self;
 }
 
-//--------------------------------------------------------------//
-#pragma mark -- View --
-//--------------------------------------------------------------//
-
-- (void)viewWillAppear:(BOOL)animated
+- (void)_manageObserver
 {
 	// Get me
 	__weak typeof(self) me = self;
 	
-	// super
-	[super viewWillAppear:animated];
+	#pragma mark └ [self viewWillAppear:]
+	[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(viewWillAppear:), animated);
+		}
+		
+		// Start observing
+		if (!_observer) {
+			_observer = [self.view addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
+				// Get new color and its components
+				UIColor *color;
+				CGFloat r, g, b;
+				color = change[NSKeyValueChangeNewKey];
+				[color getRed:&r green:&g blue:&b alpha:nil];
+				
+				// Update label
+				me.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
+			}];
+		}
+	}];
 	
-	// Start observing
-	if (![_observers count]) {
-		id observer;
-		observer = [self.view addObserverForKeyPath:@"backgroundColor" options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) usingBlock:^(NSDictionary *change) {
-			// Get new color and its components
-			UIColor *color;
-			CGFloat r, g, b;
-			color = change[NSKeyValueChangeNewKey];
-			[color getRed:&r green:&g blue:&b alpha:nil];
-			
-			// Update label
-			me.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
-		}];
-		[_observers addObject:observer];
-	}
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-	// super
-	[super viewWillDisappear:animated];
-	
-	// Stop observing
-	[_observers removeAllObjects];
+	#pragma mark └ [self viewWillDisappear:]
+	[self respondsToSelector:@selector(viewWillDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, @selector(viewWillDisappear:), animated);
+		}
+		
+		// Stop observing
+		_observer = nil;
+	}];
 }
 
 //--------------------------------------------------------------//

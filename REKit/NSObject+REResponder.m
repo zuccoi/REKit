@@ -38,6 +38,11 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)aProtocol
 {
+	// Filter
+	if (!aProtocol) {
+		return NO;
+	}
+	
 	// original
 	if ([self REResponder_X_conformsToProtocol:aProtocol]) {
 		return YES;

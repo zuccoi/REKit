@@ -1,6 +1,6 @@
 REKit
 =====
-REKit [rèkít] is a collection of extensions of `NSObject`.  Currently it provides 2 features:
+REKit [rikít] is a collection of extensions of `NSObject`.  Currently it provides 2 features:
 
 1. [REResponder](#REResponder): provides ability to add/override methods at instance level
 2. [REObserver](#REObserver): provides Blocks compatible method for KVO (Key-Value Coding) + α

@@ -475,6 +475,26 @@
 	STAssertEquals(rect, CGRectMake(10.0f, 20.0f, 30.0f, 40.0f), @"");
 }
 
+- (void)test_methodForSelector_executeReturnedIMP
+{
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Add doSomething method
+	[obj respondsToSelector:@selector(doSomething) withKey:nil usingBlock:^(id receiver) {
+		called = YES;
+	}];
+	
+	// Call imp
+	REVoidIMP imp;
+	imp = (REVoidIMP)[obj methodForSelector:@selector(doSomething)];
+	imp(obj, @selector(doSomething));
+	STAssertTrue(called, @"");
+}
+
 - (void)test_hasBlockForSelector_forKey
 {
 	// Make obj
@@ -1343,6 +1363,24 @@
 	
 	// Check
 	STAssertTrue(deallocated, @"");
+}
+
+- (void)test_respondsToSelector_callWithNil
+{
+	// Make obj
+	id obj;
+	BOOL responds;
+	obj = [[[NSObject alloc] init] autorelease];
+	STAssertNoThrow(responds = [obj respondsToSelector:nil], @"");
+	STAssertTrue(!responds, @"");
+}
+
+- (void)test_conformsToProtocol_callWithNil
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	STAssertNoThrow([obj conformsToProtocol:nil], @"");
 }
 
 @end

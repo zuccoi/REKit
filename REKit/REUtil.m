@@ -120,7 +120,7 @@ void* REBlockGetImplementation(id block)
 
 @implementation NSObject (REKitPrivate)
 
-+ (void)exchangeClassMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
++ (void)exchangeClassMethodWithOriginalSelector:(SEL)originalSelector newSelector:(SEL)newSelector
 {
 	// Exchange
 	Method originalMethod;
@@ -130,7 +130,7 @@ void* REBlockGetImplementation(id block)
 	method_exchangeImplementations(originalMethod, newMethod);
 }
 
-+ (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector
++ (void)exchangeInstanceMethodWithOriginalSelector:(SEL)originalSelector newSelector:(SEL)newSelector
 {
 	// Exchange
 	Method originalMethod;
@@ -140,13 +140,13 @@ void* REBlockGetImplementation(id block)
 	method_exchangeImplementations(originalMethod, newMethod);
 }
 
-+ (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION
++ (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)originalSelector, ... NS_REQUIRES_NIL_TERMINATION
 {
 	// Enumerate selectors
 	SEL aSelector;
 	va_list args;
-	va_start(args, selector);
-	aSelector = selector;
+	va_start(args, originalSelector);
+	aSelector = originalSelector;
 	while (aSelector) {
 		// Exchange
 		Method originalMethod;
@@ -161,13 +161,13 @@ void* REBlockGetImplementation(id block)
 	va_end(args);
 }
 
-+ (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION
++ (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)originalSelector, ... NS_REQUIRES_NIL_TERMINATION
 {
 	// Enumerate selectors
 	SEL aSelector;
 	va_list args;
-	va_start(args, selector);
-	aSelector = selector;
+	va_start(args, originalSelector);
+	aSelector = originalSelector;
 	while (aSelector) {
 		// Exchange
 		Method originalMethod;

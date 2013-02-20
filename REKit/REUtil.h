@@ -95,10 +95,10 @@ extern void* REBlockGetImplementation(id block);
 @interface NSObject (REKitPrivate)
 
 // Method Exchange
-+ (void)exchangeClassMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector;
-+ (void)exchangeInstanceMethodsWithSelectors:(SEL)originalSelector :(SEL)newSelector;
-+ (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
-+ (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)selector, ... NS_REQUIRES_NIL_TERMINATION;
++ (void)exchangeClassMethodWithOriginalSelector:(SEL)originalSelector newSelector:(SEL)newSelector;
++ (void)exchangeInstanceMethodWithOriginalSelector:(SEL)originalSelector newSelector:(SEL)newSelector;
++ (void)exchangeClassMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)originalSelector, ... NS_REQUIRES_NIL_TERMINATION;
++ (void)exchangeInstanceMethodsWithAdditiveSelectorPrefix:(NSString*)prefix selectors:(SEL)originalSelector, ... NS_REQUIRES_NIL_TERMINATION;
 
 @end
 

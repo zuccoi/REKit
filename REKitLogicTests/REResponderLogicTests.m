@@ -1224,6 +1224,65 @@
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
 }
 
+- (void)test_setConformableToProtocol__conformsToIncorporatedProtocols
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set obj conformable to NSSecureCoding
+	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) withKey:@"key"];
+	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+}
+
+- (void)test_setConformableToProtocol__canNotRemoveIncorporatedProtocol
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set obj conformable to NSSecureCoding
+	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) withKey:@"key"];
+	
+	// Set not conformable to NSCoding
+	[obj setConformable:NO toProtocol:@protocol(NSCoding) withKey:@"key"];
+	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+}
+
+- (void)test_setConformableToProtocol__managesProtocolsBySpecifiedProtocol
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set obj conformable to NSSecureCoding and NSCoding then remove NSSecureCoding
+	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) withKey:@"key"];
+	[obj setConformable:YES toProtocol:@protocol(NSCoding) withKey:@"key"];
+	[obj setConformable:NO toProtocol:@protocol(NSSecureCoding) withKey:@"key"];
+	STAssertTrue(![obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+	
+	// Set obj conformable to NSSecureCoding and NSCoding then remove NSCoding
+	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) withKey:@"key"];
+	[obj setConformable:YES toProtocol:@protocol(NSCoding) withKey:@"key"];
+	[obj setConformable:NO toProtocol:@protocol(NSCoding) withKey:@"key"];
+	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+}
+
+- (void)test_setConformableToProtocol__withNilKey
+{
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Set conformable
+	[obj setConformable:YES toProtocol:@protocol(NSCoding) withKey:nil];
+	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
+}
+
 - (void)test_setConformableToProtocolWithInvalidArguments
 {
 	// Make elements
@@ -1238,10 +1297,6 @@
 	
 	// Try to set obj conformable with nil-protocol
 	[obj setConformable:YES toProtocol:nil withKey:key];
-	STAssertFalse([obj conformsToProtocol:protocol], @"");
-	
-	// Try to set obj conformable with nil-key
-	[obj setConformable:YES toProtocol:protocol withKey:nil];
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
 	
 	// Set obj conformable to protocol

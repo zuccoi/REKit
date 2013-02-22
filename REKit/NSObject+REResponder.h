@@ -23,6 +23,6 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 - (void)removeCurrentBlock;
 
 // Conformance
-- (void)setConformable:(BOOL)comformable toProtocol:(Protocol*)protocol withKey:(id)key;
+- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key;
 
 @end

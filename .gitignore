@@ -22,3 +22,4 @@
 
 **/*.xcworkspace/*
 !**/*.xcworkspace/contents.xcworkspacedata
+REKit.xcworkspace/xcuserdata/*/UserInterfaceState.xcuserstate

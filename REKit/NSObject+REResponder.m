@@ -295,22 +295,19 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
-		// Become subclass
-		if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
-			if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
-				// Become subclass
-				Class originalClass;
-				Class subclass;
-				NSString *className;
-				originalClass = [self class];
-				className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass([self class])];
-				subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
-				objc_registerClassPair(subclass);
-				[self willChangeClass:subclass];
-				object_setClass(self, subclass);
-				[self didChangeClass:originalClass];
-			}
-		}
+        if (![NSStringFromClass([self class]) hasPrefix:kClassNamePrefix]) {
+            // Become subclass
+            Class originalClass;
+            Class subclass;
+            NSString *className;
+            originalClass = [self class];
+            className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass([self class])];
+            subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
+            objc_registerClassPair(subclass);
+            [self willChangeClass:subclass];
+            object_setClass(self, subclass);
+            [self didChangeClass:originalClass];
+        }
 		
 		// Replace method
 		class_replaceMethod([self class], selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);

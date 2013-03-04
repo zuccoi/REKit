@@ -384,6 +384,31 @@ iOS 5.0 and later
 OS X 10.7 and later
 
 
+## Installation
+You can install REKit using [CocoaPods](http://cocoapods.org "CcooaPods").
+
+&lt;Podfile for iOS&gt;
+
+```
+platform :ios, '5.0'
+pod 'REKit'
+```
+
+&lt;Podfile for OS X&gt;
+
+```
+platform :osx, '10.7'
+pod 'REKit'
+```
+
+&lt;Terminal&gt;
+
+```
+$ pod install
+```
+
+If you want to install REKit manually, add files which is under REKit folder to your project.
+
 
 ## License
 MIT License. For more detail, read LICENSE file.

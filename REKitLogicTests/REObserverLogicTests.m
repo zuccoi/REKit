@@ -88,11 +88,10 @@
 	NSDictionary *observingInfo;
 	NSDictionary *observedInfo;
 	REObserverHandler block;
-	block = ^(NSDictionary *change) {
+	observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
 		observed = YES;
-	};
-	block = Block_copy(block);
-	observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:block];
+	}];
+	block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
 	observingInfo = @{
 		REObserverKeyPathKey : @"name",
 		REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
@@ -536,12 +535,13 @@
 	// Add observer for name
 	__block NSString *recognizedName = nil;
 	id observer;
-	REObserverHandler block;
-	block = ^(NSDictionary *change) {
+	observer = [obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
 		recognizedName = change[NSKeyValueChangeNewKey];
-	};
-	block = Block_copy(block);
-	observer = [obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:block];
+	}];
+	
+	// Get block
+	REObserverHandler block;
+	block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
 	
 	// Add read method
 	NSString *key;
@@ -592,12 +592,13 @@
 	// Add observer for name
 	__block NSString *recognizedName = nil;
 	id observer;
-	REObserverHandler block;
-	block = ^(NSDictionary *change) {
+	observer = [obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
 		recognizedName = change[NSKeyValueChangeNewKey];
-	};
-	block = Block_copy(block);
-	observer = [obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:block];
+	}];
+	
+	// Get block
+	REObserverHandler block;
+	block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
 	
 	// Override log method
 	NSString *key;
@@ -902,13 +903,18 @@
 		RETestObject *obj;
 		obj = [RETestObject testObject];
 		
-		// Make block
-		REObserverHandler block;
-		block = ^(NSDictionary *change) {
+		// Start observing
+		id observer;
+		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
 			// Do nothing…
-		};
-		block = Block_copy(block);
-		[(id)block respondsToSelector:@selector(release) withKey:nil usingBlock:^(id receiver) {
+		}];
+		
+		// Get block
+		id block;
+		block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
+		
+		// Override release method
+		[block respondsToSelector:@selector(release) withKey:nil usingBlock:^(id receiver) {
 			// supermethod
 			IMP supermethod;
 			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -918,20 +924,15 @@
 			released = YES;
 		}];
 		
-		// Start observing
-		id observer;
-		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:block];
-		
 		// Check retain and copy method
-		[(id)block respondsToSelector:@selector(retain) withKey:nil usingBlock:^(id receiver) {
+		[block respondsToSelector:@selector(retain) withKey:nil usingBlock:^(id receiver) {
 			STFail(@"");
 		}];
-		[(id)block respondsToSelector:@selector(copy) withKey:nil usingBlock:^(id receiver) {
+		[block respondsToSelector:@selector(copy) withKey:nil usingBlock:^(id receiver) {
 			STFail(@"");
 		}];
 		
 		// Release block
-		Block_release(block);
 		STAssertEquals(CFGetRetainCount(block), 1L, @"");
 	}
 	

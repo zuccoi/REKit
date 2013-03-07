@@ -249,13 +249,7 @@
 		
 		// Get block
 		id block;
-		NSDictionary *blockInfo;
-		SEL sel;
-		IMP imp;
-		sel = @selector(REResponder_blockInfoForSelector:withKey:blockInfos:);
-		imp = [obj methodForSelector:sel];
-		blockInfo = imp(obj, sel, @selector(log), @"key", nil);
-		block = blockInfo[@"block"];
+		block = imp_getBlock([obj methodForSelector:@selector(log)]);
 		[block respondsToSelector:(sel = @selector(release)) withKey:nil usingBlock:^(id receiver) {
 			// super
 			IMP supermethod;

@@ -25,13 +25,16 @@ static NSString* const kProtocolInfoKeysKey = @"keys";
 static NSString* const kProtocolInfoIncorporatedProtocolNamesKey = @"incorporatedProtocolNames";
 
 // Keys for blockInfo
-static NSString* const kBlockInfoBlockKey = @"block";
 static NSString* const kBlockInfoKeyKey = @"key";
+static NSString* const kBlockInfoImpKey = @"imp";
 
 // kDummyBlock
 static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	return nil;
 };
+// implementation for dummy block
+static IMP dummyBlockImp = NULL;
+
 
 
 @implementation NSObject (REResponder)
@@ -108,7 +111,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		@synchronized (self) {
 			// Remove protocols
 			[self associateValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			
+            			
 			// Remove blocks
 			NSMutableDictionary *blocks;
 			blocks = [self associatedValueForKey:kBlocksAssociationKey];
@@ -192,7 +195,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		__block NSDictionary *blockInfo = nil;
 		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
 			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-				if (REBlockGetImplementation(aBlockInfo[kBlockInfoBlockKey]) == imp) {
+                if (REBlockGetImplementation(imp_getBlock([aBlockInfo[kBlockInfoImpKey] pointerValue])) == imp) {
 					blockInfo = aBlockInfo;
 					*stopB = YES;
 				}
@@ -310,17 +313,18 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		}
 		
 		// Replace method
-		class_replaceMethod([self class], selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
+		id copiedBlock;
+		copiedBlock = Block_copy(block);
+        IMP imp = imp_implementationWithBlock(copiedBlock);
+		class_replaceMethod([self class], selector, imp, [objCTypes UTF8String]);
+		Block_release(copiedBlock);
 		
 		// Add blockInfo to blockInfos
 		NSDictionary *blockInfo;
-		id copiedBlock;
-		copiedBlock = Block_copy(block);
 		blockInfo = @{
-			kBlockInfoBlockKey : copiedBlock,
-			kBlockInfoKeyKey : key,
+            kBlockInfoImpKey : [NSValue valueWithPointer:imp],
+            kBlockInfoKeyKey : key,
 		};
-		Block_release(copiedBlock);
 		[blockInfos addObject:blockInfo];
 	}
 }
@@ -333,15 +337,15 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 	}
 	
 	// Get block
-	id block;
+	IMP blockImp;
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
 		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:nil];
-		block = blockInfo[kBlockInfoBlockKey];
+		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
 	}
 	
-	return (block != nil);
+	return (blockImp != NULL);
 }
 
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key
@@ -374,27 +378,23 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 				}
 				else {
 					// supermethod is superblock's IMP
-					id superblock;
-					superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
-					supermethod = imp_implementationWithBlock(superblock);
+                    supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
 				}
-				
+                
 				// Replace method
 				if (supermethod) {
 					class_replaceMethod([self class], selector, supermethod, objCTypes);
 				}
 				else {
-					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), objCTypes);
+                    if (dummyBlockImp == NULL)
+                        dummyBlockImp = imp_implementationWithBlock(kDummyBlock);
+					class_replaceMethod([self class], selector, dummyBlockImp, objCTypes);
 				}
 			}
-			
-			// Remove block
-			id block;
-			block = blockInfo[kBlockInfoBlockKey];
-			if (CFGetRetainCount(block) == 1) {
-				imp_removeBlock(imp_implementationWithBlock(block));
-			}
-			
+            
+            // Remove implementation which causing releasing block as well
+            imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
+			            
 			// Remove blockInfo
 			[blockInfos removeObject:blockInfo];
 		}
@@ -435,9 +435,10 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		}
 		else {
 			// supermethod is superblock's IMP
-			id superblock;
-			superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
-			supermethod = imp_implementationWithBlock(superblock);
+			//id superblock;
+            //superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
+			//supermethod = imp_implementationWithBlock(superblock);
+            supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
 		}
 	}
 	

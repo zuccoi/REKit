@@ -272,9 +272,10 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		return;
 	}
 	
-	// Update blocks
-	[self removeBlockForSelector:selector withKey:key];
 	@synchronized (self) {
+		// Remove old one
+		[self removeBlockForSelector:selector withKey:key];
+		
 		// Get blocks
 		NSMutableDictionary *blocks;
 		blocks = [self associatedValueForKey:kBlocksAssociationKey];
@@ -314,13 +315,16 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 		
 		// Add blockInfo to blockInfos
 		NSDictionary *blockInfo;
-		id copiedBlock;
-		copiedBlock = Block_copy(block);
+		id impBlock;
+		impBlock = imp_getBlock([self methodForSelector:selector]);
+		if (!impBlock) {
+			NSLog(@"Failed to get impBlock «%s-%d", __PRETTY_FUNCTION__, __LINE__);
+			return;
+		}
 		blockInfo = @{
-			kBlockInfoBlockKey : copiedBlock,
+			kBlockInfoBlockKey : impBlock,
 			kBlockInfoKeyKey : key,
 		};
-		Block_release(copiedBlock);
 		[blockInfos addObject:blockInfo];
 	}
 }

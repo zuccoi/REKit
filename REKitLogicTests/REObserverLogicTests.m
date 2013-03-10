@@ -640,7 +640,7 @@
 	STAssertEqualObjects(recognizedName, @"name2", @"");
 }
 
-- (void)test_ordinalObservationAfterClassChangeCasedByDynamicBlock
+- (void)test_ordinalObservationAfterClassChangeCausedByDynamicBlock
 {
 	// Make obj
 	RETestObject *obj;
@@ -658,7 +658,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj respondsToSelector:@selector(read) withKey:key usingBlock:^(id receiver) {
+	[obj respondsToSelector:@selector(log) withKey:key usingBlock:^(id receiver) {
 		return @"Dynamic";
 	}];
 	
@@ -684,7 +684,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(read) withKey:key];
+	[obj removeBlockForSelector:@selector(log) withKey:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -894,7 +894,7 @@
 	STAssertTrue([[observer observingInfos] count] == 0, @"");
 }
 
-- (void)test_blockIsReleased
+- (void)test_blockIsDeallocated
 {
 	__block BOOL released = NO;
 	
@@ -913,27 +913,19 @@
 		id block;
 		block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
 		
-		// Override release method
+		// Override methods
 		[block respondsToSelector:@selector(release) withKey:nil usingBlock:^(id receiver) {
-			// supermethod
-			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(release));
-			}
-			
 			released = YES;
-		}];
-		
-		// Check retain and copy method
-		[block respondsToSelector:@selector(retain) withKey:nil usingBlock:^(id receiver) {
-			STFail(@"");
 		}];
 		[block respondsToSelector:@selector(copy) withKey:nil usingBlock:^(id receiver) {
 			STFail(@"");
 		}];
+		[block respondsToSelector:@selector(retain) withKey:nil usingBlock:^(id receiver) {
+			STFail(@"");
+		}];
 		
-		// Release block
-		STAssertEquals(CFGetRetainCount(block), 1L, @"");
+		// Check retain count of block
+		STAssertEquals(CFGetRetainCount(block), (signed long)1, @"");
 	}
 	
 	// Check
@@ -958,14 +950,14 @@
 		// Override dealloc method of observingInfos
 		SEL sel = @selector(dealloc);
 		[[observer observingInfos] respondsToSelector:sel withKey:nil usingBlock:^(id receiver) {
+			// Raise deallocated flag
+			deallocated = YES;
+			
 			// supermethod
 			IMP supermethod;
 			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, sel);
 			}
-			
-			// Raise deallocated flag
-			deallocated = YES;
 		}];
 	}
 	
@@ -991,14 +983,14 @@
 		// Override dealloc method of observedInfos
 		SEL sel = @selector(dealloc);
 		[[obj observedInfos] respondsToSelector:sel withKey:nil usingBlock:^(id receiver) {
+			// Raise deallocated flag
+			deallocated = YES;
+			
 			// supermethod
 			IMP supermethod;
 			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 				supermethod(receiver, sel);
 			}
-			
-			// Raise deallocated flag
-			deallocated = YES;
 		}];
 	}
 	

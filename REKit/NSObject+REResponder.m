@@ -392,15 +392,14 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 				}
 			}
 			
-			// Remove block
+			// Remove block and blockInfo
 			id block;
 			block = blockInfo[kBlockInfoBlockKey];
+			[blockInfos removeObject:blockInfo];
 			if (CFGetRetainCount(block) == 1) {
 				imp_removeBlock(imp_implementationWithBlock(block));
 			}
-			
-			// Remove blockInfo
-			[blockInfos removeObject:blockInfo];
+			Block_release(block);
 		}
 	}
 }

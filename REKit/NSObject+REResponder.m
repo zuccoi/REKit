@@ -380,7 +380,8 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 					// supermethod is superblock's IMP
 					id superblock;
 					superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
-					supermethod = imp_implementationWithBlock(superblock);
+					supermethod = REBlockGetImplementation(superblock);
+//					imp_removeBlock(REBlockGetImplementation(superblock));
 				}
 				
 				// Replace method
@@ -388,7 +389,8 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 					class_replaceMethod([self class], selector, supermethod, objCTypes);
 				}
 				else {
-					class_replaceMethod([self class], selector, imp_implementationWithBlock(kDummyBlock), objCTypes);
+					class_replaceMethod([self class], selector, REBlockGetImplementation(kDummyBlock), objCTypes);
+//					imp_removeBlock(REBlockGetImplementation(kDummyBlock));
 				}
 			}
 			
@@ -397,7 +399,7 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			block = blockInfo[kBlockInfoBlockKey];
 			[blockInfos removeObject:blockInfo];
 			if (CFGetRetainCount(block) == 1) {
-				imp_removeBlock(imp_implementationWithBlock(block));
+				imp_removeBlock(REBlockGetImplementation(block));
 			}
 			Block_release(block);
 		}
@@ -440,7 +442,9 @@ static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
 			// supermethod is superblock's IMP
 			id superblock;
 			superblock = [blockInfos objectAtIndex:(index - 1)][kBlockInfoBlockKey];
-			supermethod = imp_implementationWithBlock(superblock);
+			supermethod = REBlockGetImplementation(superblock);
+			NSAssert(supermethod, @"");
+//			imp_removeBlock(REBlockGetImplementation(superblock));
 		}
 	}
 	

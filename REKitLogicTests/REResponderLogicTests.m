@@ -370,6 +370,57 @@
 	STAssertTrue(isObjDeallocated, @"");
 }
 
+- (void)test_contextOfSuperblockIsDeallocated
+{
+	__block BOOL isContextDeallocated = NO;
+	__block BOOL isObjDeallocated = NO;
+	
+	@autoreleasepool {
+		// Make context
+		id context;
+		context = [[[NSObject alloc] init] autorelease];
+		[context respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
+			// Raise deallocated flag
+			isContextDeallocated = YES;
+			
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+		}];
+		
+		// Make obj
+		id obj;
+		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			// Use context
+			id ctx;
+			ctx = context;
+		}];
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			// Do nothing…
+// ?????
+//id ctx;
+//ctx = context;
+		}];
+		[obj respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
+			// Raise isObjDeallocated
+			isObjDeallocated = YES;
+			
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+		}];
+	}
+	
+	// Check
+	STAssertTrue(isContextDeallocated, @"");
+	STAssertTrue(isObjDeallocated, @"");
+}
+
 - (void)test_autoreleasingContextIsDeallocated
 {
 	__block BOOL isContextDeallocated = NO;

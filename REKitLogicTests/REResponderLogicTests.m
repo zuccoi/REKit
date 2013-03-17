@@ -295,7 +295,7 @@
 	STAssertTrue(deallocated, @"");
 }
 
-- (void)test_blockIsDeallocated
+- (void)test_blockIsReleased
 {
 	__block BOOL released = NO;
 	
@@ -325,49 +325,48 @@
 	}
 }
 
-- (void)test_contextIsDeallocated
+- (void)test_superblockIsReleased
 {
-	__block BOOL isContextDeallocated = NO;
-	__block BOOL isObjDeallocated = NO;
+	__block BOOL released = NO;
 	
 	@autoreleasepool {
-		// Make context
-		id context;
-		context = [[[NSObject alloc] init] autorelease];
-		[context respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
-			// Raise deallocated flag
-			isContextDeallocated = YES;
-			
-			// super
-			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(dealloc));
-			}
-		}];
-		
 		// Make obj
 		id obj;
 		obj = [[[NSObject alloc] init] autorelease];
+		
+		// Add log method
 		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
-			// Use context
-			id ctx;
-			ctx = context;
+			// Do nothing…
 		}];
-		[obj respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
-			// Raise isObjDeallocated
-			isObjDeallocated = YES;
-			
-			// super
+		
+		// Get block
+		id block;
+		block = imp_getBlock([obj methodForSelector:@selector(log)]);
+		[block respondsToSelector:@selector(release) withKey:nil usingBlock:^(id receiver) {
+			released = YES;
+		}];
+		[block respondsToSelector:@selector(retain) withKey:nil usingBlock:^(id receiver) {
+			STFail(@"");
+		}];
+		[block respondsToSelector:@selector(copy) withKey:nil usingBlock:^(id receiver) {
+			STFail(@"");
+		}];
+		
+		// Override log method
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			// supermethod
 			IMP supermethod;
 			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(dealloc));
+				supermethod(receiver, @selector(log));
 			}
 		}];
+		
+		// Perform log method
+		[obj performSelector:@selector(log)];
+		
+		// Check retain count of block
+		STAssertEquals(CFGetRetainCount(block), (signed long)1, @"");
 	}
-	
-	// Check
-	STAssertTrue(isContextDeallocated, @"");
-	STAssertTrue(isObjDeallocated, @"");
 }
 
 - (void)test_contextOfSuperblockIsDeallocated
@@ -400,9 +399,56 @@
 		}];
 		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
 			// Do nothing…
-// ?????
-//id ctx;
-//ctx = context;
+			id ctx;
+			ctx = context;
+		}];
+		[obj respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
+			// Raise isObjDeallocated
+			isObjDeallocated = YES;
+			
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+		}];
+		
+		// Perform log method
+		[obj performSelector:@selector(log)];
+	}
+	
+	// Check
+	STAssertTrue(isContextDeallocated, @"");
+	STAssertTrue(isObjDeallocated, @"");
+}
+
+- (void)test_contextIsDeallocated
+{
+	__block BOOL isContextDeallocated = NO;
+	__block BOOL isObjDeallocated = NO;
+	
+	@autoreleasepool {
+		// Make context
+		id context;
+		context = [[[NSObject alloc] init] autorelease];
+		[context respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
+			// Raise deallocated flag
+			isContextDeallocated = YES;
+			
+			// super
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+				supermethod(receiver, @selector(dealloc));
+			}
+		}];
+		
+		// Make obj
+		id obj;
+		obj = [[[NSObject alloc] init] autorelease];
+		[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
+			// Use context
+			id ctx;
+			ctx = context;
 		}];
 		[obj respondsToSelector:@selector(dealloc) withKey:nil usingBlock:^(id receiver) {
 			// Raise isObjDeallocated

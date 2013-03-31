@@ -313,15 +313,12 @@ static IMP _dummyBlockImp = NULL;
 		}
 		
 		// Replace method
-		id copiedBlock;
-		IMP imp;
-		copiedBlock = Block_copy(block);
-		imp = imp_implementationWithBlock(copiedBlock);
-		class_replaceMethod([self class], selector, imp, [objCTypes UTF8String]);
-		Block_release(copiedBlock);
+		class_replaceMethod([self class], selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
 		
 		// Add blockInfo to blockInfos
 		NSDictionary *blockInfo;
+		IMP imp;
+		imp = [self methodForSelector:selector];
 		blockInfo = @{
 			kBlockInfoImpKey : [NSValue valueWithPointer:imp],
 			kBlockInfoKeyKey : key,

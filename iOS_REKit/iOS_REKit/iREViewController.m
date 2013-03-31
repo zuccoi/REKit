@@ -35,6 +35,43 @@
 	return self;
 }
 
+
+//--------------------------------------------------------------//
+#pragma mark -- Action --
+//--------------------------------------------------------------//
+
+- (IBAction)changeBackgroundColorAction:(id)sender
+{
+	// Get me
+	__weak typeof(self) self_ = self;
+	
+	// Show alertView
+	UIAlertView *alertView;
+	NSString *title;
+	NSString *message;
+	title = @"Change Background Color?";
+	message = @"This alert view's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature.";
+	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withKey:nil usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+		// Cancel
+		if (buttonIndex == 0) {
+			return;
+		}
+		
+		// Change backgroundColor
+		float (^random)() = ^{
+			return (arc4random() % 11) / 10.0f;
+		};
+		self_.view.backgroundColor = [UIColor colorWithRed:random() green:random() blue:random() alpha:1.0f];
+	}];
+	alertView.delegate = alertView;
+	[alertView show];
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- Observer --
+//--------------------------------------------------------------//
+
 - (void)_manageObserver
 {
 	__weak typeof(self) self_ = self;
@@ -74,38 +111,6 @@
 			supermethod(receiver, @selector(viewWillDisappear:), animated);
 		}
 	}];
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Action --
-//--------------------------------------------------------------//
-
-- (IBAction)changeBackgroundColorAction:(id)sender
-{
-	// Get me
-	__weak typeof(self) self_ = self;
-	
-	// Show alertView
-	UIAlertView *alertView;
-	NSString *title;
-	NSString *message;
-	title = @"Change Background Color?";
-	message = @"This alert view's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature.";
-	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
-	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withKey:nil usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
-		// Cancel
-		if (buttonIndex == 0) {
-			return;
-		}
-		
-		// Change backgroundColor
-		float (^random)() = ^{
-			return (arc4random() % 11) / 10.0f;
-		};
-		self_.view.backgroundColor = [UIColor colorWithRed:random() green:random() blue:random() alpha:1.0f];
-	}];
-	alertView.delegate = alertView;
-	[alertView show];
 }
 
 @end

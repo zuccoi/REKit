@@ -610,7 +610,7 @@
 		[obj removeBlockForSelector:@selector(log) withKey:@"key"];
 		
 		// Check
-		STAssertTrue(isContextDeallocated, @"");
+		STAssertTrue(!isContextDeallocated, @"");
 	}
 	
 	// Check

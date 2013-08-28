@@ -1492,6 +1492,21 @@
 	STAssertEquals([obj class], newClass, @"");
 }
 
+- (void)test_replacedClassIsKindOfOriginalClass
+{
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject testObject];
+	
+	// Override log method
+	[obj respondsToSelector:@selector(log) withKey:@"logBlock" usingBlock:^(id receiver) {
+		return @"Overridden log";
+	}];
+	
+	// Check class
+	STAssertTrue([obj isKindOfClass:[RETestObject class]], @"");
+}
+
 - (void)test_setConformableToProtocol
 {
 	// Make elements

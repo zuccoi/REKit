@@ -108,5 +108,5 @@ extern void* REBlockGetImplementation(id block);
 //--------------------------------------------------------------//
 
 #define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __PRETTY_FUNCTION__, __LINE__]
-#define RL_PRETTY_FUNCTION [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+#define RE_PRETTY_FUNCTION [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
 extern NSString* REUUIDString();

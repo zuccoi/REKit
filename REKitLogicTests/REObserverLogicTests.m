@@ -546,7 +546,7 @@
 	// Add read method
 	NSString *key;
 	key = @"key";
-	[obj respondsToSelector:@selector(read) withKey:key usingBlock:^(id receiver) {
+	[obj respondsToSelector:NSSelectorFromString(@"read") withKey:key usingBlock:^(id receiver) {
 		return @"Dynamic";
 	}];
 	
@@ -574,7 +574,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(read) withKey:key];
+	[obj removeBlockForSelector:NSSelectorFromString(@"read") withKey:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	

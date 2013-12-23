@@ -1,7 +1,7 @@
 /*
  RETestObject.h
  
- Copyright ©2012 Kazki Miura. All rights reserved.
+ Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import <Foundation/Foundation.h>
@@ -23,5 +23,8 @@
 - (NSString*)say;
 - (void)sayHello;
 - (NSUInteger)ageAfterYears:(NSUInteger)years;
++ (NSInteger)integerWithInteger:(NSInteger)integer;
++ (CGRect)theRect;
++ (void)sayHello;
 
 @end

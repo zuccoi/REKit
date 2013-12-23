@@ -1,7 +1,7 @@
 /*
  REUtil.h
  
- Copyright ©2012 Kazki Miura. All rights reserved.
+ Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import <Foundation/Foundation.h>
@@ -84,6 +84,8 @@ extern void* REBlockGetImplementation(id block);
 // Association
 - (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
 - (id)associatedValueForKey:(void*)key;
++ (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
++ (id)associatedValueForKey:(void*)key;
 
 @end
 

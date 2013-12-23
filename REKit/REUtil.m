@@ -1,7 +1,7 @@
 /*
  REUtil.m
  
- Copyright ©2012 Kazki Miura. All rights reserved.
+ Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import "REUtil.h"
@@ -109,6 +109,16 @@ void* REBlockGetImplementation(id block)
 - (id)associatedValueForKey:(void*)key
 {
 	return objc_getAssociatedObject(self, key);
+}
+
++ (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
+{
+	objc_setAssociatedObject(object_getClass(self), key, value, policy);
+}
+
++ (id)associatedValueForKey:(void*)key
+{
+	return objc_getAssociatedObject(object_getClass(self), key);
 }
 
 @end

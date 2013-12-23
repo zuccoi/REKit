@@ -1,7 +1,7 @@
 /*
  NSObject+REResponder.h
  
- Copyright ©2012 Kazki Miura. All rights reserved.
+ Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import <Foundation/Foundation.h>

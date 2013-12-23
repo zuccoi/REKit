@@ -1,7 +1,7 @@
 /*
  REResponderLogicTests.m
  
- Copyright ©2012 Kazki Miura. All rights reserved.
+ Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import "REKit.h"

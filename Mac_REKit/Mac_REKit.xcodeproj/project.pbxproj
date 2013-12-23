@@ -35,7 +35,7 @@
 		EBA4217E167DFFFA0052D11E /* REResponderLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42158167DE2B80052D11E /* REResponderLogicTests.m */; };
 		EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215A167DE2B80052D11E /* RETestObject.m */; };
 		EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */; };
-		EBE6AD1016EC3C1A00B3A1B1 /* REResponderARCLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */; };
+		EBE6AD1016EC3C1A00B3A1B1 /* REResponderARCLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBEC4FF81681B72000E94925 /* MREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBEC4FF61681B72000E94925 /* MREViewController.m */; };
 		EBEC4FF91681B72000E94925 /* MREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBEC4FF71681B72000E94925 /* MREViewController.xib */; };
 /* End PBXBuildFile section */
@@ -177,10 +177,10 @@
 				EBA42156167DE2B80052D11E /* REObserverLogicTests.m */,
 				EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */,
 				EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */,
-				EBA42157167DE2B80052D11E /* REResponderLogicTests.h */,
-				EBA42158167DE2B80052D11E /* REResponderLogicTests.m */,
 				EB8535F118689B920043D9A1 /* REResponderClassLogicTests.h */,
 				EB8535F218689B920043D9A1 /* REResponderClassLogicTests.m */,
+				EBA42157167DE2B80052D11E /* REResponderLogicTests.h */,
+				EBA42158167DE2B80052D11E /* REResponderLogicTests.m */,
 				EBA42159167DE2B80052D11E /* RETestObject.h */,
 				EBA4215A167DE2B80052D11E /* RETestObject.m */,
 				EBA4215B167DE2B80052D11E /* REUtilLogicTests.h */,
@@ -485,7 +485,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Mac_REKitLogicTests/Mac_REKitLogicTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
 			};
@@ -500,7 +500,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Mac_REKitLogicTests/Mac_REKitLogicTests-Prefix.pch";
 				INFOPLIST_FILE = "Mac_REKitLogicTests/Mac_REKitLogicTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
 			};

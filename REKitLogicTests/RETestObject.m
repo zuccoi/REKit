@@ -1,7 +1,7 @@
 /*
  RETestObject.m
  
- Copyright ©2012 Kazki Miura. All rights reserved.
+ Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import "RETestObject.h"
@@ -53,6 +53,21 @@
 - (NSUInteger)ageAfterYears:(NSUInteger)years
 {
 	return self.age + years;
+}
+
++ (NSInteger)integerWithInteger:(NSInteger)integer
+{
+	return integer;
+}
+
++ (CGRect)theRect
+{
+	return CGRectMake(100.0, 200.0, 300.0, 400.0);
+}
+
++ (void)sayHello
+{
+	NSLog(@"Hello");
 }
 
 @end

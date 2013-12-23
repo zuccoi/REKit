@@ -1,11 +1,11 @@
 /*
- REResponderLogicTests.m
+ REResponderClassLogicTests.m
  
  Copyright ©2012 Kazki Miura. All rights reserved.
 */
 
 #import "REKit.h"
-#import "REResponderLogicTests.h"
+#import "REResponderClassLogicTests.h"
 #import "RETestObject.h"
 #import <objc/message.h>
 
@@ -14,27 +14,39 @@
 #endif
 
 
-@implementation REResponderLogicTests
+@implementation REResponderClassLogicTests
 
 - (void)test_respondsToUnimplementedMethod
 {
 	SEL sel = @selector(log);
 	NSString *log;
 	
-	// Make obj
-	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	// Check NSObject
+	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 	
 	// Responds to log method dynamically
-	[obj respondsToSelector:sel withKey:nil usingBlock:^NSString*(id receiver) {
+	[NSObject respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+		// Check receiver
+		STAssertTrue(receiver == [NSObject class], @"");
+		
 		return @"block";
 	}];
-	log = [obj performSelector:sel];
+	
+	// Responds to selector?
+	STAssertTrue([[NSObject class] respondsToSelector:sel], @"");
+	
+	// Call the sel
+	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
-	// Don't affect to class
-	STAssertFalse([NSObject respondsToSelector:sel], @"");
-	STAssertFalse([[obj class] respondsToSelector:sel], @"");
+	// Don't affect to instances
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	STAssertFalse([obj respondsToSelector:sel], @"");
+	
+	// Remove block
+	[NSObject removeBlockForSelector:sel withKey:@"key"];
+	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 }
 
 - (void)test_overrideHardcodedMethod
@@ -1414,19 +1426,24 @@
 
 - (void)test_removeBlockForSelector_withKey
 {
-	// Make obj
-	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	SEL sel = @selector(log);
 	
-	// Add log method
-	[obj respondsToSelector:@selector(log) withKey:@"key" usingBlock:^(id receiver) {
-		// Do something
+	// Responds?
+	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
+	
+	// Responds to log method dynamically
+	[NSObject respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
+		// Check receiver
+		STAssertTrue(receiver == [NSObject class], @"");
+		
+		return @"block";
 	}];
-	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) withKey:@"key"];
-	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
+	[NSObject removeBlockForSelector:sel withKey:@"key"];
+	
+	// Responds?
+	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 }
 
 - (void)test_removeCurrentBlock
@@ -1753,76 +1770,6 @@
 	id obj;
 	obj = [[[NSObject alloc] init] autorelease];
 	STAssertNoThrow([obj conformsToProtocol:nil], @"");
-}
-
-- (void)test_respondsToUnimplementedMethod_class
-{
-	SEL sel = @selector(log);
-	NSString *log;
-	
-	// Check NSObject
-	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
-	
-	// Responds to log method dynamically
-	[NSObject respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
-		// Check receiver
-		STAssertTrue(receiver == [NSObject class], @"");
-		
-		return @"block";
-	}];
-	
-	// Responds to selector?
-	STAssertTrue([[NSObject class] respondsToSelector:sel], @"");
-	
-	// Call the sel
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Don't affect to instances
-	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
-	STAssertFalse([obj respondsToSelector:sel], @"");
-	
-	// Remove block
-	[NSObject removeBlockForSelector:sel withKey:@"key"];
-	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
-}
-
-//- (void)test_overrideHardcodedMethod_class
-//{
-//	SEL selector = @selector(testObject);
-//	// Override testObject method
-//	[RETestObject respondsToSelector:selector withKey:nil usingBlock:^(id receiver) {
-//		
-//	RETestObject *obj;
-//	obj = [RETestObject testObject];
-//	[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^NSString*(id receiver) {
-//		return @"Overridden log";
-//	}];
-//	log = [obj log];
-//	STAssertEqualObjects(log, @"Overridden log", @"");
-//}
-
-- (void)test_removeBlockForSelector_withKey_class
-{
-	SEL sel = @selector(log);
-	
-	// Responds?
-	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
-	
-	// Responds to log method dynamically
-	[NSObject respondsToSelector:sel withKey:@"key" usingBlock:^(id receiver) {
-		// Check receiver
-		STAssertTrue(receiver == [NSObject class], @"");
-		
-		return @"block";
-	}];
-	
-	// Remove block
-	[NSObject removeBlockForSelector:sel withKey:@"key"];
-	
-	// Responds?
-	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 }
 
 @end

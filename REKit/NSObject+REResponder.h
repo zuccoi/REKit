@@ -25,11 +25,12 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 // Conformance
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key;
 
-// Class Method
+// Class Method Version
 + (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block;
 + (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key;
 + (void)removeBlockForSelector:(SEL)selector withKey:(id)key;
 + (IMP)supermethodOfCurrentBlock;
 + (void)removeCurrentBlock;
++ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key;
 
 @end

@@ -549,4 +549,35 @@ static IMP _dummyBlockImp = NULL;
 	}
 }
 
+//--------------------------------------------------------------//
+#pragma mark -- Class Method --
+//--------------------------------------------------------------//
+
++ (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block
+{
+	// Not Implemented >>>
+}
+
++ (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key
+{
+	// Not Implemented >>>
+	return NO;
+}
+
++ (void)removeBlockForSelector:(SEL)selector withKey:(id)key
+{
+	// Not Implemented >>>
+}
+
++ (IMP)supermethodOfCurrentBlock
+{
+	// Not Implemented >>>
+	return NULL;
+}
+
++ (void)removeCurrentBlock
+{
+	// Not Implemented >>>
+}
+
 @end

@@ -18,6 +18,7 @@
 - (void)test_associatedContextIsDeallocated
 {
 	__block BOOL deallocated = NO;
+	__block NSString *string = nil;
 	
 	@autoreleasepool {
 		// Make obj
@@ -40,13 +41,10 @@
 			
 			// Add log block
 			[obj respondsToSelector:@selector(log) withKey:nil usingBlock:^(id receiver) {
-				id ctx;
+				RETestObject *ctx;
 				ctx = [receiver associatedValueForKey:@"context"];
-				NSLog(@"ctx = %@", ctx);
+				string = [ctx log];
 			}];
-			
-			// Call log method
-			STAssertNoThrow([obj performSelector:@selector(log)], @"");
 		}
 		
 		// Call log method
@@ -54,6 +52,7 @@
 	}
 	
 	// Check
+	STAssertEqualObjects(string, @"log", @"");
 	STAssertTrue(deallocated, @"");
 }
 

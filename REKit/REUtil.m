@@ -81,6 +81,60 @@ void* REBlockGetImplementation(id block)
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
+NSArray* RESubclassesOfClass(Class cls)
+{
+	// Filter
+	if (!cls) {
+		return nil;
+	}
+	
+	// Get count of classes
+	int count;
+	count = objc_getClassList(NULL, 0);
+	if (count <= 0) {
+		return nil;
+	}
+	
+	// Get classes
+	Class *classes;
+	classes = malloc(sizeof(Class) * count);
+	count = objc_getClassList(classes, count);
+	
+	// Get subclasses
+	NSMutableArray *subclasses;
+	subclasses = [NSMutableArray array];
+	for (NSInteger i = 0; i < count; i++) {
+		// Get aClass
+		Class aClass;
+		aClass = classes[i];
+		
+		// Is kind of cls?
+		Class superClass;
+		superClass = aClass;
+		do {
+			superClass = class_getSuperclass(superClass);
+		} while(superClass && superClass != cls);
+		if (!superClass) {
+			continue;
+		}
+		
+		// Check className
+		NSString *className;
+		className = NSStringFromClass(aClass);
+		if ([className hasPrefix:@"REResponder_"] || [className hasPrefix:@"NSKVONotifying_"]) {
+			continue;
+		}
+		
+		// Collect aClass
+		[subclasses addObject:classes[i]];
+	}
+	
+	// Free classes
+	free(classes);
+	 
+	return subclasses;
+}
+
 @implementation NSObject (REUtil)
 
 - (void)willChangeClass:(Class)toClass

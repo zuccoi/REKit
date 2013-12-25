@@ -66,6 +66,8 @@ extern void* REBlockGetImplementation(id block);
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
+NSArray* RESubclassesOfClass(Class cls);
+
 @interface NSObject (REUtil)
 
 // Class Exchange

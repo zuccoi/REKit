@@ -15,6 +15,21 @@
 
 @implementation REUtilLogicTests
 
+- (void)test_RESubclassesOfClass
+{
+	NSArray *subclasses;
+	NSArray *expected;
+	
+	// Get subclasses of RETestObject
+	subclasses = RESubclassesOfClass([RETestObject class]);
+	expected = @[[RESubTestObject class]];
+	STAssertEqualObjects(subclasses, expected, @"");
+	
+	// Pass nil
+	subclasses = RESubclassesOfClass(nil);
+	STAssertNil(subclasses, @"");
+}
+
 - (void)test_willChangeClass
 {
 	__block Class newClass = nil;

@@ -897,6 +897,13 @@
 	STAssertTrue(called, @"");
 }
 
+- (void)test_getSupermethodFromOutsideOfBlock
+{
+	IMP supermethod;
+	supermethod = [NSObject supermethodOfCurrentBlock];
+	STAssertNil((id)supermethod, @"");
+}
+
 - (void)test_removeBlockForSelector_key
 {
 	SEL sel = @selector(log);
@@ -930,6 +937,25 @@
 	STAssertTrue([NSObject respondsToSelector:sel], @"");
 	objc_msgSend([NSObject class], sel);
 	STAssertFalse([NSObject respondsToSelector:sel], @"");
+}
+
+- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
+{
+	SEL sel = @selector(doSomething);
+	
+	// Call removeCurrentBlock
+	STAssertNoThrow([NSObject removeCurrentBlock], @"");
+	
+	// Add doSomething method
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		// Do something
+	}];
+	
+	// Call removeCurrentBlock
+	STAssertNoThrow([NSObject removeCurrentBlock], @"");
+	
+	// Check doSomething method
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
 }
 
 - (void)test_doNotChangeClass

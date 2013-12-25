@@ -106,7 +106,7 @@ extern void* REBlockGetImplementation(id block);
 
 
 //--------------------------------------------------------------//
-#pragma mark -- NSObject (REUtil_Deprecated) --
+#pragma mark - NSObject (REUtil_Deprecated) -
 //--------------------------------------------------------------//
 
 @interface NSObject ()

@@ -691,7 +691,18 @@ static IMP _dummyBlockImp = NULL;
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
 		SEL selector;
-		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+		Class class;
+		class = self;
+		while (YES) {
+			blockInfo = [class REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+			if (blockInfo) {
+				break;
+			}
+			class = [class superclass];
+			if (!class) {
+				break;
+			}
+		}
 		if (!blockInfo || !blockInfos || !selector) {
 			return NULL;
 		}
@@ -700,11 +711,21 @@ static IMP _dummyBlockImp = NULL;
 		NSUInteger index;
 		index = [blockInfos indexOfObject:blockInfo];
 		if (index == 0) {
-			supermethod = [[blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey] pointerValue];
+			NSValue *originalMethodValue;
+			originalMethodValue = [blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey];
+			if (originalMethodValue) {
+				supermethod = [originalMethodValue pointerValue];
+			}
+			else {
+				supermethod = method_getImplementation(class_getClassMethod([class superclass], selector));
+			}
 		}
 		else {
 			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
 		}
+	}
+	if (supermethod == _dummyBlockImp) {
+		return NULL;
 	}
 	
 	return supermethod;

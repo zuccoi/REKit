@@ -112,18 +112,32 @@
 	// Call the sel
 	log = objc_msgSend([NSNumber class], sel);
 	STAssertEqualObjects(log, @"block", @"");
+	
+	// Remove the block
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	STAssertFalse([NSNumber respondsToSelector:sel], @"");
 }
 
 - (void)test_overrideBlockAffectSubclasses
 {
 	SEL sel = @selector(version);
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	NSInteger version;
+	
+	// Override +[NSObject version]
+	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
 		return 3;
 	}];
 	
-	NSInteger version;
+	// Check version of NSArray
 	version = [NSArray version];
 	STAssertEquals(version, (NSInteger)3, @"");
+	
+	// Remove the block
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	
+	// Check version of NSArray
+	version = [NSArray version];
+	STAssertEquals(0, (NSInteger)0, @"");
 }
 
 //- (void)test_overrideBlockAffectSubclassOfString
@@ -523,7 +537,7 @@
 	SEL sel = @selector(log);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[NSString setBlockForSelector:sel key:nil block:^(id receiver) {
 		// Get supermethod
 		REVoidIMP supermethod;
 		supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock];
@@ -531,7 +545,39 @@
 	}];
 	
 	// Call
-	objc_msgSend([NSObject class], sel);
+	objc_msgSend([NSString class], sel);
+}
+
+- (void)test_supermethodOfSubclass
+{
+	SEL sel = @selector(version);
+	NSInteger version;
+	
+	// Record original version of NSArray
+	NSInteger originalVersion;
+	originalVersion = [NSArray version];
+	
+	// Override version
+	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		NSInteger res = -1;
+		typedef NSInteger (*NSInteger_IMP)(id, SEL, ...);
+		NSInteger_IMP supermethod;
+		if ((supermethod = (NSInteger_IMP)[receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		return res;
+	}];
+	
+	// Get version of NSArray
+	version = [NSArray version];
+	STAssertEquals(version, originalVersion, @"");
+	
+	// Remove the block
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	version = [NSArray version];
+	STAssertEquals(version, originalVersion, @"");
 }
 
 - (void)test_supermethodOfDynamicBlock

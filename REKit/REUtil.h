@@ -53,15 +53,6 @@ extern void* REBlockGetImplementation(id block);
 
 
 //--------------------------------------------------------------//
-#pragma mark - NSInvocation
-//--------------------------------------------------------------//
-
-@interface NSInvocation (REUtil)
-- (void)invokeUsingIMP:(IMP)imp;
-@end
-
-
-//--------------------------------------------------------------//
 #pragma mark - NSMethodSignature
 //--------------------------------------------------------------//
 

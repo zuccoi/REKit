@@ -137,7 +137,7 @@
 	
 	// Check version of NSArray
 	version = [NSArray version];
-	STAssertEquals(0, (NSInteger)0, @"");
+	STAssertEquals(version, (NSInteger)0, @"");
 }
 
 - (void)test_dynamicBlockDoesNotAffectOtherClasses

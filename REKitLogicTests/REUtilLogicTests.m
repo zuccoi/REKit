@@ -17,8 +17,8 @@
 
 - (void)test_RESubclassesOfClass
 {
-	NSArray *subclasses;
-	NSArray *expected;
+	NSSet *subclasses;
+	NSSet *expected;
 	
 	// Pass nil
 	subclasses = RESubclassesOfClass(nil, NO);
@@ -26,12 +26,12 @@
 	
 	// Get subclasses of RETestObject
 	subclasses = RESubclassesOfClass([RETestObject class], NO);
-	expected = @[[RESubTestObject class]];
+	expected = [NSSet setWithArray:@[[RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
 	
 	// Get subclasses of REREstObject
 	subclasses = RESubclassesOfClass([RETestObject class], YES);
-	expected = @[[RETestObject class], [RESubTestObject class]];
+	expected = [NSSet setWithArray:@[[RETestObject class], [RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
 }
 

@@ -81,7 +81,7 @@ void* REBlockGetImplementation(id block)
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
-NSArray* RESubclassesOfClass(Class cls, BOOL includeCls)
+NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 {
 	// Filter
 	if (!cls) {
@@ -101,8 +101,8 @@ NSArray* RESubclassesOfClass(Class cls, BOOL includeCls)
 	count = objc_getClassList(classes, count);
 	
 	// Get subclasses
-	NSMutableArray *subclasses;
-	subclasses = [NSMutableArray array];
+	NSMutableSet *subclasses;
+	subclasses = [NSMutableSet set];
 	for (NSInteger i = 0; i < count; i++) {
 		// Get aClass
 		Class aClass;

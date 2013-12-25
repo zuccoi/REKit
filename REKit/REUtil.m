@@ -81,7 +81,7 @@ void* REBlockGetImplementation(id block)
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
-NSArray* RESubclassesOfClass(Class cls)
+NSArray* RESubclassesOfClass(Class cls, BOOL includeCls)
 {
 	// Filter
 	if (!cls) {
@@ -107,6 +107,10 @@ NSArray* RESubclassesOfClass(Class cls)
 		// Get aClass
 		Class aClass;
 		aClass = classes[i];
+		if (includeCls && aClass == cls) {
+			[subclasses addObject:aClass];
+			continue;
+		}
 		
 		// Is kind of cls?
 		Class superClass;

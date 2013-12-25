@@ -20,14 +20,19 @@
 	NSArray *subclasses;
 	NSArray *expected;
 	
+	// Pass nil
+	subclasses = RESubclassesOfClass(nil, NO);
+	STAssertNil(subclasses, @"");
+	
 	// Get subclasses of RETestObject
-	subclasses = RESubclassesOfClass([RETestObject class]);
+	subclasses = RESubclassesOfClass([RETestObject class], NO);
 	expected = @[[RESubTestObject class]];
 	STAssertEqualObjects(subclasses, expected, @"");
 	
-	// Pass nil
-	subclasses = RESubclassesOfClass(nil);
-	STAssertNil(subclasses, @"");
+	// Get subclasses of REREstObject
+	subclasses = RESubclassesOfClass([RETestObject class], YES);
+	expected = @[[RETestObject class], [RESubTestObject class]];
+	STAssertEqualObjects(subclasses, expected, @"");
 }
 
 - (void)test_willChangeClass

@@ -16,35 +16,28 @@
 
 @implementation REResponderClassLogicTests
 
-- (void)_resetClass:(Class)class
-{
-	// Remove blocks
-	NSDictionary *blocks;
-	blocks = [class associatedValueForKey:@"REResponder_blocks"];
-	[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
-		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
-			objc_msgSend(class, @selector(removeBlockForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
-		}];
-	}];
-	
-	// Remove protocols
-	NSDictionary *protocols;
-	protocols = [class associatedValueForKey:@"REResponder_protocols"];
-	[protocols enumerateKeysAndObjectsUsingBlock:^(NSString *protocolName, NSDictionary *protocolInfo, BOOL *stop) {
-		[protocolInfo[@"keys"] enumerateObjectsUsingBlock:^(NSString *aKey, NSUInteger idx, BOOL *stop) {
-			[class setConformable:NO toProtocol:NSProtocolFromString(protocolName) key:aKey];
-		}];
-	}];
-}
-
 - (void)tearDown
 {
-	// Remove all blocks
-	[self _resetClass:[NSObject class]];
-	[self _resetClass:[RETestObject class]];
-	[self _resetClass:[NSString class]];
-	[self _resetClass:[NSMutableString class]];
-	[self _resetClass:[NSNumber class]];
+	// Reset all classes
+	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
+		// Remove blocks
+		NSDictionary *blocks;
+		blocks = [aClass associatedValueForKey:@"REResponder_blocks"];
+		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
+			[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
+				objc_msgSend(aClass, @selector(removeBlockForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
+			}];
+		}];
+		
+		// Remove protocols
+		NSDictionary *protocols;
+		protocols = [aClass associatedValueForKey:@"REResponder_protocols"];
+		[protocols enumerateKeysAndObjectsUsingBlock:^(NSString *protocolName, NSDictionary *protocolInfo, BOOL *stop) {
+			[protocolInfo[@"keys"] enumerateObjectsUsingBlock:^(NSString *aKey, NSUInteger idx, BOOL *stop) {
+				[aClass setConformable:NO toProtocol:NSProtocolFromString(protocolName) key:aKey];
+			}];
+		}];
+	}
 	
 	// super
 	[super tearDown];
@@ -217,6 +210,41 @@
 	rect = [RESubTestObject theRect];
 	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
+
+//- (void)test_addDynamicBlockToSubclasses
+//{
+//	SEL sel = @selector(log);
+//	NSString *log;
+//	
+//	// Add log method
+//	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
+//		[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+//			return @"block";
+//		}];
+//	}
+//	
+//	// Call [NSObject log]
+//	log = objc_msgSend([NSObject class], sel);
+//	STAssertEqualObjects(log, @"block", @"");
+//	
+//	// Call [RETestObject log]
+//	log = objc_msgSend([RETestObject class], sel);
+//	STAssertEqualObjects(log, @"block", @"");
+//	
+//	// Remove log method of RETestObject
+//	[RETestObject removeBlockForSelector:sel key:@"key"];
+//	
+//	// Call [NSObject log]
+//	log = objc_msgSend([NSObject class], sel);
+//	STAssertEqualObjects(log, @"block", @"");
+//	
+//	// RETestObject responds to sel?
+//	STAssertTrue([RETestObject respondsToSelector:sel], @"");
+//	
+//	// Call [RESubTestObject log]
+//	log = objc_msgSend([RESubTestObject class], sel);
+//	STAssertEqualObjects(log, @"block", @"");
+//}
 
 - (void)test_receiverIsClass
 {
@@ -924,6 +952,11 @@
 	
 	// Responds?
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
+	
+	// Have method?
+	IMP imp;
+	imp = [NSObject methodForSelector:sel];
+	STAssertNil((id)imp, @"");
 }
 
 - (void)test_removeCurrentBlock

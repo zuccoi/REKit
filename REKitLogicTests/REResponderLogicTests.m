@@ -1439,6 +1439,11 @@
 	// Remove block
 	[obj removeBlockForSelector:@selector(log) key:@"key"];
 	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
+	
+	// Have method?
+	IMP imp;
+	imp = [obj methodForSelector:@selector(log)];
+	STAssertNil((id)imp, @"");
 }
 
 - (void)test_removeCurrentBlock

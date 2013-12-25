@@ -41,6 +41,17 @@ static IMP _dummyBlockImp = NULL;
 #pragma mark -- Setup --
 //--------------------------------------------------------------//
 
++ (IMP)REResponder_X_methodForSelector:(SEL)aSelector
+{
+	IMP method;
+	method = [self REResponder_X_methodForSelector:aSelector];
+	if (method == _dummyBlockImp) {
+		method = [[self superclass] methodForSelector:aSelector];
+	}
+	
+	return method;
+}
+
 + (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
 	// Filter
@@ -86,13 +97,24 @@ static IMP _dummyBlockImp = NULL;
 		responds = [self REResponder_X_respondsToSelector:aSelector];
 		if (responds) {
 			// It's dummy?
-			if ([self methodForSelector:aSelector] == _dummyBlockImp) {
+			if (![self methodForSelector:aSelector]) {
 				return NO;
 			}
 		}
 		
 		return responds;
 	}
+}
+
+- (IMP)REResponder_X_methodForSelector:(SEL)aSelector
+{
+	IMP method;
+	method = [self REResponder_X_methodForSelector:aSelector];
+	if (method == _dummyBlockImp) {
+		return nil;
+	}
+	
+	return method;
 }
 
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
@@ -140,7 +162,7 @@ static IMP _dummyBlockImp = NULL;
 		responds = [self REResponder_X_respondsToSelector:aSelector];
 		if (responds) {
 			// It's dummy?
-			if ([self methodForSelector:aSelector] == _dummyBlockImp) {
+			if (![self methodForSelector:aSelector]) {
 				return NO;
 			}
 		}
@@ -199,6 +221,7 @@ static IMP _dummyBlockImp = NULL;
 	@autoreleasepool {
 		// Exchange class methods
 		[self exchangeClassMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
+			@selector(methodForSelector:),
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
 			nil
@@ -206,6 +229,7 @@ static IMP _dummyBlockImp = NULL;
 		
 		// Exchange instance methods
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
+			@selector(methodForSelector:),
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
 			@selector(dealloc),

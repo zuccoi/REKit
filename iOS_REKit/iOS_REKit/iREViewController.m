@@ -52,7 +52,7 @@
 	title = @"Change Background Color?";
 	message = @"This alert view's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature.";
 	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
-	[alertView respondsToSelector:@selector(alertView:didDismissWithButtonIndex:) withKey:nil usingBlock:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+	[alertView setBlockForSelector:@selector(alertView:didDismissWithButtonIndex:) key:nil block:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
 		// Cancel
 		if (buttonIndex == 0) {
 			return;
@@ -77,7 +77,7 @@
 	__weak typeof(self) self_ = self;
 	
 	#pragma mark └ [self viewWillAppear:]
-	[self respondsToSelector:@selector(viewWillAppear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+	[self setBlockForSelector:@selector(viewWillAppear:) key:nil block:^(id receiver, BOOL animated) {
 		// supermethod
 		REVoidIMP supermethod;
 		if ((supermethod = (REVoidIMP)[self_ supermethodOfCurrentBlock])) {
@@ -100,7 +100,7 @@
 	}];
 	
 	#pragma mark └ [self viewWillDisappear:]
-	[self respondsToSelector:@selector(viewWillDisappear:) withKey:nil usingBlock:^(id receiver, BOOL animated) {
+	[self setBlockForSelector:@selector(viewWillDisappear:) key:nil block:^(id receiver, BOOL animated) {
 		// Stop observing
 		[self_.observer stopObserving];
 		self_.observer = nil;

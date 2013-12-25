@@ -163,7 +163,7 @@ static IMP _dummyBlockImp = NULL;
 				while ([blockInfos count]) {
 					NSDictionary *blockInfo;
 					blockInfo = [blockInfos lastObject];
-					[self removeBlockForSelector:NSSelectorFromString(selectorName) withKey:blockInfo[kBlockInfoKeyKey]];
+					[self removeBlockForSelector:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 				}
 			}];
 			[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -218,7 +218,7 @@ static IMP _dummyBlockImp = NULL;
 #pragma mark -- Util --
 //--------------------------------------------------------------//
 
-+ (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector withKey:(id)key blockInfos:(NSMutableArray**)outBlockInfos
++ (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos
 {
 	@synchronized (self) {
 		// Get blockInfo
@@ -239,7 +239,7 @@ static IMP _dummyBlockImp = NULL;
 	}
 }
 
-- (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector withKey:(id)key blockInfos:(NSMutableArray**)outBlockInfos
+- (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos
 {
 	@synchronized (self) {
 		// Get blockInfo
@@ -370,7 +370,7 @@ static IMP _dummyBlockImp = NULL;
 #pragma mark -- Block --
 //--------------------------------------------------------------//
 
-+ (void)respondsToSelector:(SEL)selector withKey:(id)inKey usingBlock:(id)block
++ (void)setBlockForSelector:(SEL)selector key:(id)inKey block:(id)block
 {
 	// Filter
 	if (!selector || !block) {
@@ -403,7 +403,7 @@ static IMP _dummyBlockImp = NULL;
 	// Update blocks
 	@synchronized (self) {
 		// Remove old one
-		[self removeBlockForSelector:selector withKey:key];
+		[self removeBlockForSelector:selector key:key];
 		
 		// Get blocks
 		NSMutableDictionary *blocks;
@@ -443,7 +443,7 @@ static IMP _dummyBlockImp = NULL;
 	}
 }
 
-- (void)respondsToSelector:(SEL)selector withKey:(id)inKey usingBlock:(id)block
+- (void)setBlockForSelector:(SEL)selector key:(id)inKey block:(id)block
 {
 	// Filter
 	if (!selector || !block) {
@@ -476,7 +476,7 @@ static IMP _dummyBlockImp = NULL;
 	// Update blocks
 	@synchronized (self) {
 		// Remove old one
-		[self removeBlockForSelector:selector withKey:key];
+		[self removeBlockForSelector:selector key:key];
 		
 		// Get blocks
 		NSMutableDictionary *blocks;
@@ -527,7 +527,7 @@ static IMP _dummyBlockImp = NULL;
 	}
 }
 
-+ (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key
++ (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
 {
 	// Filter
 	if (!selector || !key) {
@@ -539,14 +539,14 @@ static IMP _dummyBlockImp = NULL;
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:nil];
+		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:nil];
 		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
 	}
 	
 	return (blockImp != NULL);
 }
 
-- (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key
+- (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
 {
 	// Filter
 	if (!selector || !key) {
@@ -558,14 +558,14 @@ static IMP _dummyBlockImp = NULL;
 	@synchronized (self) {
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:nil];
+		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:nil];
 		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
 	}
 	
 	return (blockImp != NULL);
 }
 
-+ (void)removeBlockForSelector:(SEL)selector withKey:(id)key
++ (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
 	// Filter
 	if (!selector || !key) {
@@ -577,7 +577,7 @@ static IMP _dummyBlockImp = NULL;
 		// Get elements
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:&blockInfos];
+		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
 		if (blockInfo && blockInfos) {
 			// Replace method
 			if (blockInfo == [blockInfos lastObject]) {
@@ -617,7 +617,7 @@ static IMP _dummyBlockImp = NULL;
 	}
 }
 
-- (void)removeBlockForSelector:(SEL)selector withKey:(id)key
+- (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
 	// Filter
 	if (!selector || !key) {
@@ -629,7 +629,7 @@ static IMP _dummyBlockImp = NULL;
 		// Get elements
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoForSelector:selector withKey:key blockInfos:&blockInfos];
+		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
 		if (blockInfo && blockInfos) {
 			// Replace method
 			if (blockInfo == [blockInfos lastObject]) {
@@ -765,7 +765,7 @@ static IMP _dummyBlockImp = NULL;
 	}
 	
 	// Call removeBlockForSelector:forKey:
-	[self removeBlockForSelector:selector withKey:blockInfo[kBlockInfoKeyKey]];
+	[self removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
 }
 
 - (void)removeCurrentBlock
@@ -786,14 +786,14 @@ static IMP _dummyBlockImp = NULL;
 	}
 	
 	// Call removeBlockForSelector:forKey:
-	[self removeBlockForSelector:selector withKey:blockInfo[kBlockInfoKeyKey]];
+	[self removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
 }
 
 //--------------------------------------------------------------//
 #pragma mark -- Conformance --
 //--------------------------------------------------------------//
 
-+ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)inKey
++ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
 {
 	// Filter
 	if (!protocol || (!conformable && !inKey)) {
@@ -876,7 +876,7 @@ static IMP _dummyBlockImp = NULL;
 	}
 }
 
-- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)inKey
+- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
 {
 	// Filter
 	if (!protocol || (!conformable && !inKey)) {
@@ -957,6 +957,33 @@ static IMP _dummyBlockImp = NULL;
 			}
 		}
 	}
+}
+
+@end
+
+#pragma mark -
+
+
+@implementation NSObject (REResponder_Deprecated)
+
+- (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated))
+{
+	[self setBlockForSelector:selector key:key block:block];
+}
+
+- (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
+{
+	return [self hasBlockForSelector:selector key:key];
+}
+
+- (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
+{
+	[self removeBlockForSelector:selector key:key];
+}
+
+- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated))
+{
+	[self setConformable:conformable toProtocol:protocol key:key];
 }
 
 @end

@@ -51,7 +51,7 @@
 /* Begin PBXFileReference section */
 		EB55780D16887865003DBEAB /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard.storyboard; path = iOS_REKit/MainStoryboard.storyboard; sourceTree = "<group>"; };
 		EB8535EE18689B7C0043D9A1 /* REResponderClassLogicTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REResponderClassLogicTests.h; path = ../../REKitLogicTests/REResponderClassLogicTests.h; sourceTree = "<group>"; };
-		EB8535EF18689B7C0043D9A1 /* REResponderClassLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = REResponderClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassLogicTests.m; sourceTree = "<group>"; };
+		EB8535EF18689B7C0043D9A1 /* REResponderClassLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassLogicTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBA420A9167DE1A10052D11E /* iOS_REKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOS_REKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA420AD167DE1A10052D11E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EBA420AF167DE1A10052D11E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -66,7 +66,7 @@
 		EBA420C1167DE1A10052D11E /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		EBA420C3167DE1A10052D11E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		EBA420C5167DE1A10052D11E /* iREViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iREViewController.h; sourceTree = "<group>"; };
-		EBA420C6167DE1A10052D11E /* iREViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iREViewController.m; sourceTree = "<group>"; };
+		EBA420C6167DE1A10052D11E /* iREViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iREViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBA42101167DE1DC0052D11E /* iOS_REKitLogicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOS_REKitLogicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA42102167DE1DC0052D11E /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		EBA42108167DE1DC0052D11E /* iOS_REKitLogicTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iOS_REKitLogicTests-Info.plist"; sourceTree = "<group>"; };

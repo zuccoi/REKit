@@ -42,7 +42,7 @@
 
 /* Begin PBXFileReference section */
 		EB8535F118689B920043D9A1 /* REResponderClassLogicTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REResponderClassLogicTests.h; path = ../../REKitLogicTests/REResponderClassLogicTests.h; sourceTree = "<group>"; };
-		EB8535F218689B920043D9A1 /* REResponderClassLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = REResponderClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassLogicTests.m; sourceTree = "<group>"; };
+		EB8535F218689B920043D9A1 /* REResponderClassLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassLogicTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBA420DB167DE1BE0052D11E /* Mac_REKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mac_REKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA420DF167DE1BE0052D11E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		EBA420E2167DE1BE0052D11E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -79,7 +79,7 @@
 		EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REResponderARCLogicTests.h; path = ../../REKitLogicTests/REResponderARCLogicTests.h; sourceTree = "<group>"; };
 		EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REResponderARCLogicTests.m; path = ../../REKitLogicTests/REResponderARCLogicTests.m; sourceTree = "<group>"; };
 		EBEC4FF51681B72000E94925 /* MREViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MREViewController.h; sourceTree = "<group>"; };
-		EBEC4FF61681B72000E94925 /* MREViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MREViewController.m; sourceTree = "<group>"; };
+		EBEC4FF61681B72000E94925 /* MREViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MREViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBEC4FF71681B72000E94925 /* MREViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MREViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

@@ -106,6 +106,17 @@ extern void* REBlockGetImplementation(id block);
 
 
 //--------------------------------------------------------------//
+#pragma mark -- NSObject (REUtil_Deprecated) --
+//--------------------------------------------------------------//
+
+@interface NSObject ()
+
+- (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy __attribute__((deprecated));
+
+@end
+
+
+//--------------------------------------------------------------//
 #pragma mark - NSString
 //--------------------------------------------------------------//
 

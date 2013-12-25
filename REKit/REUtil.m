@@ -196,6 +196,20 @@ void* REBlockGetImplementation(id block)
 
 
 //--------------------------------------------------------------//
+#pragma mark - NSObject REUtil_Deprecated
+//--------------------------------------------------------------//
+
+@implementation NSObject (REUtil_Deprecated)
+
+- (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy __attribute__((deprecated))
+{
+	[self setAssociatedValue:value forKey:key policy:policy];
+}
+
+@end
+
+
+//--------------------------------------------------------------//
 #pragma mark - NSString
 //--------------------------------------------------------------//
 

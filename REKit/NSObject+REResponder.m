@@ -154,7 +154,7 @@ static IMP _dummyBlockImp = NULL;
 	@autoreleasepool {
 		@synchronized (self) {
 			// Remove protocols
-			[self associateValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			
 			// Remove blocks
 			NSMutableDictionary *blocks;
@@ -166,7 +166,7 @@ static IMP _dummyBlockImp = NULL;
 					[self removeBlockForSelector:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 				}
 			}];
-			[self associateValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self setAssociatedValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			
 			// Dispose classes
 			NSString *className;
@@ -416,14 +416,14 @@ static IMP _dummyBlockImp = NULL;
 			// Make blocks
 			if (!blocks) {
 				blocks = [NSMutableDictionary dictionary];
-				[self associateValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[self setAssociatedValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
 			// Make blockInfos
 			blockInfos = [NSMutableArray array];
-			[blockInfos associateValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			if ([self respondsToSelector:selector]) {
-				[blockInfos associateValue:[NSValue valueWithPointer:[self methodForSelector:selector]] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[blockInfos setAssociatedValue:[NSValue valueWithPointer:[self methodForSelector:selector]] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
@@ -489,12 +489,12 @@ static IMP _dummyBlockImp = NULL;
 			// Make blocks
 			if (!blocks) {
 				blocks = [NSMutableDictionary dictionary];
-				[self associateValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[self setAssociatedValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
 			// Make blockInfos
 			blockInfos = [NSMutableArray array];
-			[blockInfos associateValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
@@ -819,7 +819,7 @@ static IMP _dummyBlockImp = NULL;
 			// Associate protocols
 			if (!protocols) {
 				protocols = [NSMutableDictionary dictionary];
-				[self associateValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[self setAssociatedValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
 			// Set protocolInfo to protocols
@@ -902,7 +902,7 @@ static IMP _dummyBlockImp = NULL;
 			// Associate protocols
 			if (!protocols) {
 				protocols = [NSMutableDictionary dictionary];
-				[self associateValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[self setAssociatedValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
 			// Set protocolInfo to protocols

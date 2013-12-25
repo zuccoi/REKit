@@ -82,10 +82,10 @@ extern void* REBlockGetImplementation(id block);
 - (void)didChangeClass:(Class)fromClass;
 
 // Association
-- (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
-- (id)associatedValueForKey:(void*)key;
-+ (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
++ (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
+- (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;
 + (id)associatedValueForKey:(void*)key;
+- (id)associatedValueForKey:(void*)key;
 
 @end
 

@@ -67,7 +67,7 @@ NSString* const REObserverContainerKey = @"container";
 			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 			if (!observingInfos) {
 				observingInfos = [NSMutableArray array];
-				[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[observer setAssociatedValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[observingInfos addObject:observingInfo];
 			
@@ -88,7 +88,7 @@ NSString* const REObserverContainerKey = @"container";
 			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
 			if (!observedInfos) {
 				observedInfos = [NSMutableArray array];
-				[obj associateValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[obj setAssociatedValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[observedInfos addObject:observedInfo];
 		}];	
@@ -205,7 +205,7 @@ NSString* const REObserverContainerKey = @"container";
 		observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 		if (!observingInfos) {
 			observingInfos = [NSMutableArray array];
-			[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[observer setAssociatedValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observingInfos addObject:observingInfo];
 		
@@ -214,7 +214,7 @@ NSString* const REObserverContainerKey = @"container";
 		observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
 		if (!observedInfos) {
 			observedInfos = [NSMutableArray array];
-			[self associateValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self setAssociatedValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observedInfos addObject:observedInfo];
 	}
@@ -477,7 +477,7 @@ NSString* const REObserverContainerKey = @"container";
 		observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
 		if (!observingInfos) {
 			observingInfos = [NSMutableArray array];
-			[observer associateValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[observer setAssociatedValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observingInfos addObject:observingInfo];
 		
@@ -495,7 +495,7 @@ NSString* const REObserverContainerKey = @"container";
 		observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
 		if (!observedInfos) {
 			observedInfos = [NSMutableArray array];
-			[self associateValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self setAssociatedValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		}
 		[observedInfos addObject:observedInfo];
 	}

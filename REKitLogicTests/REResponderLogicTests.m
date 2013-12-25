@@ -708,7 +708,7 @@
 			}];
 			
 			// Associate context
-			[obj associateValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
+			[obj setAssociatedValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
 			
 			// Add log block
 			[obj setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {

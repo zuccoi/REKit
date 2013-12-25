@@ -101,24 +101,24 @@ void* REBlockGetImplementation(id block)
 	}];
 }
 
-- (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
-{
-	objc_setAssociatedObject(self, key, value, policy);
-}
-
-- (id)associatedValueForKey:(void*)key
-{
-	return objc_getAssociatedObject(self, key);
-}
-
-+ (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
++ (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
 {
 	objc_setAssociatedObject(object_getClass(self), key, value, policy);
+}
+
+- (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
+{
+	objc_setAssociatedObject(self, key, value, policy);
 }
 
 + (id)associatedValueForKey:(void*)key
 {
 	return objc_getAssociatedObject(object_getClass(self), key);
+}
+
+- (id)associatedValueForKey:(void*)key
+{
+	return objc_getAssociatedObject(self, key);
 }
 
 @end

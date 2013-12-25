@@ -218,6 +218,24 @@
 	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
 
+- (void)test_receiverIsClass
+{
+	SEL sel = @selector(version);
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		STAssertEquals(receiver, [NSObject class], @"");
+	}];
+	[NSObject version];
+}
+
+- (void)test_receiverCanBeSubclass
+{
+	SEL sel = @selector(version);
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		STAssertEquals(receiver, [NSArray class], @"");
+	}];
+	[NSArray version];
+}
+
 - (void)test_canPsssReceiverAsKey
 {
 	SEL selector = @selector(log);

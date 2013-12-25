@@ -140,21 +140,6 @@
 	STAssertEquals(0, (NSInteger)0, @"");
 }
 
-//- (void)test_overrideBlockAffectSubclassOfString
-//{
-//	SEL sel = @selector(stringWithString:);
-//	NSString *string;
-//	
-//	// Override
-//	[NSString setBlockForSelector:sel key:@"key" block:^(id receiver, NSString *string) {
-//		return @"block";
-//	}];
-//	
-//	// Call the sel
-//	string = [NSMutableString stringWithString:@"string"];
-//	STAssertEqualObjects(string, @"block", @"");
-//}
-
 - (void)test_dynamicBlockDoesNotAffectOtherClasses
 {
 	SEL selector = @selector(log);
@@ -186,6 +171,51 @@
 	// Call NSString's
 	string = objc_msgSend([NSString class], selector, @"string");
 	STAssertEqualObjects(string, @"string", @"");
+}
+
+//- (void)test_overrideBlockAffectSubclassOfString
+//{
+//	SEL sel = @selector(stringWithString:);
+//	NSString *string;
+//	
+//	// Override
+//	[NSString setBlockForSelector:sel key:@"key" block:^(id receiver, NSString *string) {
+//		return @"block";
+//	}];
+//	
+//	// Call the sel
+//	string = [NSMutableString stringWithString:@"string"];
+//	STAssertEqualObjects(string, @"block", @"");
+//}
+
+- (void)test_dynamicBlockDoesNotOverrideImplementationOfSubclass
+{
+	SEL sel = @selector(subRect);
+	
+	// Add subRect method
+	[RETestObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		return CGRectZero;
+	}];
+	
+	// Get rect
+	CGRect rect;
+	rect = [RESubTestObject subRect];
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
+}
+
+- (void)test_overrideBlockDoesNotOverrideImplementationOfSubclass
+{
+	SEL sel = @selector(theRect);
+	
+	// Override theRect
+	[RETestObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		return CGRectZero;
+	}];
+	
+	// Get rect
+	CGRect rect;
+	rect = [RESubTestObject theRect];
+	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
 
 - (void)test_canPsssReceiverAsKey

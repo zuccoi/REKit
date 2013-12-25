@@ -28,3 +28,8 @@
 + (void)sayHello;
 
 @end
+
+@interface RESubTestObject : RETestObject
++ (CGRect)theRect;
++ (CGRect)subRect;
+@end

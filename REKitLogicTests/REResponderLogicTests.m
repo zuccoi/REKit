@@ -1093,6 +1093,49 @@
 	STAssertEqualObjects(log, @"log", @"");
 }
 
+- (void)test_implementBySameBlock
+{
+	SEL sel = @selector(log);
+	
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	for (id anObj in @[obj, obj]) {
+		[anObj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+			return @"block";
+		}];
+	}
+	
+	// Call log
+	STAssertTrue([obj respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
+	
+	// Remove block
+	[obj removeBlockForSelector:sel key:@"key"];
+	STAssertFalse([obj respondsToSelector:sel], @"");
+}
+
+- (void)test_overrideBySameBlock
+{
+	SEL sel = @selector(log);
+	
+	id obj;
+	obj = [[[RETestObject alloc] init] autorelease];
+	for (id anObj in @[obj, obj]) {
+		[anObj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+			return @"block";
+		}];
+	}
+	
+	// Call log
+	STAssertTrue([obj respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
+	
+	// Remove block
+	[obj removeBlockForSelector:sel key:@"key"];
+	STAssertTrue([obj respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"log", @"");
+}
+
 - (void)test_canShareBlock
 {
 	SEL sel = @selector(log);
@@ -1132,6 +1175,32 @@
 	STAssertFalse([obj1 respondsToSelector:sel], @"");
 	STAssertFalse([obj2 respondsToSelector:sel], @"");
 	STAssertEqualObjects(objc_msgSend(obj3, sel), @"log", @"");
+}
+
+- (void)test_canPassAlreadyExistBlock
+{
+	SEL sel = @selector(log);
+	
+	// Make block
+	NSString *(^block)(id receiver);
+	block = ^(id receiver) {
+		return @"block";
+	};
+	
+	// Make obj
+	id obj;
+	obj = [[[NSObject alloc] init] autorelease];
+	
+	// Add block
+	[obj setBlockForSelector:sel key:@"key" block:block];
+	
+	// Call
+	STAssertTrue([obj respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
+	
+	// Remove block
+	[obj removeBlockForSelector:sel key:@"key"];
+	STAssertFalse([obj respondsToSelector:sel], @"");
 }
 
 - (void)test_supermethodOf1stDynamicBlock

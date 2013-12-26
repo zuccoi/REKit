@@ -29,9 +29,6 @@ static NSString* const kProtocolInfoIncorporatedProtocolNamesKey = @"incorporate
 static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 
-// Class Variables
-static NSMutableDictionary *_blockRetainCounts = nil;
-
 
 @implementation NSObject (REResponder)
 
@@ -209,9 +206,6 @@ static NSMutableDictionary *_blockRetainCounts = nil;
 			@selector(dealloc),
 			nil
 		];
-		
-		// Create _blockRetainCounts
-		_blockRetainCounts = [[NSMutableDictionary alloc] init];
 	}
 }
 
@@ -455,13 +449,6 @@ static NSMutableDictionary *_blockRetainCounts = nil;
 			kBlockInfoKeyKey : key,
 		};
 		[blockInfos addObject:blockInfo];
-		
-		// Increase retain ount of block
-		NSUInteger retainCount;
-		NSValue *blockImpKey;
-		blockImpKey = [NSValue valueWithPointer:REBlockGetImplementation(imp_getBlock([blockInfo[kBlockInfoImpKey] pointerValue]))];
-		retainCount = [_blockRetainCounts[blockImpKey] unsignedIntegerValue];
-		_blockRetainCounts[blockImpKey] = @(++retainCount);
 	}
 }
 
@@ -546,13 +533,6 @@ static NSMutableDictionary *_blockRetainCounts = nil;
 			kBlockInfoKeyKey : key,
 		};
 		[blockInfos addObject:blockInfo];
-		
-		// Increase retain ount of block
-		NSUInteger retainCount;
-		NSValue *blockImpKey;
-		blockImpKey = [NSValue valueWithPointer:REBlockGetImplementation(imp_getBlock([blockInfo[kBlockInfoImpKey] pointerValue]))];
-		retainCount = [_blockRetainCounts[blockImpKey] unsignedIntegerValue];
-		_blockRetainCounts[blockImpKey] = @(++retainCount);
 	}
 }
 
@@ -632,22 +612,8 @@ static NSMutableDictionary *_blockRetainCounts = nil;
 				class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
 			}
 			
-			// Get retainCount of block
-			NSUInteger retainCount;
-			NSValue *blockImpKey;
-			blockImpKey = [NSValue valueWithPointer:REBlockGetImplementation(imp_getBlock([blockInfo[kBlockInfoImpKey] pointerValue]))];
-			retainCount = [_blockRetainCounts[blockImpKey] unsignedIntegerValue];
-			if (retainCount <= 1) {
-				// Remove entry for block
-				[_blockRetainCounts removeObjectForKey:blockImpKey];
-				
-				// Remove implementation
-				imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
-			}
-			else {
-				// Decrease retainCount
-				_blockRetainCounts[blockImpKey] = @(--retainCount);
-			}
+			// Remove implementation which causing releasing block as well
+			imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
 			
 			// Remove blockInfo
 			[blockInfos removeObject:blockInfo];
@@ -695,22 +661,8 @@ static NSMutableDictionary *_blockRetainCounts = nil;
 				class_replaceMethod([self class], selector, supermethod, objCTypes);
 			}
 			
-			// Get retainCount of block
-			NSUInteger retainCount;
-			NSValue *blockImpKey;
-			blockImpKey = [NSValue valueWithPointer:REBlockGetImplementation(imp_getBlock([blockInfo[kBlockInfoImpKey] pointerValue]))];
-			retainCount = [_blockRetainCounts[blockImpKey] unsignedIntegerValue];
-			if (retainCount <= 1) {
-				// Remove entry for block
-				[_blockRetainCounts removeObjectForKey:blockImpKey];
-				
-				// Remove implementation
-				imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
-			}
-			else {
-				// Decrease retainCount
-				_blockRetainCounts[blockImpKey] = @(--retainCount);
-			}
+			// Remove implementation which causing releasing block as well
+			imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
 			
 			// Remove blockInfo
 			[blockInfos removeObject:blockInfo];

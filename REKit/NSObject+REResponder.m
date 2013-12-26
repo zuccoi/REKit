@@ -29,11 +29,6 @@ static NSString* const kProtocolInfoIncorporatedProtocolNamesKey = @"incorporate
 static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 
-// Dummy block and its imp
-static id (^kDummyBlock)(id, SEL, ...) = ^id (id receiver, SEL selector, ...) {
-	return nil;
-};
-static IMP _dummyBlockImp = NULL;
 
 @implementation NSObject (REResponder)
 
@@ -41,18 +36,45 @@ static IMP _dummyBlockImp = NULL;
 #pragma mark -- Setup --
 //--------------------------------------------------------------//
 
-+ (IMP)REResponder_X_methodForSelector:(SEL)aSelector
++ (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
-	IMP method;
-	method = [self REResponder_X_methodForSelector:aSelector];
-	if (method == _dummyBlockImp) {
-		method = [[self superclass] methodForSelector:aSelector];
+	// Filter
+	if (!protocol) {
+		return NO;
 	}
 	
-	return method;
+	// original
+	if ([self REResponder_X_conformsToProtocol:protocol]) {
+		return YES;
+	}
+	
+	// Check protocols
+	@synchronized (self) {
+		// Get protocols
+		NSMutableDictionary *protocols;
+		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
+		if (!protocols) {
+			return NO;
+		}
+		
+		// Find protocolName
+		NSString *protocolName;
+		__block BOOL found = NO;
+		protocolName = NSStringFromProtocol(protocol);
+		[protocols enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString *aProtocolName, NSMutableDictionary *protocolInfo, BOOL *stop) {
+			if ([aProtocolName isEqualToString:protocolName]
+				|| [protocolInfo[kProtocolInfoIncorporatedProtocolNamesKey] containsObject:protocolName]
+			){
+				found = YES;
+				*stop = YES;
+			}
+		}];
+		
+		return found;
+	}
 }
 
-+ (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
+- (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
 	// Filter
 	if (!protocol) {
@@ -96,62 +118,13 @@ static IMP _dummyBlockImp = NULL;
 		BOOL responds;
 		responds = [self REResponder_X_respondsToSelector:aSelector];
 		if (responds) {
-			// It's dummy?
-			if (![self methodForSelector:aSelector]) {
-				return NO;
+			// Forwarding method?
+			if ([self methodForSelector:aSelector] == [self REResponder_dynamicForwardingMethod]) {
+				responds = NO;
 			}
 		}
 		
 		return responds;
-	}
-}
-
-- (IMP)REResponder_X_methodForSelector:(SEL)aSelector
-{
-	IMP method;
-	method = [self REResponder_X_methodForSelector:aSelector];
-	if (method == _dummyBlockImp) {
-		return nil;
-	}
-	
-	return method;
-}
-
-- (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
-{
-	// Filter
-	if (!protocol) {
-		return NO;
-	}
-	
-	// original
-	if ([self REResponder_X_conformsToProtocol:protocol]) {
-		return YES;
-	}
-	
-	// Check protocols
-	@synchronized (self) {
-		// Get protocols
-		NSMutableDictionary *protocols;
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
-		if (!protocols) {
-			return NO;
-		}
-		
-		// Find protocolName
-		NSString *protocolName;
-		__block BOOL found = NO;
-		protocolName = NSStringFromProtocol(protocol);
-		[protocols enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString *aProtocolName, NSMutableDictionary *protocolInfo, BOOL *stop) {
-			if ([aProtocolName isEqualToString:protocolName]
-				|| [protocolInfo[kProtocolInfoIncorporatedProtocolNamesKey] containsObject:protocolName]
-			){
-				found = YES;
-				*stop = YES;
-			}
-		}];
-		
-		return found;
 	}
 }
 
@@ -161,9 +134,9 @@ static IMP _dummyBlockImp = NULL;
 		BOOL responds;
 		responds = [self REResponder_X_respondsToSelector:aSelector];
 		if (responds) {
-			// It's dummy?
-			if (![self methodForSelector:aSelector]) {
-				return NO;
+			// Forwarding method?
+			if ([self methodForSelector:aSelector] == [self REResponder_dynamicForwardingMethod]) {
+				responds = NO;
 			}
 		}
 		
@@ -221,7 +194,6 @@ static IMP _dummyBlockImp = NULL;
 	@autoreleasepool {
 		// Exchange class methods
 		[self exchangeClassMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
-			@selector(methodForSelector:),
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
 			nil
@@ -229,7 +201,6 @@ static IMP _dummyBlockImp = NULL;
 		
 		// Exchange instance methods
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
-			@selector(methodForSelector:),
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
 			@selector(dealloc),
@@ -241,6 +212,16 @@ static IMP _dummyBlockImp = NULL;
 //--------------------------------------------------------------//
 #pragma mark -- Util --
 //--------------------------------------------------------------//
+
++ (IMP)REResponder_dynamicForwardingMethod
+{
+	return [self methodForSelector:@selector(REResponder_UnexistingMethod)];
+}
+
+- (IMP)REResponder_dynamicForwardingMethod
+{
+	return [self methodForSelector:@selector(REResponder_UnexistingMethod)];
+}
 
 + (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos
 {
@@ -446,8 +427,12 @@ static IMP _dummyBlockImp = NULL;
 			// Make blockInfos
 			blockInfos = [NSMutableArray array];
 			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			if ([self respondsToSelector:selector]) {
-				[blockInfos setAssociatedValue:[NSValue valueWithPointer:[self methodForSelector:selector]] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			
+			// Associate original method
+			IMP originalMethod;
+			originalMethod = [self methodForSelector:selector];
+			if (originalMethod && originalMethod != [self REResponder_dynamicForwardingMethod]) {
+				[blockInfos setAssociatedValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
@@ -619,17 +604,12 @@ static IMP _dummyBlockImp = NULL;
 				else {
 					supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
 				}
+				if (!supermethod) {
+					supermethod = [self REResponder_dynamicForwardingMethod];
+				}
 				
 				// Replace method
-				if (supermethod) {
-					class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
-				}
-				else {
-					if (_dummyBlockImp == NULL) {
-						_dummyBlockImp = imp_implementationWithBlock(kDummyBlock);
-					}
-					class_replaceMethod(object_getClass(self), selector, _dummyBlockImp, objCTypes);
-				}
+				class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
 			}
 			
 			// Remove implementation which causing releasing block as well
@@ -673,17 +653,12 @@ static IMP _dummyBlockImp = NULL;
 					// supermethod is superblock's IMP
 					supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
 				}
+				if (!supermethod) {
+					supermethod = [self REResponder_dynamicForwardingMethod];
+				}
 				
 				// Replace method
-				if (supermethod) {
-					class_replaceMethod([self class], selector, supermethod, objCTypes);
-				}
-				else {
-					if (_dummyBlockImp == NULL) {
-						_dummyBlockImp = imp_implementationWithBlock(kDummyBlock);
-					}
-					class_replaceMethod([self class], selector, _dummyBlockImp, objCTypes);
-				}
+				class_replaceMethod([self class], selector, supermethod, objCTypes);
 			}
 			
 			// Remove implementation which causing releasing block as well
@@ -748,7 +723,7 @@ static IMP _dummyBlockImp = NULL;
 			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
 		}
 	}
-	if (supermethod == _dummyBlockImp) {
+	if (supermethod == [self REResponder_dynamicForwardingMethod]) {
 		return NULL;
 	}
 	

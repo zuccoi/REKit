@@ -162,21 +162,6 @@
 	STAssertEqualObjects(string, @"string", @"");
 }
 
-//- (void)test_overrideBlockAffectSubclassOfString
-//{
-//	SEL sel = @selector(stringWithString:);
-//	NSString *string;
-//	
-//	// Override
-//	[NSString setBlockForSelector:sel key:@"key" block:^(id receiver, NSString *string) {
-//		return @"block";
-//	}];
-//	
-//	// Call the sel
-//	string = [NSMutableString stringWithString:@"string"];
-//	STAssertEqualObjects(string, @"block", @"");
-//}
-
 - (void)test_dynamicBlockDoesNotOverrideImplementationOfSubclass
 {
 	SEL sel = @selector(subRect);

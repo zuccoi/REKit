@@ -23,6 +23,7 @@
 - (NSString*)say;
 - (void)sayHello;
 - (NSUInteger)ageAfterYears:(NSUInteger)years;
+- (void)overrideMe;
 + (NSInteger)integerWithInteger:(NSInteger)integer;
 + (CGRect)theRect;
 + (void)sayHello;
@@ -30,6 +31,7 @@
 @end
 
 @interface RESubTestObject : RETestObject
+- (void)overrideMe;
 + (CGRect)theRect;
 + (CGRect)subRect;
 @end

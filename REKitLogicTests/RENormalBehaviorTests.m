@@ -5,6 +5,7 @@
 */
 
 #import "RENormalBehaviorTests.h"
+#import "RETestObject.h"
 #import <objc/message.h>
 
 #if __has_feature(objc_arc)
@@ -104,6 +105,34 @@
 	STAssertNotNil((id)imp, @"");
 	STAssertEquals(imp, [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 	STAssertEquals(imp, [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+}
+
+- (void)test_methodForSelectorSearchesSuperClassMethodForInstance
+{
+	RETestObject *obj;
+	RESubTestObject *subObj;
+	obj = [[[RETestObject alloc] init] autorelease];
+	subObj = [[[RESubTestObject alloc] init] autorelease];
+	
+	IMP imp;
+	IMP subImp;
+	imp = [obj methodForSelector:@selector(log)];
+	subImp = [subObj methodForSelector:@selector(log)];
+	STAssertEquals(imp, subImp, @"");
+}
+
+- (void)test_methodForSelectorReturnsOverriddenImplementation
+{
+	RETestObject *obj;
+	RESubTestObject *subObj;
+	obj = [[[RETestObject alloc] init] autorelease];
+	subObj = [[[RESubTestObject alloc] init] autorelease];
+	
+	IMP imp;
+	IMP subImp;
+	imp = [obj methodForSelector:@selector(overrideMe)];
+	subImp = [subObj methodForSelector:@selector(overrideMe)];
+	STAssertFalse(imp == subImp, @"");
 }
 
 - (void)test_classInstanceDoesNotRespondToUnexistingMethod

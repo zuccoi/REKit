@@ -55,6 +55,10 @@
 	return self.age + years;
 }
 
+- (void)overrideMe
+{
+}
+
 + (NSInteger)integerWithInteger:(NSInteger)integer
 {
 	return integer;
@@ -83,6 +87,10 @@
 + (CGRect)subRect
 {
 	return CGRectMake(10.0, 20.0, 30.0, 40.0);
+}
+
+- (void)overrideMe
+{
 }
 
 @end

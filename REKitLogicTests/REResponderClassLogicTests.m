@@ -192,6 +192,7 @@
 	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
 
+// ?????
 //- (void)test_addDynamicBlockToSubclasses
 //{
 //	SEL sel = @selector(log);
@@ -199,9 +200,11 @@
 //	
 //	// Add log method
 //	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
-//		[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
-//			return @"block";
-//		}];
+//		if (aClass == [NSObject class] || aClass == [RETestObject class] || aClass == [RESubTestObject class]) {
+//			[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+//				return @"block";
+//			}];
+//		}
 //	}
 //	
 //	// Call [NSObject log]
@@ -221,6 +224,8 @@
 //	
 //	// RETestObject responds to sel?
 //	STAssertTrue([RETestObject respondsToSelector:sel], @"");
+//	log = objc_msgSend([RETestObject class], sel);
+//	STAssertEqualObjects(log, @"block", @"");
 //	
 //	// Call [RESubTestObject log]
 //	log = objc_msgSend([RESubTestObject class], sel);

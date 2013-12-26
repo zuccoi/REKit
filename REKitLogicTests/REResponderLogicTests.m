@@ -1093,6 +1093,47 @@
 	STAssertEqualObjects(log, @"log", @"");
 }
 
+- (void)test_canShareBlock
+{
+	SEL sel = @selector(log);
+	
+	id obj1, obj2;
+	RETestObject *obj3;
+	obj1 = [[[NSObject alloc] init] autorelease];
+	obj2 = [[[NSObject alloc] init] autorelease];
+	obj3 = [[[RETestObject alloc] init] autorelease];
+	
+	// Share block
+	for (id obj in @[obj1, obj2, obj3]) {
+		[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+			return @"block";
+		}];
+	}
+	
+	// Call log method
+	STAssertEqualObjects(objc_msgSend(obj1, sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(obj2, sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(obj3, sel), @"block", @"");
+	
+	// Remove block from obj2
+	[obj2 removeBlockForSelector:sel key:@"key"];
+	STAssertEqualObjects(objc_msgSend(obj1, sel), @"block", @"");
+	STAssertFalse([obj2 respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj3, sel), @"block", @"");
+	
+	// Remove block from obj3
+	[obj3 removeBlockForSelector:sel key:@"key"];
+	STAssertEqualObjects(objc_msgSend(obj1, sel), @"block", @"");
+	STAssertFalse([obj2 respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj3, sel), @"log", @"");
+	
+	// Remove block from obj1
+	[obj1 removeBlockForSelector:sel key:@"key"];
+	STAssertFalse([obj1 respondsToSelector:sel], @"");
+	STAssertFalse([obj2 respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj3, sel), @"log", @"");
+}
+
 - (void)test_supermethodOf1stDynamicBlock
 {
 	SEL sel;

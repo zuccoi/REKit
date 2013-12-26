@@ -30,6 +30,12 @@
       location = "group:REKitLogicTests"
       name = "REKitLogicTests">
       <FileRef
+         location = "group:RENormalBehaviorTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:RENormalBehaviorTests.m">
+      </FileRef>
+      <FileRef
          location = "group:REObserverLogicTests.h">
       </FileRef>
       <FileRef

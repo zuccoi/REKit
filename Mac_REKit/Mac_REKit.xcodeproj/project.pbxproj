@@ -38,6 +38,7 @@
 		EBE6AD1016EC3C1A00B3A1B1 /* REResponderARCLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		EBEC4FF81681B72000E94925 /* MREViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBEC4FF61681B72000E94925 /* MREViewController.m */; };
 		EBEC4FF91681B72000E94925 /* MREViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EBEC4FF71681B72000E94925 /* MREViewController.xib */; };
+		EBFA6ED1186C6F1B0026B98D /* RENormalBehaviorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBFA6ED0186C6F1B0026B98D /* RENormalBehaviorTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +82,8 @@
 		EBEC4FF51681B72000E94925 /* MREViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MREViewController.h; sourceTree = "<group>"; };
 		EBEC4FF61681B72000E94925 /* MREViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MREViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBEC4FF71681B72000E94925 /* MREViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MREViewController.xib; sourceTree = "<group>"; };
+		EBFA6ECF186C6F1B0026B98D /* RENormalBehaviorTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RENormalBehaviorTests.h; path = ../../REKitLogicTests/RENormalBehaviorTests.h; sourceTree = "<group>"; };
+		EBFA6ED0186C6F1B0026B98D /* RENormalBehaviorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RENormalBehaviorTests.m; path = ../../REKitLogicTests/RENormalBehaviorTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +176,8 @@
 		EBA4211C167DE1F20052D11E /* Mac_REKitLogicTests */ = {
 			isa = PBXGroup;
 			children = (
+				EBFA6ECF186C6F1B0026B98D /* RENormalBehaviorTests.h */,
+				EBFA6ED0186C6F1B0026B98D /* RENormalBehaviorTests.m */,
 				EBA42155167DE2B80052D11E /* REObserverLogicTests.h */,
 				EBA42156167DE2B80052D11E /* REObserverLogicTests.m */,
 				EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */,
@@ -350,6 +355,7 @@
 				EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */,
 				EB8535F318689B920043D9A1 /* REResponderClassLogicTests.m in Sources */,
 				EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */,
+				EBFA6ED1186C6F1B0026B98D /* RENormalBehaviorTests.m in Sources */,
 				EBA42140167DE21F0052D11E /* NSObject+REObserver.m in Sources */,
 				EBA42142167DE21F0052D11E /* NSObject+REResponder.m in Sources */,
 				EBA42144167DE21F0052D11E /* REUtil.m in Sources */,

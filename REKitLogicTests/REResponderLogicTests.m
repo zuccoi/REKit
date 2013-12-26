@@ -934,8 +934,8 @@
 	// Remove block2
 	[obj removeBlockForSelector:sel key:@"block2"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
-	log = [obj performSelector:sel];
-	STAssertNil(log, @"");
+	STAssertNotNil((id)[obj methodForSelector:sel], @"");
+	STAssertEquals([obj methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_performDummyBlock
@@ -956,8 +956,9 @@
 	
 	// Remove block1
 	[obj removeBlockForSelector:sel key:@"block1"];
-	string = [obj performSelector:sel withObject:@"Read"];
-	STAssertNil(string, @"");
+	STAssertFalse([obj respondsToSelector:sel], @"");
+	STAssertNotNil((id)[obj methodForSelector:sel], @"");
+	STAssertEquals([obj methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_stackOfOverrideBlocks
@@ -1440,10 +1441,10 @@
 	[obj removeBlockForSelector:@selector(log) key:@"key"];
 	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
 	
-	// Have method?
+	// Check imp
 	IMP imp;
 	imp = [obj methodForSelector:@selector(log)];
-	STAssertNil((id)imp, @"");
+	STAssertEquals(imp, [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_removeCurrentBlock

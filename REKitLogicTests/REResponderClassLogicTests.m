@@ -136,7 +136,6 @@
 - (void)test_dynamicBlockDoesNotAffectOtherClasses
 {
 	SEL selector = @selector(log);
-	NSString *log;
 	
 	// Override
 	[NSMutableString setBlockForSelector:selector key:nil block:^(id receiver) {
@@ -145,10 +144,7 @@
 	
 	// NSString responds to log methods?
 	STAssertFalse([NSString respondsToSelector:selector], @"");
-	
-	// Try to call
-	log = objc_msgSend([NSString class], selector);
-	STAssertNil(log, @"");
+	STAssertEquals([NSString methodForSelector:selector], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_overrideBlockDoesNotAffectOtherClasses
@@ -484,9 +480,8 @@
 	
 	// Remove block2
 	[NSObject removeBlockForSelector:selector key:@"block2"];
-	STAssertFalse([[NSObject class] respondsToSelector:selector], @"");
-	log = objc_msgSend([NSObject class], selector);
-	STAssertNil(log, @"");
+	STAssertFalse([NSObject respondsToSelector:selector], @"");
+	STAssertEquals([NSObject methodForSelector:selector], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_performDummyBlock
@@ -502,8 +497,8 @@
 	
 	// Remove block1
 	[NSObject removeBlockForSelector:sel key:@"block1"];
-	string = objc_msgSend([NSObject class], sel, @"Read");
-	STAssertNil(string, @"");
+	STAssertFalse([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_stackOfOverrideBlocks
@@ -953,10 +948,10 @@
 	// Responds?
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 	
-	// Have method?
+	// Check imp
 	IMP imp;
 	imp = [NSObject methodForSelector:sel];
-	STAssertNil((id)imp, @"");
+	STAssertEquals(imp, [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_removeCurrentBlock

@@ -159,4 +159,18 @@
 	STAssertFalse([obj respondsToSelector:sel], @"");
 }
 
+- (void)test_classInstanceDoesNotRespondToInstanceMethod
+{
+	SEL sel = @selector(count);
+	STAssertFalse([NSArray respondsToSelector:sel], @"");
+}
+
+- (void)test_instanceDoesNotRespondsToClassMethod
+{
+	SEL sel = @selector(array);
+	NSArray *array;
+	array = [NSArray array];
+	STAssertFalse([array respondsToSelector:sel], @"");
+}
+
 @end

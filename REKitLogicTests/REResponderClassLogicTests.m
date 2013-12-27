@@ -199,37 +199,56 @@
 	
 	// Add log method
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
-		if (aClass == [NSObject class] || aClass == [RETestObject class] || aClass == [RESubTestObject class]) {
-			[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
-				return @"block";
-			}];
-		}
+		[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+			return @"block";
+		}];
 	}
 	
-	// Call [NSObject log]
+	// Call [NSObject _cmd]
 	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
-	// Call [RETestObject log]
+	// Call [RETestObject _cmd]
 	log = objc_msgSend([RETestObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
-	// Remove log method of RETestObject
+	// Remove block of RETestObject
 	[RETestObject removeBlockForSelector:sel key:@"key"];
 	
-	// Call [NSObject log]
+	// Call [NSObject _cmd]
 	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
-	// RETestObject responds to sel?
-	STAssertEquals([RETestObject methodForSelector:sel], [NSObject methodForSelector:sel], @"");
-	STAssertTrue([RETestObject respondsToSelector:sel], @"");
+	// Call [RETestObject _cmd]
+	log = objc_msgSend([RETestObject class], sel); // Fail!!!!
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RESubTestObject _cmd]
+	log = objc_msgSend([RESubTestObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Remove block of RESubTestObject
+	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+	
+	// Call [NSObject _cmd]
+	log = objc_msgSend([NSObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RETestObject _cmd]
 	log = objc_msgSend([RETestObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
-	// Call [RESubTestObject log]
+	// Call [RESubTestObject _cmd]
 	log = objc_msgSend([RESubTestObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
+	
+	// Remove block of NSObject
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	
+	// Responds?
+	STAssertTrue(![NSObject respondsToSelector:sel], @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
 }
 
 - (void)test_receiverIsClass

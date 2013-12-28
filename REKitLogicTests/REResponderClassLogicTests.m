@@ -192,6 +192,7 @@
 	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
 
+#if 0
 - (void)test_addDynamicBlockToSubclassesOneByOne
 {
 	SEL sel = _cmd;
@@ -313,6 +314,7 @@
 	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
 	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
 }
+#endif
 
 - (void)test_receiverIsClass
 {

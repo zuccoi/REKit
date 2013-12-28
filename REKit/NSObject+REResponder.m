@@ -371,6 +371,95 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	return imp;
 }
 
++ (IMP)REResponder_supermethodWithImp:(IMP)imp
+{
+	// Filter
+	if (!imp) {
+		return NULL;
+	}
+	
+	// Get supermethod
+	IMP supermethod = NULL;
+	@synchronized (self) {
+		// Get elements
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		SEL selector;
+		Class class;
+		class = self;
+		while (YES) {
+			blockInfo = [class REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+			if (blockInfo) {
+				break;
+			}
+			class = [class superclass];
+			if (!class) {
+				break;
+			}
+		}
+		if (!blockInfo || !blockInfos || !selector) {
+			return NULL;
+		}
+		
+		// Check index of blockInfo
+		NSUInteger index;
+		index = [blockInfos indexOfObject:blockInfo];
+		if (index == 0) {
+			NSValue *originalMethodValue;
+			originalMethodValue = [blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey];
+			if (originalMethodValue) {
+				supermethod = [originalMethodValue pointerValue];
+			}
+			else {
+				supermethod = method_getImplementation(class_getClassMethod([class superclass], selector));
+			}
+		}
+		else {
+			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
+		}
+	}
+	if (supermethod == [self REResponder_dynamicForwardingMethod]) {
+		return NULL;
+	}
+	
+	return supermethod;
+}
+
+- (IMP)REResponder_supermethodWithImp:(IMP)imp
+{
+	// Filter
+	if (!imp) {
+		return NULL;
+	}
+	
+	// Get supermethod
+	IMP supermethod = NULL;
+	@synchronized (self) {
+		// Get elements
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		SEL selector;
+		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+		if (!blockInfo || !blockInfos || !selector) {
+			return NULL;
+		}
+		
+		// Check index of blockInfo
+		NSUInteger index;
+		index = [blockInfos indexOfObject:blockInfo];
+		if (index == 0) {
+			// supermethod is superclass's instance method
+			supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
+		}
+		else {
+			// supermethod is superblock's IMP
+			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
+		}
+	}
+	
+	return supermethod;
+}
+
 //--------------------------------------------------------------//
 #pragma mark -- Block --
 //--------------------------------------------------------------//
@@ -577,7 +666,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 + (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
 	// Filter
-	if (!selector || !key) {
+	if (!selector || !key || ![self hasBlockForSelector:selector key:key]) {
 		return;
 	}
 	
@@ -587,44 +676,46 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
 		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
-		if (blockInfo && blockInfos) {
-			// Replace method
-			if (blockInfo == [blockInfos lastObject]) {
-				// Get objCTypes
-				const char *objCTypes;
-				objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
-				
-				// Get supermethod
-				IMP supermethod = NULL;
-				NSUInteger index;
-				index = [blockInfos indexOfObject:blockInfo];
-				if (index == 0) {
-					supermethod = [[blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey] pointerValue];
-				}
-				else {
-					supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
-				}
-				if (!supermethod) {
-					supermethod = [self REResponder_dynamicForwardingMethod];
-				}
-				
-				// Replace method
-				class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
+		if (!blockInfo || !blockInfos) {
+			return;
+		}
+		
+		// Replace method
+		if (blockInfo == [blockInfos lastObject]) {
+			// Get objCTypes
+			const char *objCTypes;
+			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
+			
+			// Get supermethod
+			IMP supermethod = NULL;
+			NSUInteger index;
+			index = [blockInfos indexOfObject:blockInfo];
+			if (index == 0) {
+				supermethod = [[blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey] pointerValue];
+			}
+			else {
+				supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
+			}
+			if (!supermethod) {
+				supermethod = [self REResponder_dynamicForwardingMethod];
 			}
 			
-			// Remove implementation which causing releasing block as well
-			imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
-			
-			// Remove blockInfo
-			[blockInfos removeObject:blockInfo];
+			// Replace method
+			class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
 		}
+		
+		// Remove implementation which causing releasing block as well
+		imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
+		
+		// Remove blockInfo
+		[blockInfos removeObject:blockInfo];
 	}
 }
 
 - (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
 	// Filter
-	if (!selector || !key) {
+	if (!selector || !key || ![self hasBlockForSelector:selector key:key]) {
 		return;
 	}
 	
@@ -676,93 +767,22 @@ static NSString* const kBlockInfoKeyKey = @"key";
 
 + (IMP)supermethodOfCurrentBlock
 {
-	// Get imp of current block
+	// Get supermethod
+	IMP supermethod;
 	IMP imp;
 	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	if (!imp) {
-		return NULL;
-	}
-	
-	// Get supermethod
-	IMP supermethod = NULL;
-	@synchronized (self) {
-		// Get elements
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
-		SEL selector;
-		Class class;
-		class = self;
-		while (YES) {
-			blockInfo = [class REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
-			if (blockInfo) {
-				break;
-			}
-			class = [class superclass];
-			if (!class) {
-				break;
-			}
-		}
-		if (!blockInfo || !blockInfos || !selector) {
-			return NULL;
-		}
-		
-		// Check index of blockInfo
-		NSUInteger index;
-		index = [blockInfos indexOfObject:blockInfo];
-		if (index == 0) {
-			NSValue *originalMethodValue;
-			originalMethodValue = [blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey];
-			if (originalMethodValue) {
-				supermethod = [originalMethodValue pointerValue];
-			}
-			else {
-				supermethod = method_getImplementation(class_getClassMethod([class superclass], selector));
-			}
-		}
-		else {
-			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
-		}
-	}
-	if (supermethod == [self REResponder_dynamicForwardingMethod]) {
-		return NULL;
-	}
+	supermethod = [self REResponder_supermethodWithImp:imp];
 	
 	return supermethod;
 }
 
 - (IMP)supermethodOfCurrentBlock
 {
-	// Get imp of current block
+	// Get supermethod
+	IMP supermethod;
 	IMP imp;
 	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	if (!imp) {
-		return NULL;
-	}
-	
-	// Get supermethod
-	IMP supermethod = NULL;
-	@synchronized (self) {
-		// Get elements
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
-		SEL selector;
-		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
-		if (!blockInfo || !blockInfos || !selector) {
-			return NULL;
-		}
-		
-		// Check index of blockInfo
-		NSUInteger index;
-		index = [blockInfos indexOfObject:blockInfo];
-		if (index == 0) {
-			// supermethod is superclass's instance method
-			supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
-		}
-		else {
-			// supermethod is superblock's IMP
-			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
-		}
-	}
+	supermethod = [self REResponder_supermethodWithImp:imp];
 	
 	return supermethod;
 }

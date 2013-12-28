@@ -272,7 +272,9 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		__block NSDictionary *blockInfo = nil;
 		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
 			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-				if (REBlockGetImplementation(imp_getBlock([aBlockInfo[kBlockInfoImpKey] pointerValue])) == imp) {
+				IMP aImp;
+				aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
+				if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
 					blockInfo = aBlockInfo;
 					*stopB = YES;
 				}
@@ -299,7 +301,9 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		__block NSDictionary *blockInfo = nil;
 		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
 			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-				if (REBlockGetImplementation(imp_getBlock([aBlockInfo[kBlockInfoImpKey] pointerValue])) == imp) {
+				IMP aImp;
+				aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
+				if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
 					blockInfo = aBlockInfo;
 					*stopB = YES;
 				}
@@ -688,14 +692,9 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			
 			// Get supermethod
 			IMP supermethod = NULL;
-			NSUInteger index;
-			index = [blockInfos indexOfObject:blockInfo];
-			if (index == 0) {
-				supermethod = [[blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey] pointerValue];
-			}
-			else {
-				supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
-			}
+			IMP imp;
+			imp = [blockInfo[kBlockInfoImpKey] pointerValue];
+			supermethod = [self REResponder_supermethodWithImp:imp];
 			if (!supermethod) {
 				supermethod = [self REResponder_dynamicForwardingMethod];
 			}
@@ -725,39 +724,34 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
 		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
-		if (blockInfo && blockInfos) {
-			// Replace method
-			if (blockInfo == [blockInfos lastObject]) {
-				// Get objCTypes
-				const char *objCTypes;
-				objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
-				
-				// Get supermethod
-				IMP supermethod = NULL;
-				NSUInteger index;
-				index = [blockInfos indexOfObject:blockInfo];
-				if (index == 0) {
-					// supermethod is superclass's instance method
-					supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
-				}
-				else {
-					// supermethod is superblock's IMP
-					supermethod = (IMP)[blockInfos[index-1][kBlockInfoImpKey] pointerValue];
-				}
-				if (!supermethod) {
-					supermethod = [self REResponder_dynamicForwardingMethod];
-				}
-				
-				// Replace method
-				class_replaceMethod([self class], selector, supermethod, objCTypes);
+		if (!blockInfo || !blockInfos) {
+			return;
+		}
+		
+		// Replace method
+		if (blockInfo == [blockInfos lastObject]) {
+			// Get objCTypes
+			const char *objCTypes;
+			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
+			
+			// Get supermethod
+			IMP supermethod = NULL;
+			IMP imp;
+			imp = [blockInfo[kBlockInfoImpKey] pointerValue];
+			supermethod = [self REResponder_supermethodWithImp:imp];
+			if (!supermethod) {
+				supermethod = [self REResponder_dynamicForwardingMethod];
 			}
 			
-			// Remove implementation which causing releasing block as well
-			imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
-			
-			// Remove blockInfo
-			[blockInfos removeObject:blockInfo];
+			// Replace method
+			class_replaceMethod([self class], selector, supermethod, objCTypes);
 		}
+		
+		// Remove implementation which causing releasing block as well
+		imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
+		
+		// Remove blockInfo
+		[blockInfos removeObject:blockInfo];
 	}
 }
 

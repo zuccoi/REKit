@@ -6,6 +6,7 @@
 
 #import "RENormalBehaviorTests.h"
 #import "RETestObject.h"
+#import "REUtil.h"
 #import <objc/message.h>
 
 #if __has_feature(objc_arc)
@@ -118,6 +119,15 @@
 	IMP subImp;
 	imp = [obj methodForSelector:@selector(log)];
 	subImp = [subObj methodForSelector:@selector(log)];
+	STAssertEquals(imp, subImp, @"");
+}
+
+- (void)test_methodForSelectorSearchesSuperClassMethodForClass
+{
+	IMP imp;
+	IMP subImp;
+	imp = [RETestObject methodForSelector:@selector(integerWithInteger:)];
+	subImp = [RESubTestObject methodForSelector:@selector(integerWithInteger:)];
 	STAssertEquals(imp, subImp, @"");
 }
 

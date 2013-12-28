@@ -192,12 +192,75 @@
 	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
 
+- (void)test_addDynamicBlockToSubclassesOneByOne
+{
+	SEL sel = _cmd;
+	NSString *log;
+	
+	// Add _cmd
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"block";
+	}];
+	[RETestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"block";
+	}];
+	[RESubTestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"block";
+	}];
+	
+	// Call [NSObject _cmd]
+	log = objc_msgSend([NSObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RETestObject _cmd]
+	log = objc_msgSend([RETestObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Remove block of RETestObject
+	[RETestObject removeBlockForSelector:sel key:@"key"];
+	
+	// Call [NSObject _cmd]
+	log = objc_msgSend([NSObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RETestObject _cmd]
+	log = objc_msgSend([RETestObject class], sel); // Fail!!!!
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RESubTestObject _cmd]
+	log = objc_msgSend([RESubTestObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Remove block of RESubTestObject
+	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+	
+	// Call [NSObject _cmd]
+	log = objc_msgSend([NSObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RETestObject _cmd]
+	log = objc_msgSend([RETestObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Call [RESubTestObject _cmd]
+	log = objc_msgSend([RESubTestObject class], sel);
+	STAssertEqualObjects(log, @"block", @"");
+	
+	// Remove block of NSObject
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	
+	// Responds?
+	STAssertTrue(![NSObject respondsToSelector:sel], @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
+}
+
 - (void)test_addDynamicBlockToSubclasses
 {
 	SEL sel = _cmd;
 	NSString *log;
 	
-	// Add log method
+	// Add _cmd
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
 		[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
 			return @"block";
@@ -239,7 +302,7 @@
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Call [RESubTestObject _cmd]
-	log = objc_msgSend([RESubTestObject class], sel);
+	log = objc_msgSend([RESubTestObject class], sel); // EXC_BAD_ACCESS!!!
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Remove block of NSObject

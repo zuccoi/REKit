@@ -405,28 +405,23 @@ void REResponder_setBlockForSelector_key_block(id receiver, SEL selector, id inK
 	
 	// Update blocks
 	@synchronized (receiver) {
-		// Remove old one
-		[receiver removeBlockForSelector:selector key:key];
-		
-		// Get blocks
+		// Get elements
 		NSMutableDictionary *blocks;
-		blocks = [receiver associatedValueForKey:kBlocksAssociationKey];
-		
-		// Get blockInfos
 		NSMutableArray *blockInfos;
-		blockInfos = blocks[selectorName];
+		NSDictionary *oldBlockInfo;
+		blocks = [receiver associatedValueForKey:kBlocksAssociationKey];
+		oldBlockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
+		
+		// Make blocks
+		if (!blocks) {
+			blocks = [NSMutableDictionary dictionary];
+			[receiver setAssociatedValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		}
+		
+		// Make blockInfos
 		if (!blockInfos) {
-			// Associate blocks
-			if (!blocks) {
-				blocks = [NSMutableDictionary dictionary];
-				[receiver setAssociatedValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			
-			// Make blockInfos
 			blockInfos = [NSMutableArray array];
 			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			
-			// Associate original method
 			if (isClass) {
 				IMP originalMethod;
 				originalMethod = [receiver methodForSelector:selector];
@@ -437,8 +432,6 @@ void REResponder_setBlockForSelector_key_block(id receiver, SEL selector, id inK
 					[blockInfos setAssociatedValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				}
 			}
-			
-			// Set blockInfos to blocks
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
@@ -459,12 +452,32 @@ void REResponder_setBlockForSelector_key_block(id receiver, SEL selector, id inK
 		}
 		
 		// Replace method
-		class_replaceMethod(object_getClass(receiver), selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
-		
-		// Add blockInfo to blockInfos
-		NSDictionary *blockInfo;
 		IMP imp;
+		class_replaceMethod(object_getClass(receiver), selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
 		imp = [receiver methodForSelector:selector];
+		
+		// Remove oldBlockInfo
+		if (oldBlockInfo) {
+			IMP oldImp;
+			oldImp = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
+			[blockInfos removeObject:oldBlockInfo];
+			if (oldImp && oldImp != imp) {
+				// Replace method of subclasses
+				if (isClass && oldBlockInfo && ![blockInfos count]) {
+					for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+						if ([subclass methodForSelector:selector] == oldImp) {
+							class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
+						}
+					}
+				}
+				
+				// Remove block
+				imp_removeBlock(oldImp);
+			}
+		}
+		
+		// Add blockInfo
+		NSDictionary *blockInfo;
 		blockInfo = @{
 			kBlockInfoImpKey : [NSValue valueWithPointer:imp],
 			kBlockInfoKeyKey : key,

@@ -195,7 +195,51 @@
 - (void)test_addDynamicBlockToSubclassesOneByOne
 {
 	SEL sel = _cmd;
-	NSString *log;
+	
+	// Add _cmd
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"NSObject";
+	}];
+	[RETestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"RETestObject";
+	}];
+	[RESubTestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"RESubTestObject";
+	}];
+	
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"NSObject", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"RETestObject", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"RESubTestObject", @"");
+	
+	// Remove block of RETestObject
+	[RETestObject removeBlockForSelector:sel key:@"key"];
+	
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"NSObject", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"NSObject", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"RESubTestObject", @"");
+	
+	// Remove block of RESubTestObject
+	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+	
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"NSObject", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"NSObject", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"NSObject", @"");
+	
+	// Remove block of NSObject
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	
+	// Responds?
+	STAssertTrue(![NSObject respondsToSelector:sel], @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
+}
+
+- (void)test_overridingLastBlockUpdatesSubclasses
+{
+	SEL sel = _cmd;
 	
 	// Add _cmd
 	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
@@ -208,45 +252,59 @@
 		return @"block";
 	}];
 	
-	// Call [NSObject _cmd]
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
 	// Remove block of RETestObject
 	[RETestObject removeBlockForSelector:sel key:@"key"];
-	
-	// Call [NSObject _cmd]
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RESubTestObject _cmd]
-	log = objc_msgSend([RESubTestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
 	
 	// Remove block of RESubTestObject
 	[RESubTestObject removeBlockForSelector:sel key:@"key"];
 	
-	// Call [NSObject _cmd]
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
+	// Override block of NSObject
+	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		return @"overridden";
+	}];
 	
-	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RESubTestObject _cmd]
-	log = objc_msgSend([RESubTestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"overridden", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"overridden", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"overridden", @"");
 	
 	// Remove block of NSObject
+	[NSObject removeBlockForSelector:sel key:@"key"];
+	
+	// Responds?
+	STAssertTrue(![NSObject respondsToSelector:sel], @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
+}
+
+- (void)test_overrideLastBlockWithSameBlock
+{
+	SEL sel = _cmd;
+	
+	// Make block
+	NSString *(^block)(Class receiver);
+	block = ^(Class receiver) {
+		return @"block";
+	};
+	
+	// Set block
+	[NSObject setBlockForSelector:sel key:@"key" block:block];
+	[RETestObject setBlockForSelector:sel key:@"key" block:block];
+	[RESubTestObject setBlockForSelector:sel key:@"key" block:block];
+	
+	// Remove block
+	[RETestObject removeBlockForSelector:sel key:@"key"];
+	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+	
+	// Override block
+	[NSObject setBlockForSelector:sel key:@"key" block:block];
+	
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
+	
+	// Remove block
 	[NSObject removeBlockForSelector:sel key:@"key"];
 	
 	// Responds?
@@ -258,52 +316,34 @@
 - (void)test_addDynamicBlockToSubclasses
 {
 	SEL sel = _cmd;
-	NSString *log;
 	
-	// Add _cmd
+	// Add block
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
 		[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
 			return @"block";
 		}];
 	}
 	
-	// Call [NSObject _cmd]
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 	
 	// Remove block of RETestObject
 	[RETestObject removeBlockForSelector:sel key:@"key"];
 	
-	// Call [NSObject _cmd]
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RESubTestObject _cmd]
-	log = objc_msgSend([RESubTestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 	
 	// Remove block of RESubTestObject
 	[RESubTestObject removeBlockForSelector:sel key:@"key"];
 	
-	// Call [NSObject _cmd]
-	log = objc_msgSend([NSObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
-	
-	// Call [RESubTestObject _cmd]
-	log = objc_msgSend([RESubTestObject class], sel);
-	STAssertEqualObjects(log, @"block", @"");
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 	
 	// Remove block of NSObject
 	[NSObject removeBlockForSelector:sel key:@"key"];

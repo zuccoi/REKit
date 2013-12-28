@@ -513,26 +513,26 @@ BOOL REResponder_hasBlockForSelector(id receiver, SEL selector, id key)
 	return REResponder_hasBlockForSelector(self, selector, key);
 }
 
-+ (void)removeBlockForSelector:(SEL)selector key:(id)key
+void REResponder_removeBlockForSelector_key(id receiver, SEL selector, id key, BOOL isClass)
 {
 	// Filter
-	if (!selector || !key || ![self hasBlockForSelector:selector key:key]) {
+	if (!selector || !key || ![receiver hasBlockForSelector:selector key:key]) {
 		return;
 	}
 	
 	// Remove
-	@synchronized (self) {
+	@synchronized (receiver) {
 		// Get elements
 		IMP imp;
 		IMP supermethod;
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
+		blockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
 		if (!blockInfo || !blockInfos) {
 			return;
 		}
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-		supermethod = [self REResponder_supermethodWithImp:imp];
+		supermethod = [receiver REResponder_supermethodWithImp:imp];
 		if (!supermethod) {
 			supermethod = REResponder_dynamicForwardingMethod();
 		}
@@ -543,13 +543,15 @@ BOOL REResponder_hasBlockForSelector(id receiver, SEL selector, id key)
 			const char *objCTypes;
 			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 			
-			// Replace method of self
-			class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
+			// Replace method of receiver
+			class_replaceMethod(object_getClass(receiver), selector, supermethod, objCTypes);
 			
 			// Replace method of subclasses
-			for (Class subclass in RESubclassesOfClass(self, NO)) {
-				if ([subclass methodForSelector:selector] == imp) {
-					class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
+			if (isClass) {
+				for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+					if ([subclass methodForSelector:selector] == imp) {
+						class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
+					}
 				}
 			}
 		}
@@ -562,46 +564,14 @@ BOOL REResponder_hasBlockForSelector(id receiver, SEL selector, id key)
 	}
 }
 
++ (void)removeBlockForSelector:(SEL)selector key:(id)key
+{
+	REResponder_removeBlockForSelector_key(self, selector, key, YES);
+}
+
 - (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
-	// Filter
-	if (!selector || !key || ![self hasBlockForSelector:selector key:key]) {
-		return;
-	}
-	
-	// Remove
-	@synchronized (self) {
-		// Get elements
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
-		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
-		if (!blockInfo || !blockInfos) {
-			return;
-		}
-		IMP supermethod = NULL;
-		IMP imp;
-		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-		supermethod = [self REResponder_supermethodWithImp:imp];
-		if (!supermethod) {
-			supermethod = REResponder_dynamicForwardingMethod();
-		}
-		
-		// Replace method
-		if (blockInfo == [blockInfos lastObject]) {
-			// Get objCTypes
-			const char *objCTypes;
-			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
-			
-			// Replace method
-			class_replaceMethod([self class], selector, supermethod, objCTypes);
-		}
-		
-		// Remove implementation which causing releasing block as well
-		imp_removeBlock(imp);
-		
-		// Remove blockInfo
-		[blockInfos removeObject:blockInfo];
-	}
+	REResponder_removeBlockForSelector_key(self, selector, key, NO);
 }
 
 //--------------------------------------------------------------//

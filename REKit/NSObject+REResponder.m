@@ -409,8 +409,10 @@ void REResponder_setBlockForSelector_key_block(id receiver, SEL selector, id inK
 		NSMutableDictionary *blocks;
 		NSMutableArray *blockInfos;
 		NSDictionary *oldBlockInfo;
+		IMP oldImp;
 		blocks = [receiver associatedValueForKey:kBlocksAssociationKey];
 		oldBlockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
+		oldImp = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
 		
 		// Make blocks
 		if (!blocks) {
@@ -456,24 +458,21 @@ void REResponder_setBlockForSelector_key_block(id receiver, SEL selector, id inK
 		class_replaceMethod(object_getClass(receiver), selector, imp_implementationWithBlock(block), [objCTypes UTF8String]);
 		imp = [receiver methodForSelector:selector];
 		
+		// Replace method of subclasses
+		if (isClass) {
+			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+				IMP subImp;
+				subImp = [subclass methodForSelector:selector];
+				if (subImp == oldImp || subImp == REResponder_dynamicForwardingMethod()) {
+					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
+				}
+			}
+		}
+		
 		// Remove oldBlockInfo
 		if (oldBlockInfo) {
-			IMP oldImp;
-			oldImp = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
 			[blockInfos removeObject:oldBlockInfo];
-			if (oldImp && oldImp != imp) {
-				// Replace method of subclasses
-				if (isClass && oldBlockInfo && ![blockInfos count]) {
-					for (Class subclass in RESubclassesOfClass(receiver, NO)) {
-						if ([subclass methodForSelector:selector] == oldImp) {
-							class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
-						}
-					}
-				}
-				
-				// Remove block
-				imp_removeBlock(oldImp);
-			}
+			imp_removeBlock(oldImp);
 		}
 		
 		// Add blockInfo

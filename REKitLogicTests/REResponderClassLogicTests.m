@@ -111,6 +111,35 @@
 	STAssertFalse([NSNumber respondsToSelector:sel], @"");
 }
 
+- (void)test_dynamicBlockAffectSubclassesConnectedToForwardingMethod
+{
+	SEL sel = _cmd;
+	
+	// Add block
+	[RETestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"RETestObject";
+	}];
+	[RESubTestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"RESubTestObject";
+	}];
+	
+	// Remove block
+	[RETestObject removeBlockForSelector:sel key:@"key"];
+	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+	STAssertEquals([RETestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertEquals([RESubTestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	
+	// Add block to NSObject
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		return @"block";
+	}];
+	
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
+}
+
 - (void)test_overrideBlockAffectSubclasses
 {
 	SEL sel = @selector(version);

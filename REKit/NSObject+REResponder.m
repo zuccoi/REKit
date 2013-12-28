@@ -477,7 +477,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	
 	// Get key
 	id key;
-	key = (inKey != nil ? inKey : REUUIDString());
+	key = (inKey ? inKey : REUUIDString());
 	
 	// Get selectorName
 	NSString *selectorName;
@@ -554,7 +554,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	
 	// Get key
 	id key;
-	key = (inKey != nil ? inKey : REUUIDString());
+	key = (inKey ? inKey : REUUIDString());
 	
 	// Get selectorName
 	NSString *selectorName;

@@ -36,7 +36,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 #pragma mark -- Setup --
 //--------------------------------------------------------------//
 
-+ (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
+BOOL REREsponder_conformsToProtocol(id receiver, Protocol *protocol)
 {
 	// Filter
 	if (!protocol) {
@@ -44,15 +44,15 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	}
 	
 	// original
-	if ([self REResponder_X_conformsToProtocol:protocol]) {
+	if ([receiver REResponder_X_conformsToProtocol:protocol]) {
 		return YES;
 	}
 	
 	// Check protocols
-	@synchronized (self) {
+	@synchronized (receiver) {
 		// Get protocols
 		NSMutableDictionary *protocols;
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
+		protocols = [receiver associatedValueForKey:kProtocolsAssociationKey];
 		if (!protocols) {
 			return NO;
 		}
@@ -74,74 +74,40 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	}
 }
 
++ (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
+{
+	return REREsponder_conformsToProtocol(self, protocol);
+}
+
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
-	// Filter
-	if (!protocol) {
-		return NO;
-	}
-	
-	// original
-	if ([self REResponder_X_conformsToProtocol:protocol]) {
-		return YES;
-	}
-	
-	// Check protocols
-	@synchronized (self) {
-		// Get protocols
-		NSMutableDictionary *protocols;
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
-		if (!protocols) {
-			return NO;
+	return REREsponder_conformsToProtocol(self, protocol);
+}
+
+BOOL REResponder_respondsToSelector(id receiver, SEL aSelector)
+{
+	@synchronized (receiver) {
+		BOOL responds;
+		responds = [receiver REResponder_X_respondsToSelector:aSelector];
+		if (responds) {
+			// Forwarding method?
+			if ([receiver methodForSelector:aSelector] == [receiver methodForSelector:@selector(REResponder_UnexistingMethod)]) {
+				responds = NO;
+			}
 		}
 		
-		// Find protocolName
-		NSString *protocolName;
-		__block BOOL found = NO;
-		protocolName = NSStringFromProtocol(protocol);
-		[protocols enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString *aProtocolName, NSMutableDictionary *protocolInfo, BOOL *stop) {
-			if ([aProtocolName isEqualToString:protocolName]
-				|| [protocolInfo[kProtocolInfoIncorporatedProtocolNamesKey] containsObject:protocolName]
-			){
-				found = YES;
-				*stop = YES;
-			}
-		}];
-		
-		return found;
+		return responds;
 	}
 }
 
 + (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
-	@synchronized (self) {
-		BOOL responds;
-		responds = [self REResponder_X_respondsToSelector:aSelector];
-		if (responds) {
-			// Forwarding method?
-			if ([self methodForSelector:aSelector] == [self REResponder_dynamicForwardingMethod]) {
-				responds = NO;
-			}
-		}
-		
-		return responds;
-	}
+	return REResponder_respondsToSelector(self, aSelector);
 }
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
-	@synchronized (self) {
-		BOOL responds;
-		responds = [self REResponder_X_respondsToSelector:aSelector];
-		if (responds) {
-			// Forwarding method?
-			if ([self methodForSelector:aSelector] == [self REResponder_dynamicForwardingMethod]) {
-				responds = NO;
-			}
-		}
-		
-		return responds;
-	}
+	return REResponder_respondsToSelector(self, aSelector);
 }
 
 - (void)REResponder_X_dealloc
@@ -213,23 +179,44 @@ static NSString* const kBlockInfoKeyKey = @"key";
 #pragma mark -- Util --
 //--------------------------------------------------------------//
 
-+ (IMP)REResponder_dynamicForwardingMethod
+IMP REResponder_dynamicForwardingMethod()
 {
-	return [self methodForSelector:@selector(REResponder_UnexistingMethod)];
+	return [NSObject methodForSelector:@selector(REResponder_UnexistingMethod)];
 }
 
-- (IMP)REResponder_dynamicForwardingMethod
+IMP REResponder_implementationWithBacktraceDepth(int depth)
 {
-	return [self methodForSelector:@selector(REResponder_UnexistingMethod)];
+	// Get trace
+	int num;
+	void *trace[depth + 1];
+	num = backtrace(trace, (depth + 1));
+	if (num < (depth + 1)) {
+		return NULL;
+	}
+	
+	// Get imp
+	IMP imp;
+	Dl_info callerInfo;
+	if (!dladdr(trace[depth], &callerInfo)) {
+		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
+		return NULL;
+	}
+	imp = callerInfo.dli_saddr;
+	if (!imp) {
+		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
+		return NULL;
+	}
+	
+	return imp;
 }
 
-+ (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos
+NSDictionary* REResponder_blockInfoForSelector_key_blockInfos(id receiver, SEL selector, id key, NSMutableArray **outBlockInfos)
 {
-	@synchronized (self) {
+	@synchronized (receiver) {
 		// Get blockInfo
 		__block NSDictionary *blockInfo = nil;
 		NSMutableArray *blockInfos;
-		blockInfos = [self associatedValueForKey:kBlocksAssociationKey][NSStringFromSelector(selector)];
+		blockInfos = [receiver associatedValueForKey:kBlocksAssociationKey][NSStringFromSelector(selector)];
 		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stop) {
 			if ([aBlockInfo[kBlockInfoKeyKey] isEqual:key]) {
 				blockInfo = aBlockInfo;
@@ -244,22 +231,40 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	}
 }
 
++ (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos
+{
+	return REResponder_blockInfoForSelector_key_blockInfos(self, selector, key, outBlockInfos);
+}
+
 - (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos
 {
-	@synchronized (self) {
+	return REResponder_blockInfoForSelector_key_blockInfos(self, selector, key, outBlockInfos);
+}
+
+NSDictionary* REResponder_blockInfoWithImplementation_blockInfos_selector(id receiver, IMP imp, NSMutableArray **outBlockInfos, SEL *outSelector)
+{
+	@synchronized (receiver) {
 		// Get blockInfo
 		__block NSDictionary *blockInfo = nil;
-		NSMutableArray *blockInfos;
-		blockInfos = [self associatedValueForKey:kBlocksAssociationKey][NSStringFromSelector(selector)];
-		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stop) {
-			if ([aBlockInfo[kBlockInfoKeyKey] isEqual:key]) {
-				blockInfo = aBlockInfo;
-				*stop = YES;
+		[[receiver associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
+			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
+				IMP aImp;
+				aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
+				if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
+					blockInfo = aBlockInfo;
+					*stopB = YES;
+				}
+			}];
+			if (blockInfo) {
+				if (outSelector) {
+					*outSelector = NSSelectorFromString(aSelectorName);
+				}
+				if (outBlockInfos) {
+					*outBlockInfos = aBlockInfos;
+				}
+				*stopA = YES;
 			}
 		}];
-		if (outBlockInfos) {
-			*outBlockInfos = blockInfos;
-		}
 		
 		return blockInfo;
 	}
@@ -267,112 +272,12 @@ static NSString* const kBlockInfoKeyKey = @"key";
 
 + (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
 {
-	@synchronized (self) {
-		// Get blockInfo
-		__block NSDictionary *blockInfo = nil;
-		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
-			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-				IMP aImp;
-				aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
-				if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
-					blockInfo = aBlockInfo;
-					*stopB = YES;
-				}
-			}];
-			if (blockInfo) {
-				if (outSelector) {
-					*outSelector = NSSelectorFromString(aSelectorName);
-				}
-				if (outBlockInfos) {
-					*outBlockInfos = aBlockInfos;
-				}
-				*stopA = YES;
-			}
-		}];
-		
-		return blockInfo;
-	}
+	return REResponder_blockInfoWithImplementation_blockInfos_selector(self, imp, outBlockInfos, outSelector);
 }
 
 - (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
 {
-	@synchronized (self) {
-		// Get blockInfo
-		__block NSDictionary *blockInfo = nil;
-		[[self associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
-			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-				IMP aImp;
-				aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
-				if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
-					blockInfo = aBlockInfo;
-					*stopB = YES;
-				}
-			}];
-			if (blockInfo) {
-				if (outSelector) {
-					*outSelector = NSSelectorFromString(aSelectorName);
-				}
-				if (outBlockInfos) {
-					*outBlockInfos = aBlockInfos;
-				}
-				*stopA = YES;
-			}
-		}];
-		
-		return blockInfo;
-	}
-}
-
-+ (IMP)REResponder_implementationWithBacktraceDepth:(int)depth
-{
-	// Get trace
-	int num;
-	void *trace[depth + 1];
-	num = backtrace(trace, (depth + 1));
-	if (num < (depth + 1)) {
-		return NULL;
-	}
-	
-	// Get imp
-	IMP imp;
-	Dl_info callerInfo;
-	if (!dladdr(trace[depth], &callerInfo)) {
-		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	imp = callerInfo.dli_saddr;
-	if (!imp) {
-		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	
-	return imp;
-}
-
-- (IMP)REResponder_implementationWithBacktraceDepth:(int)depth
-{
-	// Get trace
-	int num;
-	void *trace[depth + 1];
-	num = backtrace(trace, (depth + 1));
-	if (num < (depth + 1)) {
-		return NULL;
-	}
-	
-	// Get imp
-	IMP imp;
-	Dl_info callerInfo;
-	if (!dladdr(trace[depth], &callerInfo)) {
-		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	imp = callerInfo.dli_saddr;
-	if (!imp) {
-		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	
-	return imp;
+	return REResponder_blockInfoWithImplementation_blockInfos_selector(self, imp, outBlockInfos, outSelector);
 }
 
 + (IMP)REResponder_supermethodWithImp:(IMP)imp
@@ -422,7 +327,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
 		}
 	}
-	if (supermethod == [self REResponder_dynamicForwardingMethod]) {
+	if (supermethod == REResponder_dynamicForwardingMethod()) {
 		return NULL;
 	}
 	
@@ -525,7 +430,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			IMP originalMethod;
 			originalMethod = [self methodForSelector:selector];
 			if (originalMethod
-				&& originalMethod != [self REResponder_dynamicForwardingMethod]
+				&& originalMethod != REResponder_dynamicForwardingMethod()
 				&& originalMethod != [[self superclass] methodForSelector:selector]
 			){
 				[blockInfos setAssociatedValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -632,42 +537,34 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	}
 }
 
-+ (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
+BOOL REResponder_hasBlockForSelector(id receiver, SEL selector, id key)
 {
 	// Filter
 	if (!selector || !key) {
 		return NO;
 	}
 	
-	// Get block
-	IMP blockImp;
-	@synchronized (self) {
+	@synchronized (receiver) {
+		// Get block
+		IMP blockImp;
+		
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:nil];
+		blockInfo = REResponder_blockInfoForSelector_key_blockInfos(receiver, selector, key, nil);
 		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
+		
+		return (blockImp != NULL);
 	}
-	
-	return (blockImp != NULL);
+}
+
++ (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
+{
+	return REResponder_hasBlockForSelector(self, selector, key);
 }
 
 - (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
 {
-	// Filter
-	if (!selector || !key) {
-		return NO;
-	}
-	
-	// Get block
-	IMP blockImp;
-	@synchronized (self) {
-		// Get blockInfo
-		NSDictionary *blockInfo;
-		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:nil];
-		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
-	}
-	
-	return (blockImp != NULL);
+	return REResponder_hasBlockForSelector(self, selector, key);
 }
 
 + (void)removeBlockForSelector:(SEL)selector key:(id)key
@@ -691,7 +588,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
 		supermethod = [self REResponder_supermethodWithImp:imp];
 		if (!supermethod) {
-			supermethod = [self REResponder_dynamicForwardingMethod];
+			supermethod = REResponder_dynamicForwardingMethod();
 		}
 		
 		// Replace method
@@ -740,7 +637,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
 		supermethod = [self REResponder_supermethodWithImp:imp];
 		if (!supermethod) {
-			supermethod = [self REResponder_dynamicForwardingMethod];
+			supermethod = REResponder_dynamicForwardingMethod();
 		}
 		
 		// Replace method
@@ -765,75 +662,63 @@ static NSString* const kBlockInfoKeyKey = @"key";
 #pragma mark -- Current Block --
 //--------------------------------------------------------------//
 
-+ (IMP)supermethodOfCurrentBlock
+IMP REResponder_supermethodOfCurrentBlock(id receiver)
 {
 	// Get supermethod
 	IMP supermethod;
 	IMP imp;
-	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	supermethod = [self REResponder_supermethodWithImp:imp];
+	imp = REResponder_implementationWithBacktraceDepth(3);
+	supermethod = [receiver REResponder_supermethodWithImp:imp];
 	
 	return supermethod;
+}
+
++ (IMP)supermethodOfCurrentBlock
+{
+	return REResponder_supermethodOfCurrentBlock(self);
 }
 
 - (IMP)supermethodOfCurrentBlock
 {
-	// Get supermethod
-	IMP supermethod;
+	return REResponder_supermethodOfCurrentBlock(self);
+}
+
+void REResponder_removeCurrentBlock(id receiver)
+{
+	// Get imp of current block
 	IMP imp;
-	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	supermethod = [self REResponder_supermethodWithImp:imp];
+	imp = REResponder_implementationWithBacktraceDepth(3);
+	if (!imp) {
+		return;
+	}
 	
-	return supermethod;
+	// Get elements
+	NSDictionary *blockInfo;
+	SEL selector;
+	blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
+	if (!blockInfo || !selector) {
+		return;
+	}
+	
+	// Call removeBlockForSelector:forKey:
+	[receiver removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
 }
 
 + (void)removeCurrentBlock
 {
-	// Get imp of current block
-	IMP imp;
-	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	if (!imp) {
-		return;
-	}
-	
-	// Get elements
-	NSDictionary *blockInfo;
-	SEL selector;
-	blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
-	if (!blockInfo || !selector) {
-		return;
-	}
-	
-	// Call removeBlockForSelector:forKey:
-	[self removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+	REResponder_removeCurrentBlock(self);
 }
 
 - (void)removeCurrentBlock
 {
-	// Get imp of current block
-	IMP imp;
-	imp = [self REResponder_implementationWithBacktraceDepth:2];
-	if (!imp) {
-		return;
-	}
-	
-	// Get elements
-	NSDictionary *blockInfo;
-	SEL selector;
-	blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
-	if (!blockInfo || !selector) {
-		return;
-	}
-	
-	// Call removeBlockForSelector:forKey:
-	[self removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+	REResponder_removeCurrentBlock(self);
 }
 
 //--------------------------------------------------------------//
 #pragma mark -- Conformance --
 //--------------------------------------------------------------//
 
-+ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
+void REResponder_setConformable_toProtocol_key(id receiver, BOOL conformable, Protocol *protocol, id inKey)
 {
 	// Filter
 	if (!protocol || (!conformable && !inKey)) {
@@ -845,13 +730,13 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	key = inKey ? inKey : REUUIDString();
 	
 	// Update REResponder_protocols
-	@synchronized (self) {
+	@synchronized (receiver) {
 		// Get elements
 		NSString *protocolName;
 		NSMutableDictionary *protocols;
 		NSMutableDictionary *protocolInfo;
 		protocolName = NSStringFromProtocol(protocol);
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
+		protocols = [receiver associatedValueForKey:kProtocolsAssociationKey];
 		protocolInfo = protocols[protocolName];
 		
 		// Add key
@@ -859,7 +744,7 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			// Associate protocols
 			if (!protocols) {
 				protocols = [NSMutableDictionary dictionary];
-				[self setAssociatedValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[receiver setAssociatedValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
 			// Set protocolInfo to protocols
@@ -916,87 +801,14 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	}
 }
 
++ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
+{
+	REResponder_setConformable_toProtocol_key(self, conformable, protocol, inKey);
+}
+
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
 {
-	// Filter
-	if (!protocol || (!conformable && !inKey)) {
-		return;
-	}
-	
-	// Get key
-	id key;
-	key = inKey ? inKey : REUUIDString();
-	
-	// Update REResponder_protocols
-	@synchronized (self) {
-		// Get elements
-		NSString *protocolName;
-		NSMutableDictionary *protocols;
-		NSMutableDictionary *protocolInfo;
-		protocolName = NSStringFromProtocol(protocol);
-		protocols = [self associatedValueForKey:kProtocolsAssociationKey];
-		protocolInfo = protocols[protocolName];
-		
-		// Add key
-		if (conformable) {
-			// Associate protocols
-			if (!protocols) {
-				protocols = [NSMutableDictionary dictionary];
-				[self setAssociatedValue:protocols forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			
-			// Set protocolInfo to protocols
-			if (!protocolInfo) {
-				protocolInfo = [NSMutableDictionary dictionary];
-				protocolInfo[kProtocolInfoKeysKey] = [NSMutableSet set];
-				protocols[protocolName] = protocolInfo;
-			}
-			
-			// Make incorporatedProtocolNames
-			NSMutableSet *incorporatedProtocolNames;
-			incorporatedProtocolNames = protocolInfo[kProtocolInfoIncorporatedProtocolNamesKey];
-			if (!incorporatedProtocolNames) {
-				// Set incorporatedProtocolNames to protocolInfo
-				incorporatedProtocolNames = [NSMutableSet set];
-				protocolInfo[kProtocolInfoIncorporatedProtocolNamesKey] = incorporatedProtocolNames;
-				
-				// Add protocol names
-				unsigned int count;
-				Protocol **protocols;
-				Protocol *aProtocol;
-				protocols = protocol_copyProtocolList(protocol, &count);
-				for (int i = 0; i < count; i++) {
-					aProtocol = protocols[i];
-					[incorporatedProtocolNames addObject:NSStringFromProtocol(aProtocol)];
-				}
-			}
-			
-			// Add key to keys
-			NSMutableSet *keys;
-			keys = protocolInfo[kProtocolInfoKeysKey];
-			if ([keys containsObject:key]) {
-				return;
-			}
-			[keys addObject:key];
-		}
-		// Remove key
-		else {
-			// Filter
-			if (!protocolInfo) {
-				return;
-			}
-			
-			// Remove key from keys
-			NSMutableSet *keys;
-			keys = protocolInfo[kProtocolInfoKeysKey];
-			[keys removeObject:key];
-			
-			// Remove protocolInfo
-			if (![keys count]) {
-				[protocols removeObjectForKey:protocolName];
-			}
-		}
-	}
+	REResponder_setConformable_toProtocol_key(self, conformable, protocol, inKey);
 }
 
 @end

@@ -524,7 +524,10 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			// Associate original method
 			IMP originalMethod;
 			originalMethod = [self methodForSelector:selector];
-			if (originalMethod && originalMethod != [self REResponder_dynamicForwardingMethod]) {
+			if (originalMethod
+				&& originalMethod != [self REResponder_dynamicForwardingMethod]
+				&& originalMethod != [[self superclass] methodForSelector:selector]
+			){
 				[blockInfos setAssociatedValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			[blocks setObject:blockInfos forKey:selectorName];

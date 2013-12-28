@@ -6,7 +6,6 @@
 
 #import "RENormalBehaviorTests.h"
 #import "RETestObject.h"
-#import "REUtil.h"
 #import <objc/message.h>
 
 #if __has_feature(objc_arc)

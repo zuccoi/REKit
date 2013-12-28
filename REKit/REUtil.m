@@ -117,15 +117,8 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 		superClass = aClass;
 		do {
 			superClass = class_getSuperclass(superClass);
-		} while(superClass && superClass != cls);
+		} while (superClass && superClass != cls);
 		if (!superClass) {
-			continue;
-		}
-		
-		// Check className
-		NSString *className;
-		className = NSStringFromClass(aClass);
-		if ([className hasPrefix:@"REResponder_"] || [className hasPrefix:@"NSKVONotifying_"]) {
 			continue;
 		}
 		

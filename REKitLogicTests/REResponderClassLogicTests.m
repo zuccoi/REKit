@@ -192,7 +192,6 @@
 	STAssertEquals(rect, CGRectMake(100.0, 200.0, 300.0, 400.0), @"");
 }
 
-#if 0
 - (void)test_addDynamicBlockToSubclassesOneByOne
 {
 	SEL sel = _cmd;
@@ -225,7 +224,7 @@
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel); // Fail!!!!
+	log = objc_msgSend([RETestObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Call [RESubTestObject _cmd]
@@ -284,7 +283,7 @@
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Call [RETestObject _cmd]
-	log = objc_msgSend([RETestObject class], sel); // Fail!!!!
+	log = objc_msgSend([RETestObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Call [RESubTestObject _cmd]
@@ -303,7 +302,7 @@
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Call [RESubTestObject _cmd]
-	log = objc_msgSend([RESubTestObject class], sel); // EXC_BAD_ACCESS!!!
+	log = objc_msgSend([RESubTestObject class], sel);
 	STAssertEqualObjects(log, @"block", @"");
 	
 	// Remove block of NSObject
@@ -314,7 +313,6 @@
 	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
 	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
 }
-#endif
 
 - (void)test_receiverIsClass
 {

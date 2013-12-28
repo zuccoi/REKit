@@ -680,11 +680,18 @@ static NSString* const kBlockInfoKeyKey = @"key";
 	// Remove
 	@synchronized (self) {
 		// Get elements
+		IMP imp;
+		IMP supermethod;
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
 		blockInfo = [self REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos];
 		if (!blockInfo || !blockInfos) {
 			return;
+		}
+		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
+		supermethod = [self REResponder_supermethodWithImp:imp];
+		if (!supermethod) {
+			supermethod = [self REResponder_dynamicForwardingMethod];
 		}
 		
 		// Replace method
@@ -693,21 +700,19 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			const char *objCTypes;
 			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 			
-			// Get supermethod
-			IMP supermethod = NULL;
-			IMP imp;
-			imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-			supermethod = [self REResponder_supermethodWithImp:imp];
-			if (!supermethod) {
-				supermethod = [self REResponder_dynamicForwardingMethod];
-			}
-			
-			// Replace method
+			// Replace method of self
 			class_replaceMethod(object_getClass(self), selector, supermethod, objCTypes);
+			
+			// Replace method of subclasses
+			for (Class subclass in RESubclassesOfClass(self, NO)) {
+				if ([subclass methodForSelector:selector] == imp) {
+					class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
+				}
+			}
 		}
 		
 		// Remove implementation which causing releasing block as well
-		imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
+		imp_removeBlock(imp);
 		
 		// Remove blockInfo
 		[blockInfos removeObject:blockInfo];
@@ -730,6 +735,13 @@ static NSString* const kBlockInfoKeyKey = @"key";
 		if (!blockInfo || !blockInfos) {
 			return;
 		}
+		IMP supermethod = NULL;
+		IMP imp;
+		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
+		supermethod = [self REResponder_supermethodWithImp:imp];
+		if (!supermethod) {
+			supermethod = [self REResponder_dynamicForwardingMethod];
+		}
 		
 		// Replace method
 		if (blockInfo == [blockInfos lastObject]) {
@@ -737,21 +749,12 @@ static NSString* const kBlockInfoKeyKey = @"key";
 			const char *objCTypes;
 			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 			
-			// Get supermethod
-			IMP supermethod = NULL;
-			IMP imp;
-			imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-			supermethod = [self REResponder_supermethodWithImp:imp];
-			if (!supermethod) {
-				supermethod = [self REResponder_dynamicForwardingMethod];
-			}
-			
 			// Replace method
 			class_replaceMethod([self class], selector, supermethod, objCTypes);
 		}
 		
 		// Remove implementation which causing releasing block as well
-		imp_removeBlock([blockInfo[kBlockInfoImpKey] pointerValue]);
+		imp_removeBlock(imp);
 		
 		// Remove blockInfo
 		[blockInfos removeObject:blockInfo];

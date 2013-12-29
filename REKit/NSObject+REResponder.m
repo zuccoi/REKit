@@ -76,12 +76,20 @@ BOOL REREsponder_conformsToProtocol(id receiver, Protocol *protocol)
 
 + (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
-	return REREsponder_conformsToProtocol(self, protocol);
+	BOOL conforms = NO;
+	Class class;
+	class = self;
+	while (!conforms && class) {
+		conforms = REREsponder_conformsToProtocol(class, protocol);
+		class = [class superclass];
+	}
+	
+	return conforms;
 }
 
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
-	return REREsponder_conformsToProtocol(self, protocol);
+	return (REREsponder_conformsToProtocol(self, protocol) || [[self class] conformsToProtocol:protocol]);
 }
 
 BOOL REResponder_respondsToSelector(id receiver, SEL aSelector)

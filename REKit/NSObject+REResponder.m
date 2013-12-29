@@ -18,6 +18,7 @@
 static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kBlocksAssociationKey = @"REResponder_blocks";
+static NSString* const kInstancesBlocksAssociationKey = @"REResponder_instaceBlocks";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
@@ -150,8 +151,8 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			[self setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			
 			// Remove blocks
-			NSMutableDictionary *blocks;
-			blocks = [self associatedValueForKey:kBlocksAssociationKey];
+			NSDictionary *blocks;
+			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kBlocksAssociationKey]];
 			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
 				while ([blockInfos count]) {
 					NSDictionary *blockInfo;
@@ -243,13 +244,29 @@ IMP REResponderImplementationWithBacktraceDepth(int depth)
 	return imp;
 }
 
+NSMutableDictionary* REResponderBlocks(id receiver, REResponderOperation op, BOOL create)
+{
+	NSMutableDictionary *blocks;
+	NSString *key;
+	key = (op == REResponderOperationInstances ? kInstancesBlocksAssociationKey : kBlocksAssociationKey);
+	blocks = [receiver associatedValueForKey:key];
+	if (!blocks && create) {
+		blocks = [NSMutableDictionary dictionary];
+		[receiver setAssociatedValue:blocks forKey:key policy:OBJC_ASSOCIATION_RETAIN];
+	}
+	
+	return blocks;
+}
+
 NSDictionary* REResponderBlockInfoForSelector(id receiver, SEL selector, id key, NSMutableArray **outBlockInfos, REResponderOperation op)
 {
 	@synchronized (receiver) {
 		// Get blockInfo
 		__block NSDictionary *blockInfo = nil;
 		NSMutableArray *blockInfos;
-		blockInfos = [receiver associatedValueForKey:kBlocksAssociationKey][NSStringFromSelector(selector)];
+		NSMutableDictionary *blocks;
+		blocks = REResponderBlocks(receiver, op, NO);
+		blockInfos = blocks[NSStringFromSelector(selector)];
 		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stop) {
 			if ([aBlockInfo[kBlockInfoOperationKey] integerValue] == op
 				&& [aBlockInfo[kBlockInfoKeyKey] isEqual:key]
@@ -279,27 +296,49 @@ NSDictionary* REResponderBlockInfoForSelector(id receiver, SEL selector, id key,
 NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMutableArray **outBlockInfos, SEL *outSelector)
 {
 	@synchronized (receiver) {
-		// Get blockInfo
+		// Get blockInfo 
 		__block NSDictionary *blockInfo = nil;
-		[[receiver associatedValueForKey:kBlocksAssociationKey] enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
-			[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-				IMP aImp;
-				aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
-				if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
-					blockInfo = aBlockInfo;
-					*stopB = YES;
+		
+		// Make blockInfoBlock
+		void (^blockInfoBlock)(NSMutableDictionary *blocks);
+		blockInfoBlock = ^(NSMutableDictionary *blocks) {
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
+				[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
+					IMP aImp;
+					aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
+					if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
+						blockInfo = aBlockInfo;
+						*stopB = YES;
+					}
+				}];
+				if (blockInfo) {
+					if (outSelector) {
+						*outSelector = NSSelectorFromString(aSelectorName);
+					}
+					if (outBlockInfos) {
+						*outBlockInfos = aBlockInfos;
+					}
+					*stopA = YES;
 				}
 			}];
-			if (blockInfo) {
-				if (outSelector) {
-					*outSelector = NSSelectorFromString(aSelectorName);
-				}
-				if (outBlockInfos) {
-					*outBlockInfos = aBlockInfos;
-				}
-				*stopA = YES;
-			}
-		}];
+		};
+		
+		// Search object block
+		if (receiver != [receiver class]) {
+			blockInfoBlock(REResponderBlocks(receiver, REResponderOperationObject, NO));
+		}
+		if (blockInfo) {
+			return blockInfo;
+		}
+		
+		// Search instances block
+		blockInfoBlock(REResponderBlocks(receiver, REResponderOperationInstances, NO));
+		if (blockInfo) {
+			return blockInfo;
+		}
+		
+		// Search class block
+		blockInfoBlock(REResponderBlocks(receiver, REResponderOperationClass, NO));
 		
 		return blockInfo;
 	}
@@ -447,15 +486,9 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		NSMutableArray *blockInfos;
 		NSDictionary *oldBlockInfo;
 		IMP oldImp;
-		blocks = [receiver associatedValueForKey:kBlocksAssociationKey];
+		blocks = REResponderBlocks(receiver, op, YES);
 		oldBlockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos operation:op];
 		oldImp = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
-		
-		// Make blocks
-		if (!blocks) {
-			blocks = [NSMutableDictionary dictionary];
-			[receiver setAssociatedValue:blocks forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-		}
 		
 		// Make blockInfos
 		if (!blockInfos) {
@@ -595,7 +628,11 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResponderOperation op)
 {
 	// Filter
-	if (!selector || !key || ![receiver hasBlockForSelector:selector key:key]) {
+	if (!selector
+		|| !key
+		|| (op == REResponderOperationInstances && ![receiver hasBlockForInstanceMethodForSelector:selector key:key])
+		|| (op != REResponderOperationInstances && ![receiver hasBlockForSelector:selector key:key])
+	){
 		return;
 	}
 	
@@ -623,13 +660,20 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 			
 			// Replace method of receiver
-			class_replaceMethod(object_getClass(receiver), selector, supermethod, objCTypes);
+			class_replaceMethod((op == REResponderOperationInstances ? receiver : object_getClass(receiver)), selector, supermethod, objCTypes);
 			
 			// Replace method of subclasses
 			if (op == REResponderOperationClass) {
 				for (Class subclass in RESubclassesOfClass(receiver, NO)) {
 					if ([subclass methodForSelector:selector] == imp) {
 						class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
+					}
+				}
+			}
+			else if (op == REResponderOperationInstances) {
+				for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+					if ([subclass instanceMethodForSelector:selector] == imp) {
+						class_replaceMethod(subclass, selector, supermethod, objCTypes);
 					}
 				}
 			}
@@ -640,6 +684,13 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		
 		// Remove blockInfo
 		[blockInfos removeObject:blockInfo];
+		
+		// Remove blockInfos
+		if (![blockInfos count]) {
+			NSMutableDictionary *blocks;
+			blocks = REResponderBlocks(receiver, op, NO);
+			[blocks removeObjectForKey:NSStringFromSelector(selector)];
+		}
 	}
 }
 

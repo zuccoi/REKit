@@ -21,11 +21,16 @@
 	// Reset all classes
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
 		// Remove blocks
-		NSDictionary *blocks;
+		NSMutableDictionary *blocks;
 		blocks = [aClass associatedValueForKey:@"REResponder_blocks"];
 		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
 			[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
 				objc_msgSend(aClass, @selector(removeBlockForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
+			}];
+		}];
+		blocks = [aClass associatedValueForKey:@"REResponder_instaceBlocks"];
+		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
+			[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
 				objc_msgSend(aClass, @selector(removeBlockForInstanceMethodForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
 			}];
 		}];

@@ -154,7 +154,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 + (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
 {
-	objc_setAssociatedObject(object_getClass(self), key, value, policy);
+	objc_setAssociatedObject(self, key, value, policy);
 }
 
 - (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
@@ -164,7 +164,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 + (id)associatedValueForKey:(void*)key
 {
-	return objc_getAssociatedObject(object_getClass(self), key);
+	return objc_getAssociatedObject(self, key);
 }
 
 - (id)associatedValueForKey:(void*)key

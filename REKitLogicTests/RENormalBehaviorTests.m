@@ -181,4 +181,28 @@
 	STAssertFalse([array respondsToSelector:sel], @"");
 }
 
+- (void)test_valueAssociatedToMetaClassIsObtainableUsingClassInstance
+{
+	// Associate
+	objc_setAssociatedObject(object_getClass([NSObject class]), "key", @"value", OBJC_ASSOCIATION_RETAIN);
+	
+	// Check associated value
+	STAssertEqualObjects(objc_getAssociatedObject(object_getClass([NSObject class]), "key"), @"value", @"");
+	
+	// Check class instance's one
+	STAssertEqualObjects(objc_getAssociatedObject([NSObject class], "key"), @"value", @"");
+}
+
+- (void)test_valueAssociatedToClassInstanceIsNotObtainableUsingMetaClass
+{
+	// Associate
+	objc_setAssociatedObject([NSObject class], "key", @"value", OBJC_ASSOCIATION_RETAIN);
+	
+	// Check associated value
+	STAssertEqualObjects(objc_getAssociatedObject([NSObject class], "key"), @"value", @"");
+	
+	// Check value of meta class
+	STAssertNil(objc_getAssociatedObject(object_getClass([NSObject class]), "key"), @"");
+}
+
 @end

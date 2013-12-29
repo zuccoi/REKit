@@ -1221,18 +1221,22 @@
 	// Check
 	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
+	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Set NSObject conformable to protocol
 	[NSObject setConformable:YES toProtocol:protocol key:key];
 	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
 	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Set NSObject not-conformable to protocol
 	[NSObject setConformable:NO toProtocol:protocol key:key];
 	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
-	STAssertFalse([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:protocol], @"");
 }
 
 - (void)test_setConformableToProtocol__conformsToIncorporatedProtocols
@@ -1243,10 +1247,12 @@
 	[NSObject setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
 - (void)test_setConformableToProtocol__canNotRemoveIncorporatedProtocol
@@ -1261,10 +1267,12 @@
 	[NSObject setConformable:NO toProtocol:@protocol(NSCoding) key:@"key"];
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
 - (void)test_setConformableToProtocol__managesProtocolsBySpecifiedProtocol
@@ -1278,10 +1286,12 @@
 	[NSObject setConformable:NO toProtocol:@protocol(NSSecureCoding) key:@"key"];
 	STAssertTrue(![NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue(![obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-	STAssertTrue(![[NSArray array] conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue(![RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue(![[RETestObject testObject] conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 	
 	// Set NSObject conformable to NSSecureCoding and NSCoding then remove NSCoding
 	[NSObject setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
@@ -1289,10 +1299,12 @@
 	[NSObject setConformable:NO toProtocol:@protocol(NSCoding) key:@"key"];
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSSecureCoding)], @"");
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
 - (void)test_setConformableToProtocol__withNilKey
@@ -1304,7 +1316,8 @@
 	[NSObject setConformable:YES toProtocol:@protocol(NSCoding) key:nil];
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
 - (void)test_setConformableToProtocol__withInvalidArguments
@@ -1329,13 +1342,15 @@
 	[NSObject setConformable:NO toProtocol:nil key:key];
 	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
 	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Try to set NSObject not-conformable with nil-key
 	[NSObject setConformable:NO toProtocol:protocol key:nil];
 	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
 	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Set NSObject not-conformable
 	[NSObject setConformable:NO toProtocol:protocol key:key];
@@ -1357,25 +1372,29 @@
 	[NSObject setConformable:YES toProtocol:protocol key:key];
 	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
 	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Set NSObject conformable to the protocol with other key
 	[NSObject setConformable:YES toProtocol:protocol key:@"OtherKey"];
 	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
 	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Try to set NSObject not-conformable to the protocol
 	[NSObject setConformable:NO toProtocol:protocol key:@"OtherKey"];
 	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
 	STAssertTrue([obj conformsToProtocol:protocol], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:protocol], @"");
 	
 	// Set NSObject not-conformable to the protocol
 	[NSObject setConformable:NO toProtocol:protocol key:key];
 	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
-	STAssertFalse([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:protocol], @"");
 }
 
 - (void)test_setConformableToProtocol__doesNotStackSameKeyForAProtocol
@@ -1393,7 +1412,8 @@
 	[NSObject setConformable:NO toProtocol:protocol key:key];
 	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
-	STAssertFalse([[NSArray array] conformsToProtocol:protocol], @"");
+	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:protocol], @"");
 }
 
 - (void)test_setConformableToProtocol__allowsSameKeyForOtherProtocol
@@ -1409,28 +1429,34 @@
 	[NSObject setConformable:YES toProtocol:@protocol(NSCoding) key:key];
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCopying)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCopying)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCopying)], @"");
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 	
 	// Set obj not-conformable to NSCopying
 	[NSObject setConformable:NO toProtocol:@protocol(NSCopying) key:key];
 	STAssertFalse([NSObject conformsToProtocol:@protocol(NSCopying)], @"");
 	STAssertFalse([obj conformsToProtocol:@protocol(NSCopying)], @"");
-	STAssertFalse([[NSArray array] conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertFalse([RETestObject conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:@protocol(NSCopying)], @"");
 	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertTrue([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 	
 	// Set obj not-conformable to NSCoding
 	[NSObject setConformable:NO toProtocol:@protocol(NSCoding) key:key];
 	STAssertFalse([NSObject conformsToProtocol:@protocol(NSCopying)], @"");
 	STAssertFalse([obj conformsToProtocol:@protocol(NSCopying)], @"");
-	STAssertFalse([[NSArray array] conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertFalse([RETestObject conformsToProtocol:@protocol(NSCopying)], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:@protocol(NSCopying)], @"");
 	STAssertFalse([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
 	STAssertFalse([obj conformsToProtocol:@protocol(NSCoding)], @"");
-	STAssertFalse([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertFalse([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
+	STAssertFalse([[RETestObject testObject] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
 - (void)test_setConformableToProtocol__keyIsDeallocated

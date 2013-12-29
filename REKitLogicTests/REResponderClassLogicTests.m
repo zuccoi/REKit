@@ -1307,7 +1307,7 @@
 	STAssertTrue([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
-- (void)test_setConformableToProtocolWithInvalidArguments
+- (void)test_setConformableToProtocol__withInvalidArguments
 {
 	// Make elements
 	Protocol *protocol;
@@ -1343,7 +1343,7 @@
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
 }
 
-- (void)test_setConformableToProtocolkeyMethodStacksKeys
+- (void)test_setConformableToProtocol__stacksKeys
 {
 	// Make elements
 	Protocol *protocol;
@@ -1378,7 +1378,7 @@
 	STAssertFalse([[NSArray array] conformsToProtocol:protocol], @"");
 }
 
-- (void)test_setConformableToProtocolDoesNotStackSameKeyForAProtocol
+- (void)test_setConformableToProtocol__doesNotStackSameKeyForAProtocol
 {
 	Protocol *protocol;
 	NSString *key;
@@ -1396,7 +1396,7 @@
 	STAssertFalse([[NSArray array] conformsToProtocol:protocol], @"");
 }
 
-- (void)test_setConformableToProtocolAllowsSameKeyForOtherProtocol
+- (void)test_setConformableToProtocol__allowsSameKeyForOtherProtocol
 {
 	// Get elements
 	NSString *key;
@@ -1433,7 +1433,7 @@
 	STAssertFalse([[NSArray array] conformsToProtocol:@protocol(NSCoding)], @"");
 }
 
-- (void)test_keyOfProtocolIsDeallocated
+- (void)test_setConformableToProtocol__keyIsDeallocated
 {
 	__block BOOL deallocated = NO;
 	
@@ -1463,7 +1463,7 @@
 	STAssertTrue(deallocated, @"");
 }
 
-- (void)test_respondsToSelector_callWithNil
+- (void)test_respondsToSelector__callWithNil
 {
 	// Make obj
 	BOOL responds;
@@ -1471,7 +1471,7 @@
 	STAssertFalse(responds, @"");
 }
 
-- (void)test_conformsToProtocol_callWithNil
+- (void)test_conformsToProtocol__callWithNil
 {
 	// Make obj
 	BOOL conforms;

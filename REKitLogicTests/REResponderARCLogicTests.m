@@ -30,7 +30,7 @@
 			RETestObject *context;
 			SEL dealloc;
 			dealloc = NSSelectorFromString(@"dealloc");
-			context = [RETestObject testObject];
+			context = [RETestObject object];
 			[context setBlockForSelector:dealloc key:nil block:^(id receiver) {
 				// Raise deallocated flag
 				deallocated = YES;

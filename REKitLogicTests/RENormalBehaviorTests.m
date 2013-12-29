@@ -18,7 +18,7 @@
 - (void)test_classMethodReturnsClassInstance
 {
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	STAssertEquals([NSObject class], [obj class], @"");
 	STAssertEquals([NSObject class], [[obj class] class], @"");
@@ -28,7 +28,7 @@
 - (void)test_object_getClassReturnsClassInstanceForInstance
 {
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	STAssertEquals([NSObject class], object_getClass(obj), @"");
 }
@@ -36,7 +36,7 @@
 - (void)test_object_getClassReturnsMetaClassForClassInstance
 {
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	STAssertFalse(object_getClass([NSObject class]) == [NSObject class], @"");
 	STAssertEquals(object_getClass([NSObject class]), object_getClass([obj class]), @"");
@@ -52,7 +52,7 @@
 	SEL sel = @selector(unexistingMethod);
 	
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	STAssertEquals([obj methodForSelector:sel], [NSObject methodForSelector:sel], @"");
 	STAssertEquals([NSObject instanceMethodForSelector:sel], [NSObject methodForSelector:sel], @"");
 }
@@ -98,7 +98,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Check
 	imp = [obj methodForSelector:sel];
@@ -162,7 +162,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Check
 	STAssertFalse([obj respondsToSelector:sel], @"");
@@ -170,8 +170,7 @@
 
 - (void)test_classInstanceDoesNotRespondToInstanceMethod
 {
-	SEL sel = @selector(count);
-	STAssertFalse([NSArray respondsToSelector:sel], @"");
+	STAssertFalse([RETestObject respondsToSelector:@selector(log)], @"");
 }
 
 - (void)test_instanceDoesNotRespondsToClassMethod

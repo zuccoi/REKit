@@ -21,11 +21,11 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
@@ -149,11 +149,11 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
@@ -224,11 +224,11 @@
 	// Make objs
 	NSArray *objs;
 	RETestObject *obj0, *obj1;
-	objs = @[(obj0 = [RETestObject testObject]), (obj1 = [RETestObject testObject])];
+	objs = @[(obj0 = [RETestObject object]), (obj1 = [RETestObject object])];
 	
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
@@ -367,7 +367,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	__block BOOL observed = NO;
@@ -388,7 +388,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
@@ -406,7 +406,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	obj.name = @"old name";
 	
 	// Add observer
@@ -425,7 +425,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	__block BOOL observed = NO;
@@ -439,7 +439,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	__block NSUInteger count = 0;
@@ -474,10 +474,10 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
@@ -510,7 +510,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer then remove it
 	id observer;
@@ -530,7 +530,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer for name
 	__block NSString *recognizedName = nil;
@@ -587,7 +587,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer for name
 	__block NSString *recognizedName = nil;
@@ -644,12 +644,12 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
 	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
@@ -697,12 +697,12 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
 	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
@@ -751,12 +751,12 @@
 	// Make objs
 	NSArray *objs;
 	RETestObject *obj0, *obj1;
-	objs = @[(obj0 = [RETestObject testObject]), (obj1 = [RETestObject testObject])];
+	objs = @[(obj0 = [RETestObject object]), (obj1 = [RETestObject object])];
 	
 	// Add observer for name
 	id observer;
 	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
@@ -806,7 +806,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	@autoreleasepool {
 		// Start observing
@@ -830,12 +830,12 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	@autoreleasepool {
 		// Start observing
 		id observer;
-		observer = [[[NSObject alloc] init] autorelease];
+		observer = [NSObject object];
 		[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 		
 		// observer will be deallocated…
@@ -851,7 +851,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Start observing
 		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
@@ -879,12 +879,12 @@
 {
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Start observing
 		[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
@@ -901,7 +901,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Start observing
 		id observer;
@@ -939,7 +939,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Strt observing
 		id observer;
@@ -972,7 +972,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Strt observing
 		id observer;

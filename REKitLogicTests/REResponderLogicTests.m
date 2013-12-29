@@ -23,7 +23,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Responds to log method dynamically
 	[obj setBlockForSelector:sel key:nil block:^NSString*(id receiver) {
@@ -32,8 +32,9 @@
 	log = [obj performSelector:sel];
 	STAssertEqualObjects(log, @"block", @"");
 	
-	// Don't affect to class
+	// Don't affect class
 	STAssertFalse([NSObject respondsToSelector:sel], @"");
+	STAssertFalse([NSObject instancesRespondToSelector:sel], @"");
 	STAssertFalse([[obj class] respondsToSelector:sel], @"");
 }
 
@@ -44,7 +45,7 @@
 	// You can override hardcoded method
 	NSString *log;
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	[obj setBlockForSelector:sel key:nil block:^NSString*(id receiver) {
 		return @"Overridden log";
 	}];
@@ -53,6 +54,7 @@
 	
 	// Don't affect to class
 	STAssertFalse([NSObject respondsToSelector:sel], @"");
+	STAssertFalse([NSObject instancesRespondToSelector:sel], @"");
 	STAssertFalse([[obj class] respondsToSelector:sel], @"");
 }
 
@@ -61,8 +63,8 @@
 	// Make obj and otherObj
 	id obj;
 	id otherObj;
-	obj = [[[NSObject alloc] init] autorelease];
-	otherObj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
+	otherObj = [NSObject object];
 	
 	// Add dynamic block to obj
 	[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -80,8 +82,8 @@
 	// Make obj and otherObj
 	RETestObject *obj;
 	RETestObject *otherObj;
-	obj = [RETestObject testObject];
-	otherObj = [RETestObject testObject];
+	obj = [RETestObject object];
+	otherObj = [RETestObject object];
 	
 	// Override log method of obj
 	[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -100,7 +102,7 @@
 	@autoreleasepool {
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		
 		// Add log method
 		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -133,7 +135,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Override log method
 		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -166,7 +168,7 @@
 	@autoreleasepool {
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(dealloc) key:obj block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
@@ -190,7 +192,7 @@
 	@autoreleasepool {
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
 			// Do something…
 			receiver = receiver;
@@ -218,7 +220,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
 			return @"Overridden log";
 		}];
@@ -245,7 +247,7 @@
 	@autoreleasepool {
 		// Prepare key
 		id key;
-		key = [[[NSObject alloc] init] autorelease];
+		key = [NSObject object];
 		[key setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
@@ -259,7 +261,7 @@
 		
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
 			// Do something
 			receiver = receiver;
@@ -276,7 +278,7 @@
 	@autoreleasepool {
 		// Prepare key
 		id key;
-		key = [[[NSObject alloc] init] autorelease];
+		key = [NSObject object];
 		[key setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
@@ -290,7 +292,7 @@
 		
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Override log method using key
 		[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
@@ -313,7 +315,7 @@
 //	@autoreleasepool {
 //		// Make obj
 //		id obj;
-//		obj = [[[NSObject alloc] init] autorelease];
+//		obj = [NSObject object];
 //		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
 //			// Do something…
 //		}];
@@ -346,7 +348,7 @@
 //	@autoreleasepool {
 //		// Make obj
 //		id obj;
-//		obj = [[[NSObject alloc] init] autorelease];
+//		obj = [NSObject object];
 //		
 //		// Add log method
 //		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -393,7 +395,7 @@
 //	@autoreleasepool {
 //		// Make obj
 //		id obj;
-//		obj = [[[NSObject alloc] init] autorelease];
+//		obj = [NSObject object];
 //		
 //		// Add log method
 //		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -437,7 +439,7 @@
 	@autoreleasepool {
 		// Make context
 		id context;
-		context = [[[NSObject alloc] init] autorelease];
+		context = [NSObject object];
 		[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
@@ -451,7 +453,7 @@
 		
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
 			// Use context
 			id ctx;
@@ -482,7 +484,7 @@
 	@autoreleasepool {
 		// Make context
 		id context;
-		context = [[[NSObject alloc] init] autorelease];
+		context = [NSObject object];
 		[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
@@ -496,7 +498,7 @@
 		
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
 			// Use context
 			id ctx;
@@ -535,7 +537,7 @@
 	@autoreleasepool {
 		// Make context
 		id context;
-		context = [[[NSObject alloc] init] autorelease];
+		context = [NSObject object];
 		[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
@@ -549,7 +551,7 @@
 		
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise isObjDeallocated
 			isObjDeallocated = YES;
@@ -591,7 +593,7 @@
 	@autoreleasepool {
 		// Make context
 		id context;
-		context = [[[NSObject alloc] init] autorelease];
+		context = [NSObject object];
 		[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
@@ -638,7 +640,7 @@
 	@autoreleasepool {
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		[obj setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise isObjDeallocated
 			isObjDeallocated = YES;
@@ -653,7 +655,7 @@
 		@autoreleasepool {
 			// Make context
 			__autoreleasing id context;
-			context = [[[NSObject alloc] init] autorelease];
+			context = [NSObject object];
 			[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 				// Raise deallocated flag
 				isContextDeallocated = YES;
@@ -690,12 +692,12 @@
 	@autoreleasepool {
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		
 		@autoreleasepool {
 			// Make context
 			RETestObject *context;
-			context = [RETestObject testObject];
+			context = [RETestObject object];
 			[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 				// Raise deallocated flag
 				deallocated = YES;
@@ -734,7 +736,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add block with arguments
 	[obj setBlockForSelector:@selector(logWithSuffix:) key:nil block:^NSString*(id receiver, NSString *suffix) {
@@ -753,7 +755,7 @@
 	CGRect rect;
 	
 	// Make obj
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add block
 	[obj setBlockForSelector:sel key:@"block" block:^CGRect(id receiver, CGPoint origin, CGSize size) {
@@ -782,7 +784,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add doSomething method
 	[obj setBlockForSelector:@selector(doSomething) key:nil block:^(id receiver) {
@@ -800,7 +802,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add log block
 	[obj setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {
@@ -820,7 +822,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add block for log method with key
 	[obj setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {
@@ -857,7 +859,7 @@
 	
 	// Make test obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add log block
 	[obj setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {
@@ -882,7 +884,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 	
 	// Add block1
@@ -945,7 +947,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add block1
 	[obj setBlockForSelector:(sel = @selector(readThis:)) key:@"block1" block:^(id receiver, NSString *string) {
@@ -968,7 +970,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Add bock1
@@ -1033,7 +1035,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add block with key
 	[obj setBlockForSelector:sel key:@"key" block:^NSString*(id receiver) {
@@ -1065,7 +1067,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add block with key
 	[obj setBlockForSelector:sel key:@"key" block:^NSString*(id receiver) {
@@ -1098,7 +1100,7 @@
 	SEL sel = @selector(log);
 	
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	for (id anObj in @[obj, obj]) {
 		[anObj setBlockForSelector:sel key:@"key" block:^(id receiver) {
 			return @"block";
@@ -1142,8 +1144,8 @@
 	
 	id obj1, obj2;
 	RETestObject *obj3;
-	obj1 = [[[NSObject alloc] init] autorelease];
-	obj2 = [[[NSObject alloc] init] autorelease];
+	obj1 = [NSObject object];
+	obj2 = [NSObject object];
 	obj3 = [[[RETestObject alloc] init] autorelease];
 	
 	// Share block
@@ -1189,7 +1191,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add block
 	[obj setBlockForSelector:sel key:@"key" block:block];
@@ -1210,7 +1212,7 @@
 	
 	// Make obj
 	NSObject *obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add log method
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
@@ -1235,7 +1237,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add block1
 	[obj setBlockForSelector:sel key:@"block1" block:^NSString*(id receiver) {
@@ -1329,7 +1331,7 @@
 	NSString *log;
 	
 	// Make obj
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add block1
 	[obj setBlockForSelector:sel key:@"block1" block:^NSString*(id receiver) {
@@ -1425,7 +1427,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	obj.age = 10;
 	
 	// Override age method
@@ -1456,7 +1458,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	obj.age = 10;
 	
 	// Override age method
@@ -1485,7 +1487,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	obj.rect = CGRectMake(10.0f, 20.0f, 30.0f, 40.0f);
 	
 	// Override rect method
@@ -1512,7 +1514,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	[obj setBlockForSelector:@selector(sayHello) key:nil block:^(id receiver) {
 		// supermethod
 		IMP supermethod;
@@ -1527,7 +1529,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Get supermethod
 	IMP supermethod;
@@ -1539,7 +1541,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add log method
 	[obj setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {
@@ -1561,7 +1563,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add log method
 	[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
@@ -1581,7 +1583,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Call removeCurrentBlock
 	STAssertNoThrow([obj removeCurrentBlock], @"");
@@ -1602,7 +1604,7 @@
 {
 	// Make obj
 	NSObject *obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Add log method
 	[obj setBlockForSelector:@selector(log) key:@"logBlock" block:^(id receiver) {
@@ -1630,7 +1632,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Override log method
 	[obj setBlockForSelector:@selector(log) key:@"logBlock" block:^(id receiver) {
@@ -1658,7 +1660,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Override log method
 	[obj setBlockForSelector:@selector(log) key:@"logBlock" block:^(id receiver) {
@@ -1679,7 +1681,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	STAssertFalse([obj conformsToProtocol:protocol], @"");
 	
 	// Set obj conformable to protocol
@@ -1695,7 +1697,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set obj conformable to NSSecureCoding
 	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
@@ -1707,7 +1709,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set obj conformable to NSSecureCoding
 	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
@@ -1722,7 +1724,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set obj conformable to NSSecureCoding and NSCoding then remove NSSecureCoding
 	[obj setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
@@ -1743,7 +1745,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set conformable
 	[obj setConformable:YES toProtocol:@protocol(NSCoding) key:nil];
@@ -1760,7 +1762,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Try to set obj conformable with nil-protocol
 	[obj setConformable:YES toProtocol:nil key:key];
@@ -1792,7 +1794,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set obj conformable to the protocol with key
 	[obj setConformable:YES toProtocol:protocol key:key];
@@ -1820,7 +1822,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set obj conformable to the protocol
 	[obj setConformable:YES toProtocol:protocol key:key];
@@ -1837,7 +1839,7 @@
 	
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	
 	// Set obj conformable to NSCopying and NSCoding
 	[obj setConformable:YES toProtocol:@protocol(NSCopying) key:key];
@@ -1863,7 +1865,7 @@
 	@autoreleasepool {
 		// Prepare key
 		id key;
-		key = [[[NSObject alloc] init] autorelease];
+		key = [NSObject object];
 		[key setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
@@ -1877,7 +1879,7 @@
 		
 		// Make obj
 		id obj;
-		obj = [[[NSObject alloc] init] autorelease];
+		obj = [NSObject object];
 		
 		// Set obj conformable to NSCopying and NSCoding
 		[obj setConformable:YES toProtocol:@protocol(NSCopying) key:key];
@@ -1893,7 +1895,7 @@
 	// Make obj
 	id obj;
 	BOOL responds;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	STAssertNoThrow(responds = [obj respondsToSelector:nil], @"");
 	STAssertTrue(!responds, @"");
 }
@@ -1902,7 +1904,7 @@
 {
 	// Make obj
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	STAssertNoThrow([obj conformsToProtocol:nil], @"");
 }
 
@@ -1931,7 +1933,7 @@
 	
 	// Don't affect to instances
 	id obj;
-	obj = [[[NSObject alloc] init] autorelease];
+	obj = [NSObject object];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 	
 	// Remove block
@@ -1941,12 +1943,12 @@
 
 //- (void)test_overrideHardcodedMethod_class
 //{
-//	SEL selector = @selector(testObject);
+//	SEL selector = @selector(object);
 //	// Override testObject method
 //	[RETestObject setBlockForSelector:selector key:nil block:^(id receiver) {
 //		
 //	RETestObject *obj;
-//	obj = [RETestObject testObject];
+//	obj = [RETestObject object];
 //	[obj setBlockForSelector:@selector(log) key:nil block:^NSString*(id receiver) {
 //		return @"Overridden log";
 //	}];

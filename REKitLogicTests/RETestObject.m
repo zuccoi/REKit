@@ -11,16 +11,25 @@
 #endif
 
 
-@implementation RETestObject
+@implementation NSObject (RETest)
 
 //--------------------------------------------------------------//
 #pragma mark -- Object --
 //--------------------------------------------------------------//
 
-+ (instancetype)testObject
++ (instancetype)object
 {
-	return [[[RETestObject alloc] init] autorelease];
+	return [[[self alloc] init] autorelease];
 }
+
+@end
+
+
+@implementation RETestObject
+
+//--------------------------------------------------------------//
+#pragma mark -- Object --
+//--------------------------------------------------------------//
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {

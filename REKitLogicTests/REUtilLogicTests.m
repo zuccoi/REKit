@@ -54,7 +54,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Call willChangeClass
 	[obj willChangeClass:[NSArray class]];
@@ -72,7 +72,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Call didChangeClass
 	[obj didChangeClass:[RETestObject class]];

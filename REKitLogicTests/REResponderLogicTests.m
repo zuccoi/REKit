@@ -16,6 +16,39 @@
 
 @implementation REResponderLogicTests
 
+- (void)tearDown
+{
+	// Reset all classes
+	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
+		// Remove blocks
+		NSMutableDictionary *blocks;
+		blocks = [aClass associatedValueForKey:@"REResponder_blocks"];
+		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
+			[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
+				objc_msgSend(aClass, @selector(removeBlockForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
+			}];
+		}];
+		blocks = [aClass associatedValueForKey:@"REResponder_instaceBlocks"];
+		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
+			[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
+				objc_msgSend(aClass, @selector(removeBlockForInstanceMethodForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
+			}];
+		}];
+		
+		// Remove protocols
+		NSDictionary *protocols;
+		protocols = [aClass associatedValueForKey:@"REResponder_protocols"];
+		[protocols enumerateKeysAndObjectsUsingBlock:^(NSString *protocolName, NSDictionary *protocolInfo, BOOL *stop) {
+			[protocolInfo[@"keys"] enumerateObjectsUsingBlock:^(NSString *aKey, NSUInteger idx, BOOL *stop) {
+				[aClass setConformable:NO toProtocol:NSProtocolFromString(protocolName) key:aKey];
+			}];
+		}];
+	}
+	
+	// super
+	[super tearDown];
+}
+
 - (void)test_respondsToUnimplementedMethod
 {
 	SEL sel = @selector(log);
@@ -53,9 +86,10 @@
 	STAssertEqualObjects(log, @"Overridden log", @"");
 	
 	// Don't affect to class
-	STAssertFalse([NSObject respondsToSelector:sel], @"");
-	STAssertFalse([NSObject instancesRespondToSelector:sel], @"");
-	STAssertFalse([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	STAssertTrue([RETestObject instancesRespondToSelector:sel], @"");
+	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([[obj class] instancesRespondToSelector:sel], @"");
 }
 
 - (void)test_dynamicBlockDoesNotAffectOtherInstances

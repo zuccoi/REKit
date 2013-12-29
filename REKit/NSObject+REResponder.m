@@ -441,6 +441,9 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
 		}
 	}
+	if (supermethod == REResponderForwardingMethod()) {
+		return NULL;
+	}
 	
 	return supermethod;
 }

@@ -456,6 +456,15 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		return;
 	}
 	
+	// Don't set block to private class
+	if (receiver == [receiver class]) {
+		NSString *className;
+		className = NSStringFromClass(receiver);
+		if ([className hasPrefix:kClassNamePrefix]) {
+			return;
+		}
+	}
+	
 	// Get key
 	id key;
 	key = (inKey ? inKey : REUUIDString());

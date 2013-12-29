@@ -15,10 +15,13 @@ typedef void (*REVoidIMP)(id, SEL, ...);
 
 // Block
 + (void)setBlockForSelector:(SEL)selector key:(id)key block:(id)block;
++ (void)setBlockForInstanceMethodForSelector:(SEL)selector key:(id)key block:(id)block;
 - (void)setBlockForSelector:(SEL)selector key:(id)key block:(id)block;
 + (BOOL)hasBlockForSelector:(SEL)selector key:(id)key;
++ (BOOL)hasBlockForInstanceMethodForSelector:(SEL)selector key:(id)key;
 - (BOOL)hasBlockForSelector:(SEL)selector key:(id)key;
 + (void)removeBlockForSelector:(SEL)selector key:(id)key;
++ (void)removeBlockForInstanceMethodForSelector:(SEL)selector key:(id)key;
 - (void)removeBlockForSelector:(SEL)selector key:(id)key;
 
 // Current Block

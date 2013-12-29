@@ -54,6 +54,12 @@
          location = "group:REResponderClassLogicTests.m">
       </FileRef>
       <FileRef
+         location = "group:REResponderInstanceLogicTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderInstanceLogicTests.m">
+      </FileRef>
+      <FileRef
          location = "group:REResponderLogicTests.h">
       </FileRef>
       <FileRef

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB27729018704F1B0023FD70 /* REResponderInstanceLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB27728F18704F1B0023FD70 /* REResponderInstanceLogicTests.m */; };
 		EB55780E16887865003DBEAB /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EB55780D16887865003DBEAB /* MainStoryboard.storyboard */; };
 		EB8535F018689B7C0043D9A1 /* REResponderClassLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB8535EF18689B7C0043D9A1 /* REResponderClassLogicTests.m */; };
 		EBA420AE167DE1A10052D11E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420AD167DE1A10052D11E /* UIKit.framework */; };
@@ -50,6 +51,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EB27728E18704F1B0023FD70 /* REResponderInstanceLogicTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REResponderInstanceLogicTests.h; path = ../../REKitLogicTests/REResponderInstanceLogicTests.h; sourceTree = "<group>"; };
+		EB27728F18704F1B0023FD70 /* REResponderInstanceLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = REResponderInstanceLogicTests.m; path = ../../REKitLogicTests/REResponderInstanceLogicTests.m; sourceTree = "<group>"; };
 		EB55780D16887865003DBEAB /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard.storyboard; path = iOS_REKit/MainStoryboard.storyboard; sourceTree = "<group>"; };
 		EB8535EE18689B7C0043D9A1 /* REResponderClassLogicTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REResponderClassLogicTests.h; path = ../../REKitLogicTests/REResponderClassLogicTests.h; sourceTree = "<group>"; };
 		EB8535EF18689B7C0043D9A1 /* REResponderClassLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassLogicTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -189,6 +192,8 @@
 				EBBF6615169040EC00B66BCE /* REResponderARCLogicTests.m */,
 				EB8535EE18689B7C0043D9A1 /* REResponderClassLogicTests.h */,
 				EB8535EF18689B7C0043D9A1 /* REResponderClassLogicTests.m */,
+				EB27728E18704F1B0023FD70 /* REResponderInstanceLogicTests.h */,
+				EB27728F18704F1B0023FD70 /* REResponderInstanceLogicTests.m */,
 				EBA42147167DE2A30052D11E /* REResponderLogicTests.h */,
 				EBA42148167DE2A30052D11E /* REResponderLogicTests.m */,
 				EBA42149167DE2A30052D11E /* RETestObject.h */,
@@ -368,6 +373,7 @@
 				EBFA6ECE186C6F0E0026B98D /* RENormalBehaviorTests.m in Sources */,
 				EBA42174167DFE280052D11E /* REUtilLogicTests.m in Sources */,
 				EBA42132167DE2130052D11E /* NSObject+REObserver.m in Sources */,
+				EB27729018704F1B0023FD70 /* REResponderInstanceLogicTests.m in Sources */,
 				EBA42134167DE2130052D11E /* NSObject+REResponder.m in Sources */,
 				EBA42136167DE2130052D11E /* REUtil.m in Sources */,
 			);

@@ -490,6 +490,11 @@ void REResponder_setBlockForSelector_key_block(id receiver, SEL selector, id inK
 	REResponder_setBlockForSelector_key_block(self, selector, inKey, block, YES);
 }
 
++ (void)setBlockForInstanceMethodForSelector:(SEL)selector key:(id)key block:(id)block
+{
+	// Not Implemented >>>
+}
+
 - (void)setBlockForSelector:(SEL)selector key:(id)inKey block:(id)block
 {
 	REResponder_setBlockForSelector_key_block(self, selector, inKey, block, NO);
@@ -518,6 +523,12 @@ BOOL REResponder_hasBlockForSelector(id receiver, SEL selector, id key)
 + (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
 {
 	return REResponder_hasBlockForSelector(self, selector, key);
+}
+
++ (BOOL)hasBlockForInstanceMethodForSelector:(SEL)selector key:(id)key
+{
+	// Not Implemented >>>
+	return NO;
 }
 
 - (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
@@ -579,6 +590,11 @@ void REResponder_removeBlockForSelector_key(id receiver, SEL selector, id key, B
 + (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
 	REResponder_removeBlockForSelector_key(self, selector, key, YES);
+}
+
++ (void)removeBlockForInstanceMethodForSelector:(SEL)selector key:(id)key
+{
+	// Not Implemented >>>
 }
 
 - (void)removeBlockForSelector:(SEL)selector key:(id)key

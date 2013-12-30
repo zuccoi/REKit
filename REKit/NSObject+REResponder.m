@@ -368,13 +368,13 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 		}
 		
 		// Search instances block
-		blockInfoBlock(REResponderBlocks(receiver, REResponderOperationInstances, NO));
+		blockInfoBlock(REResponderBlocks([receiver class], REResponderOperationInstances, NO));
 		if (blockInfo) {
 			return blockInfo;
 		}
 		
 		// Search class block
-		blockInfoBlock(REResponderBlocks(receiver, REResponderOperationClass, NO));
+		blockInfoBlock(REResponderBlocks([receiver class], REResponderOperationClass, NO));
 		
 		return blockInfo;
 	}

@@ -62,98 +62,174 @@
 	[super tearDown];
 }
 
-//- (void)test_dynamicBlock
-//{
-//	SEL sel = @selector(log);
-//	NSString *log;
-//	id obj = [NSObject object];
-//	
-//	// Responds?
-//	STAssertFalse([[NSObject object] respondsToSelector:sel], @"");
-//	
-//	// Responds to log method dynamically
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-//		// Check receiver
-//		STAssertEquals(receiver, obj, @"");
-//		
-//		return @"block";
-//	}];
-//	
-//	// Check imp
-//	STAssertTrue([NSObject methodForSelector:sel] != [NSObject instanceMethodForSelector:sel], @"");
-//	
-//	// Responds to selector?
-//	STAssertTrue(![[NSObject class] respondsToSelector:sel], @"");
-//	STAssertTrue([NSObject instancesRespondToSelector:sel], @"");
-//	STAssertTrue([obj respondsToSelector:sel], @"");
-//	
-//	// Call the sel
-//	log = objc_msgSend(obj, sel);
-//	STAssertEqualObjects(log, @"block", @"");
-//}
+- (void)test_dynamicBlock
+{
+	SEL sel = @selector(log);
+	NSString *log;
+	id obj = [NSObject object];
+	
+	// Responds to log method dynamically
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Call the sel
+	log = objc_msgSend(obj, sel);
+	STAssertEqualObjects(log, @"block", @"");
+}
 
-//- (void)test_overrideBlock
-//{
-//	SEL sel = @selector(log);
-//	
-//	// Override
-//	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-//		return @"overridden";
-//	}];
-//	
-//	// Responds?
-//	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
-//	STAssertTrue([RETestObject instancesRespondToSelector:sel], @"");
-//	STAssertTrue([[RETestObject object] respondsToSelector:sel], @"");
-//	
-//	// Check log
-//	STAssertEqualObjects([[RETestObject object] log], @"overridden", @"");
-//}
-//
-//- (void)test_dynamicBlockAffectSubclasses
-//{
-//	SEL sel = @selector(log);
-//	
-//	// Responds to log method dynamically
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Responds?
-//	STAssertTrue([@(1) respondsToSelector:sel], @"");
-//	
-//	// Check log
-//	STAssertEqualObjects(objc_msgSend(@(1), sel), @"block", @"");
-//}
+- (void)test_methodOfDynamicBlock
+{
+	SEL sel = @selector(log);
+	id obj = [RESubTestObject object];
+	
+	// Responds to log method dynamically
+	[RESubTestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	STAssertTrue([RESubTestObject instancesRespondToSelector:sel], @"");
+	
+	// Get method
+	IMP method;
+	method = [RESubTestObject instanceMethodForSelector:sel];
+	
+	// Don't affet class method
+	STAssertTrue([RESubTestObject methodForSelector:sel] != method, @"");
+	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
+	
+	// Affect to instance
+	STAssertEquals([obj methodForSelector:sel], method, @"");
+	STAssertTrue([obj respondsToSelector:sel], @"");
+	
+	// Don't affect superclass
+	STAssertTrue([NSObject methodForSelector:sel] != method, @"");
+	STAssertTrue(![NSObject respondsToSelector:sel], @"");
+	STAssertTrue([NSObject instanceMethodForSelector:sel] != method, @"");
+	STAssertTrue(![NSObject instancesRespondToSelector:sel], @"");
+	STAssertTrue([[NSObject object] methodForSelector:sel] != method, @"");
+	STAssertTrue(![[NSObject object] respondsToSelector:sel], @"");
+}
 
-//- (void)test_dynamicBlockAffectSubclassesConnectedToForwardingMethod
-//{
-//	SEL sel = _cmd;
-//	
-//	// Add block
-//	[RETestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-//		return @"RETestObject";
-//	}];
-//	[RESubTestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-//		return @"RESubTestObject";
-//	}];
-//	
-//	// Remove block
-//	[RETestObject removeBlockForSelector:sel key:@"key"];
-//	[RESubTestObject removeBlockForSelector:sel key:@"key"];
-//	STAssertEquals([RETestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
-//	STAssertEquals([RESubTestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
-//	
-//	// Add block to NSObject
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Check returned string
-//	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
-//}
+- (void)test_overrideBlock
+{
+	SEL sel = @selector(log);
+	
+	// Override
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		return @"overridden";
+	}];
+	
+	// Check log
+	STAssertEqualObjects([[RETestObject object] log], @"overridden", @"");
+}
+
+- (void)test_methodOfOverrideBlock
+{
+	SEL sel = @selector(log);
+	id obj = [RETestObject object];
+	
+	// Override log method
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	STAssertTrue([RETestObject instancesRespondToSelector:sel], @"");
+	
+	// Get method
+	IMP method;
+	method = [RETestObject instanceMethodForSelector:sel];
+	
+	// Don't affect class method
+	STAssertTrue([RETestObject methodForSelector:sel] != method, @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	
+	// Affect instance
+	STAssertEquals([obj methodForSelector:sel], method, @"");
+	STAssertTrue([obj respondsToSelector:sel], @"");
+	
+	// Don't affect superclass
+	STAssertTrue([NSObject methodForSelector:sel] != method, @"");
+	STAssertTrue(![NSObject respondsToSelector:sel], @"");
+	STAssertTrue([NSObject instanceMethodForSelector:sel] != method, @"");
+	STAssertTrue(![NSObject instancesRespondToSelector:sel], @"");
+	STAssertTrue([[NSObject object] methodForSelector:sel] != method, @"");
+	STAssertTrue(![[NSObject object] respondsToSelector:sel], @"");
+}
+
+- (void)test_receiverOfDynamicBlock
+{
+	SEL sel = @selector(log);
+	id obj = [NSObject object];
+	
+	// Set block
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		STAssertEqualObjects(receiver, obj, @"");
+		return @"block";
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+}
+
+- (void)test_receiverOfOverrideBlock
+{
+	SEL sel = @selector(log);
+	id obj = [RETestObject object];
+	
+	// Set block
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		STAssertEqualObjects(receiver, obj, @"");
+		return @"block";
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+}
+
+- (void)test_dynamicBlockAffectSubclasses
+{
+	SEL sel = @selector(log);
+	
+	// Responds to log method dynamically
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Responds?
+	STAssertTrue([NSNumber instancesRespondToSelector:sel], @"");
+	STAssertTrue([@(1) respondsToSelector:sel], @"");
+	
+	// Check log
+	STAssertEqualObjects(objc_msgSend(@(1), sel), @"block", @"");
+}
+
+- (void)test_dynamicBlockAffectSubclassesConnectedToForwardingMethod
+{
+	SEL sel = _cmd;
+	
+	// Add block
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"RETestObject";
+	}];
+	[RESubTestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"RESubTestObject";
+	}];
+	
+	// Remove block
+	[RETestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
+	[RESubTestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
+	STAssertEquals([RETestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertEquals([RESubTestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	
+	// Add block to NSObject
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Check returned string
+	STAssertEqualObjects(objc_msgSend([NSObject object], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject object], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend([RESubTestObject object], sel), @"block", @"");
+}
 
 //- (void)test_overrideBlockAffectSubclasses
 //{
@@ -170,7 +246,7 @@
 //	STAssertEquals(version, (NSInteger)3, @"");
 //	
 //	// Remove the block
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Check version of NSArray
 //	version = [NSArray version];
@@ -257,7 +333,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"RESubTestObject", @"");
 //	
 //	// Remove block of RETestObject
-//	[RETestObject removeBlockForSelector:sel key:@"key"];
+//	[RETestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Check returned string
 //	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"NSObject", @"");
@@ -265,7 +341,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"RESubTestObject", @"");
 //	
 //	// Remove block of RESubTestObject
-//	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+//	[RESubTestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Check returned string
 //	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"NSObject", @"");
@@ -273,7 +349,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"NSObject", @"");
 //	
 //	// Remove block of NSObject
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Responds?
 //	STAssertTrue(![NSObject respondsToSelector:sel], @"");
@@ -297,10 +373,10 @@
 //	}];
 //	
 //	// Remove block of RETestObject
-//	[RETestObject removeBlockForSelector:sel key:@"key"];
+//	[RETestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Remove block of RESubTestObject
-//	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+//	[RESubTestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Override block of NSObject
 //	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
@@ -313,7 +389,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"overridden", @"");
 //	
 //	// Remove block of NSObject
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Responds?
 //	STAssertTrue(![NSObject respondsToSelector:sel], @"");
@@ -337,8 +413,8 @@
 //	[RESubTestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:block];
 //	
 //	// Remove block
-//	[RETestObject removeBlockForSelector:sel key:@"key"];
-//	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+//	[RETestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
+//	[RESubTestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Override block
 //	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:block];
@@ -349,7 +425,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 //	
 //	// Remove block
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Responds?
 //	STAssertTrue(![NSObject respondsToSelector:sel], @"");
@@ -374,7 +450,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 //	
 //	// Remove block of RETestObject
-//	[RETestObject removeBlockForSelector:sel key:@"key"];
+//	[RETestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Check returned string
 //	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
@@ -382,7 +458,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 //	
 //	// Remove block of RESubTestObject
-//	[RESubTestObject removeBlockForSelector:sel key:@"key"];
+//	[RESubTestObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Check returned string
 //	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
@@ -390,7 +466,7 @@
 //	STAssertEqualObjects(objc_msgSend([RESubTestObject class], sel), @"block", @"");
 //	
 //	// Remove block of NSObject
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Responds?
 //	STAssertTrue(![NSObject respondsToSelector:sel], @"");
@@ -464,9 +540,9 @@
 //		}];
 //		
 //		// Remove blocks
-//		[NSObject removeBlockForSelector:selector key:@"key2"];
+//		[NSObject removeBlockForInstanceMethodForSelector:selector key:@"key2"];
 //		STAssertFalse(isContextDeallocated, @"");
-//		[NSObject removeBlockForSelector:selector key:@"key1"];
+//		[NSObject removeBlockForInstanceMethodForSelector:selector key:@"key1"];
 //	}
 //	
 //	// Check
@@ -574,13 +650,13 @@
 //	STAssertEqualObjects(string, @"say", @"");
 //	
 //	// Remove log block
-//	[NSObject removeBlockForSelector:@selector(log) key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:@selector(log) key:@"key"];
 //	STAssertFalse([NSObject respondsToSelector:@selector(log)], @"");
 //	string = objc_msgSend([NSObject class], @selector(say));
 //	STAssertEqualObjects(string, @"say", @"");
 //	
 //	// Remove say block
-//	[NSObject removeBlockForSelector:@selector(say) key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:@selector(say) key:@"key"];
 //	STAssertFalse([NSObject respondsToSelector:@selector(say)], @"");
 //}
 //
@@ -620,7 +696,7 @@
 //	STAssertEqualObjects(log, @"block3", @"");
 //	
 //	// Remove block3
-//	[NSObject removeBlockForSelector:selector key:@"block3"];
+//	[NSObject removeBlockForInstanceMethodForSelector:selector key:@"block3"];
 //	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
 //	
 //	// Call log method
@@ -628,7 +704,7 @@
 //	STAssertEqualObjects(log, @"block2", @"");
 //	
 //	// Remove block1
-//	[NSObject removeBlockForSelector:selector key:@"block1"];
+//	[NSObject removeBlockForInstanceMethodForSelector:selector key:@"block1"];
 //	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
 //	
 //	// Call log method
@@ -636,7 +712,7 @@
 //	STAssertEqualObjects(log, @"block2", @"");
 //	
 //	// Remove block2
-//	[NSObject removeBlockForSelector:selector key:@"block2"];
+//	[NSObject removeBlockForInstanceMethodForSelector:selector key:@"block2"];
 //	STAssertFalse([NSObject respondsToSelector:selector], @"");
 //	STAssertEquals([NSObject methodForSelector:selector], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 //}
@@ -653,7 +729,7 @@
 //	STAssertEqualObjects(string, @"Read", @"");
 //	
 //	// Remove block1
-//	[NSObject removeBlockForSelector:sel key:@"block1"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block1"];
 //	STAssertFalse([NSObject respondsToSelector:sel], @"");
 //	STAssertEquals([NSObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 //}
@@ -691,21 +767,21 @@
 //	STAssertEqualObjects(string, @"block3", @"");
 //	
 //	// Remove block3
-//	[NSString removeBlockForSelector:sel key:@"block3"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block3"];
 //	
 //	// Call block2
 //	string = objc_msgSend([NSString class], sel, @"string");
 //	STAssertEqualObjects(string, @"block2", @"");
 //	
 //	// Remove block1
-//	[NSString removeBlockForSelector:sel key:@"block1"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block1"];
 //	
 //	// Call block2
 //	string = objc_msgSend([NSString class], sel, @"string");
 //	STAssertEqualObjects(string, @"block2", @"");
 //	
 //	// Remove block2
-//	[NSString removeBlockForSelector:sel key:@"block2"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block2"];
 //	
 //	// Call original
 //	STAssertTrue([[NSString class] respondsToSelector:sel], @"");
@@ -733,7 +809,7 @@
 //	STAssertEqualObjects(log, @"block2", @"");
 //	
 //	// Remove block
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 //}
 //
@@ -752,7 +828,7 @@
 //	}];
 //	
 //	// Remove block
-//	[NSString removeBlockForSelector:sel key:@"key"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	
 //	// Call original
 //	NSString *string;
@@ -775,7 +851,7 @@
 //	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
 //	
 //	// Remove block
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 //}
 //
@@ -796,12 +872,12 @@
 //	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
 //	
 //	// Remove block from NSObject
-//	[[NSObject class] removeBlockForSelector:sel key:@"key"];
+//	[[NSObject class] removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	STAssertFalse([NSObject respondsToSelector:sel], @"");
 //	STAssertEqualObjects(objc_msgSend([RETestObject class], sel), @"block", @"");
 //	
 //	// Remove block from RETestObject
-//	[[RETestObject class] removeBlockForSelector:sel key:@"key"];
+//	[[RETestObject class] removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	STAssertFalse([RETestObject respondsToSelector:sel], @"");
 //}
 //
@@ -823,7 +899,7 @@
 //	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
 //	
 //	// Remove block
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	STAssertFalse([NSObject respondsToSelector:sel], @"");
 //}
 //
@@ -870,7 +946,7 @@
 //	STAssertEquals(version, originalVersion, @"");
 //	
 //	// Remove the block
-//	[NSObject removeBlockForSelector:sel key:@"key"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	version = [NSArray version];
 //	STAssertEquals(version, originalVersion, @"");
 //}
@@ -946,21 +1022,21 @@
 //	STAssertEqualObjects(log, @"-block1-block2-block3", @"");
 //	
 //	// Remove block3
-//	[NSObject removeBlockForSelector:sel key:@"block3"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block3"];
 //	
 //	// Call log method
 //	log = objc_msgSend([NSObject class], sel);
 //	STAssertEqualObjects(log, @"-block1-block2", @"");
 //	
 //	// Remove block1
-//	[NSObject removeBlockForSelector:sel key:@"block1"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block1"];
 //	
 //	// Call log method
 //	log = objc_msgSend([NSObject class], sel);
 //	STAssertEqualObjects(log, @"-block2", @"");
 //	
 //	// Remove block2
-//	[NSObject removeBlockForSelector:sel key:@"block2"];
+//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block2"];
 //	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 //}
 //
@@ -1033,21 +1109,21 @@
 //	STAssertEqualObjects(string, @"string-block1-block2-block3", @"");
 //	
 //	// Remove block3
-//	[NSString removeBlockForSelector:sel key:@"block3"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block3"];
 //	
 //	// Call
 //	string = objc_msgSend([NSString class], sel, @"string");
 //	STAssertEqualObjects(string, @"string-block1-block2", @"");
 //	
 //	// Remove block1
-//	[NSString removeBlockForSelector:sel key:@"block1"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block1"];
 //	
 //	// Call
 //	string = objc_msgSend([NSString class], sel, @"string");
 //	STAssertEqualObjects(string, @"string-block2", @"");
 //	
 //	// Remove block2
-//	[NSString removeBlockForSelector:sel key:@"block2"];
+//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block2"];
 //	
 //	// Call
 //	string = objc_msgSend([NSString class], sel, @"string");

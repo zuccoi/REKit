@@ -459,7 +459,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		return;
 	}
 	
-	// Don't set block to private class
+	// Don't set block to private class // Should I set block to superclass ????? // How about NSKVONotifiyng_ class ?????
 	if (receiver == [receiver class]) {
 		NSString *className;
 		className = NSStringFromClass(receiver);
@@ -568,7 +568,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
 				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
-					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
+					class_replaceMethod(subclass, selector, imp, [objCTypes UTF8String]);
 				}
 			}
 		}

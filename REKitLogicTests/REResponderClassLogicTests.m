@@ -515,7 +515,7 @@
 	STAssertEquals(rect, CGRectMake(10.0f, 20.0f, 30.0f, 40.0f), @"");
 }
 
-- (void)test_methodForSelector_executeReturnedIMP
+- (void)test_methodForSelector__executeReturnedIMP
 {
 	SEL selector = @selector(doSomething);
 	__block BOOL called = NO;
@@ -651,7 +651,7 @@
 	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
 }
 
-- (void)test_performDummyBlock
+- (void)test_recoonectedToForwardingMethod
 {
 	SEL sel = @selector(readThis:);
 	NSString *string = nil;

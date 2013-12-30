@@ -829,7 +829,7 @@
 	STAssertEquals(rect, CGRectMake(10.0f, 20.0f, 30.0f, 40.0f), @"");
 }
 
-- (void)test_methodForSelector_executeReturnedIMP
+- (void)test_methodForSelector__executeReturnedIMP
 {
 	__block BOOL called = NO;
 	
@@ -991,7 +991,7 @@
 	STAssertEquals([obj methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
-- (void)test_performDummyBlock
+- (void)test_recoonectedToForwardingMethod
 {
 	NSString *string = nil;
 	SEL sel;

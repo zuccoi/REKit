@@ -87,7 +87,7 @@ BOOL REREsponderConformsToProtocol(id receiver, Protocol *protocol)
 {
 	BOOL conforms = NO;
 	Class class;
-	class = self;
+	class = [self class];
 	while (!conforms && class) {
 		conforms = REREsponderConformsToProtocol(class, protocol);
 		class = [class superclass];
@@ -98,7 +98,13 @@ BOOL REREsponderConformsToProtocol(id receiver, Protocol *protocol)
 
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
-	return (REREsponderConformsToProtocol(self, protocol) || [[self class] conformsToProtocol:protocol]);
+	BOOL conforms;
+	conforms = REREsponderConformsToProtocol(self, protocol);
+	if (!conforms && self != [self class]) {
+		conforms = [[self class] conformsToProtocol:protocol];
+	}
+	
+	return conforms;
 }
 
 BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperation op)
@@ -130,16 +136,21 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 
 + (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
-	return REResponderRespondsToSelector(self, aSelector, REResponderOperationClass);
+	return REResponderRespondsToSelector([self class], aSelector, REResponderOperationClass);
 }
 
 + (BOOL)REResponder_X_instancesRespondToSelector:(SEL)aSelector
 {
-	return REResponderRespondsToSelector(self, aSelector, REResponderOperationInstances);
+	return REResponderRespondsToSelector([self class], aSelector, REResponderOperationInstances);
 }
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
+	// Filter
+	if (self == [self class]) {
+		return NO;
+	}
+	
 	return REResponderRespondsToSelector(self, aSelector, REResponderOperationObject);
 }
 
@@ -285,11 +296,16 @@ NSDictionary* REResponderBlockInfoForSelector(id receiver, SEL selector, id key,
 
 + (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos operation:(REResponderOperation)op
 {
-	return REResponderBlockInfoForSelector(self, selector, key, outBlockInfos, op);
+	return REResponderBlockInfoForSelector([self class], selector, key, outBlockInfos, op);
 }
 
 - (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos operation:(REResponderOperation)op
 {
+	// Filter
+	if (self == [self class]) {
+		return nil;
+	}
+	
 	return REResponderBlockInfoForSelector(self, selector, key, outBlockInfos, op);
 }
 
@@ -346,11 +362,16 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 
 + (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
 {
-	return REResponderBlockInfoWithImplementation(self, imp, outBlockInfos, outSelector);
+	return REResponderBlockInfoWithImplementation([self class], imp, outBlockInfos, outSelector);
 }
 
 - (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
 {
+	// Filter
+	if (self == [self class]) {
+		return nil;
+	}
+	
 	return REResponderBlockInfoWithImplementation(self, imp, outBlockInfos, outSelector);
 }
 
@@ -369,7 +390,7 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 		NSMutableArray *blockInfos;
 		SEL selector;
 		Class class;
-		class = self;
+		class = [self class];
 		while (YES) {
 			blockInfo = [class REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
 			if (blockInfo) {
@@ -421,7 +442,7 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 - (IMP)REResponder_supermethodWithImp:(IMP)imp
 {
 	// Filter
-	if (!imp) {
+	if (!imp || self == [self class]) {
 		return NULL;
 	}
 	
@@ -600,16 +621,21 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 
 + (void)setBlockForSelector:(SEL)selector key:(id)key block:(id)block
 {
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClass);
+	REResponderSetBlockForSelector([self class], selector, key, block, REResponderOperationClass);
 }
 
 + (void)setBlockForInstanceMethodForSelector:(SEL)selector key:(id)key block:(id)block
 {
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstances);
+	REResponderSetBlockForSelector([self class], selector, key, block, REResponderOperationInstances);
 }
 
 - (void)setBlockForSelector:(SEL)selector key:(id)key block:(id)block
 {
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationObject);
 }
 
@@ -635,16 +661,21 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 
 + (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
 {
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClass);
+	return REResponderHasBlockForSelector([self class], selector, key, REResponderOperationClass);
 }
 
 + (BOOL)hasBlockForInstanceMethodForSelector:(SEL)selector key:(id)key
 {
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstances);
+	return REResponderHasBlockForSelector([self class], selector, key, REResponderOperationInstances);
 }
 
 - (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
 {
+	// Filter
+	if (self == [self class]) {
+		return NO;
+	}
+	
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationObject);
 }
 
@@ -719,16 +750,21 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 
 + (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClass);
+	REResponderRemoveBlockForSelector([self class], selector, key, REResponderOperationClass);
 }
 
 + (void)removeBlockForInstanceMethodForSelector:(SEL)selector key:(id)key
 {
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstances);
+	REResponderRemoveBlockForSelector([self class], selector, key, REResponderOperationInstances);
 }
 
 - (void)removeBlockForSelector:(SEL)selector key:(id)key
 {
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationObject);
 }
 
@@ -780,11 +816,16 @@ void REResponderRemoveCurrentBlock(id receiver)
 
 + (void)removeCurrentBlock
 {
-	REResponderRemoveCurrentBlock(self);
+	REResponderRemoveCurrentBlock([self class]);
 }
 
 - (void)removeCurrentBlock
 {
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
 	REResponderRemoveCurrentBlock(self);
 }
 
@@ -877,11 +918,16 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 
 + (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
 {
-	REResponderSetConformableToProtocol(self, conformable, protocol, inKey);
+	REResponderSetConformableToProtocol([self class], conformable, protocol, inKey);
 }
 
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
 {
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
 	REResponderSetConformableToProtocol(self, conformable, protocol, inKey);
 }
 

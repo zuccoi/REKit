@@ -85,7 +85,7 @@
 	// Override
 	[RETestObject setBlockForSelector:selector key:nil block:^(id receiver) {
 		RETestObject *obj;
-		obj = [[RETestObject alloc] init];
+		obj = [[[RETestObject alloc] init] autorelease];
 		obj.name = @"overridden";
 		return obj;
 	}];

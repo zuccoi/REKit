@@ -111,8 +111,8 @@
 {
 	RETestObject *obj;
 	RESubTestObject *subObj;
-	obj = [[[RETestObject alloc] init] autorelease];
-	subObj = [[[RESubTestObject alloc] init] autorelease];
+	obj = [RETestObject object];
+	subObj = [RESubTestObject object];
 	
 	IMP imp;
 	IMP subImp;
@@ -134,8 +134,8 @@
 {
 	RETestObject *obj;
 	RESubTestObject *subObj;
-	obj = [[[RETestObject alloc] init] autorelease];
-	subObj = [[[RESubTestObject alloc] init] autorelease];
+	obj = [RETestObject object];
+	subObj = [RESubTestObject object];
 	
 	IMP imp;
 	IMP subImp;

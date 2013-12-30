@@ -641,7 +641,7 @@
 		
 		// Make obj
 		id obj;
-		obj = [[NSObject alloc] init];
+		obj = [NSObject object];
 		
 		// Add block
 		[obj setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {
@@ -1155,7 +1155,7 @@
 	SEL sel = @selector(log);
 	
 	id obj;
-	obj = [[[RETestObject alloc] init] autorelease];
+	obj = [RETestObject object];
 	for (id anObj in @[obj, obj]) {
 		[anObj setBlockForSelector:sel key:@"key" block:^(id receiver) {
 			return @"block";
@@ -1180,7 +1180,7 @@
 	RETestObject *obj3;
 	obj1 = [NSObject object];
 	obj2 = [NSObject object];
-	obj3 = [[[RETestObject alloc] init] autorelease];
+	obj3 = [RETestObject object];
 	
 	// Share block
 	for (id obj in @[obj1, obj2, obj3]) {

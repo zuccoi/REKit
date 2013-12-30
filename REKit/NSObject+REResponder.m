@@ -400,33 +400,34 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 	return REResponderBlockInfoWithImplementation(self, imp, outBlockInfos, outSelector);
 }
 
-+ (IMP)REResponder_supermethodWithImp:(IMP)imp
+IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 {
 	// Filter
-	if (!imp || self != [self class]) {
+	if (!imp) {
 		return NULL;
 	}
 	
 	// Get supermethod
 	IMP supermethod = NULL;
-	@synchronized (self) {
+	@synchronized (receiver) {
 		// Get elements
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
+		NSDictionary *blockInfo = nil;
+		NSMutableArray *blockInfos = nil;
 		SEL selector;
-		Class class;
-		class = self;
-		while (YES) {
-			blockInfo = [class REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
-			if (blockInfo) {
-				break;
-			}
-			class = [class superclass];
-			if (!class) {
-				break;
+		blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+		if (!blockInfo) {
+			// Search blockInfo of superclasses
+			Class superclass;
+			superclass = [[receiver class] superclass];
+			while (superclass) {
+				blockInfo = [superclass REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+				if (blockInfo && [blockInfo[kBlockInfoImpKey] pointerValue] != imp) {
+					break;
+				}
+				superclass = [superclass superclass];
 			}
 		}
-		if (!blockInfo || !blockInfos || !selector) {
+		if (!blockInfo) {
 			return NULL;
 		}
 		
@@ -443,13 +444,13 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 			else {
 				REResponderOperation op;
 				op = [blockInfo[kBlockInfoOperationKey] integerValue];
-				if (op == REResponderOperationInstances) {
-					// supermethod is superclass's instance method
-					supermethod = method_getImplementation(class_getInstanceMethod([class superclass], selector));
+				if (op == REResponderOperationClass) {
+					// supermethod is superclass's class method
+					supermethod = method_getImplementation(class_getClassMethod([receiver superclass], selector));
 				}
 				else {
-					// supermethod is superclass's class method
-					supermethod = method_getImplementation(class_getClassMethod([class superclass], selector));
+					// supermethod is superclass's instance method
+					supermethod = method_getImplementation(class_getInstanceMethod([[receiver class] superclass], selector));
 				}
 			}
 		}
@@ -464,42 +465,24 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 	return supermethod;
 }
 
++ (IMP)REResponder_supermethodWithImp:(IMP)imp
+{
+	// Filter
+	if (self != [self class]) {
+		return NULL;
+	}
+	
+	return REResponderSupermethodWithImp(self, imp);
+}
+
 - (IMP)REResponder_supermethodWithImp:(IMP)imp
 {
 	// Filter
-	if (!imp || self == [self class]) {
+	if (self == [self class]) {
 		return NULL;
 	}
 	
-	// Get supermethod
-	IMP supermethod = NULL;
-	@synchronized (self) {
-		// Get elements
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
-		SEL selector;
-		blockInfo = [self REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
-		if (!blockInfo || !blockInfos || !selector) {
-			return NULL;
-		}
-		
-		// Check index of blockInfo
-		NSUInteger index;
-		index = [blockInfos indexOfObject:blockInfo];
-		if (index == 0) {
-			// supermethod is superclass's instance method
-			supermethod = method_getImplementation(class_getInstanceMethod([[self class] superclass], selector));
-		}
-		else {
-			// supermethod is superblock's IMP
-			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
-		}
-	}
-	if (supermethod == REResponderForwardingMethod()) {
-		return NULL;
-	}
-	
-	return supermethod;
+	return REResponderSupermethodWithImp(self, imp);
 }
 
 //--------------------------------------------------------------//

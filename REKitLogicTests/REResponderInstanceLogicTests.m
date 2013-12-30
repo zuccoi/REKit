@@ -892,7 +892,31 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodPointsToMethodOfSuperclass
+- (void)test_supermethodPointsToNil // Check in other test cases >>>
+{
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
+	
+	// Add block
+	[NSArray setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([NSArray array], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToMethodOfSuperclass // Check in other test cases >>>
 {
 	SEL sel = @selector(log);
 	__block BOOL called = NO;
@@ -915,6 +939,36 @@
 	
 	// Call
 	objc_msgSend([RESubTestObject object], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToOriginalMethod // Check in other test cases
+{
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
+	
+	IMP originalMethod;
+	originalMethod = [RETestObject instanceMethodForSelector:sel];
+	STAssertNotNil((id)originalMethod, @"");
+	
+	// Override log method
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		NSString *res = nil;
+		typedef id (*id_IMP)(id, SEL, ...);
+		id_IMP supermethod;
+		if ((supermethod = (id_IMP)[receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, originalMethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([RETestObject object], sel);
 	STAssertTrue(called, @"");
 }
 

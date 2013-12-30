@@ -830,36 +830,29 @@
 //- (void)test_implementBySameBlock
 //{
 //	SEL sel = @selector(log);
-//	id obj = [NSObject object];
 //	
-//	for (id aObj in @[obj, obj]) {
-//		[aObj setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+//	for (Class cls in @[[NSObject class], [NSObject class]]) {
+//		[cls setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
 //			return @"block";
 //		}];
 //	}
 //	
 //	// Call log
-//	STAssertTrue([obj respondsToSelector:sel], @"");
-//	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
+//	STAssertTrue([NSObject respondsToSelector:sel], @"");
+//	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
 //	
 //	// Remove block
 //	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
-//	STAssertTrue(![[NSObject object] respondsToSelector:sel], @"");
+//	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 //}
 
 //- (void)test_canShareBlock
 //{
 //	SEL sel = _cmd;
-//	NSArray *objs;
-//	id obj1, obj2, obj3;
-//	obj1 = [NSObject object];
-//	obj2 = [NSObject object];
-//	obj3 = [NSObject object];
-//	objs = @[obj1, obj2, obj3];
 //	
 //	// Share block
-//	for (id aObj in objs) {
-//		[aObj setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+//	for (Class cls in @[[NSObject class], [NSObject class], [RETestObject class]]) {
+//		[cls setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
 //			return @"block";
 //		}];
 //	}
@@ -878,7 +871,7 @@
 //	[[RETestObject class] removeBlockForInstanceMethodForSelector:sel key:@"key"];
 //	STAssertFalse([RETestObject respondsToSelector:sel], @"");
 //}
-
+//
 //- (void)test_canPassAlreadyExistBlock
 //{
 //	SEL sel = @selector(log);

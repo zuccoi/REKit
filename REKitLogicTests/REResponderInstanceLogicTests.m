@@ -872,7 +872,7 @@
 	STAssertFalse([[RETestObject object] respondsToSelector:sel], @"");
 }
 
-- (void)test_supermethodOf1stDynamicBlock
+- (void)test_supermethodOf1stDynamicBlock // Check in other test cases >>>
 {
 	SEL sel = @selector(log);
 	__block BOOL called = NO;
@@ -965,6 +965,34 @@
 		STAssertEquals(supermethod, originalMethod, @"");
 		
 		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([RETestObject object], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToBlockOfSuperclass
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	// Get imp
+	IMP imp;
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		called = YES;
+	}];
+	imp = [NSObject instanceMethodForSelector:sel];
+	
+	// Add block
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		STAssertEquals(supermethod, imp, @"");
 	}];
 	
 	// Call

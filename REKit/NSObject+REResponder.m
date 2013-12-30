@@ -421,7 +421,7 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 			superclass = [[receiver class] superclass];
 			while (superclass) {
 				blockInfo = [superclass REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
-				if (blockInfo && [blockInfo[kBlockInfoImpKey] pointerValue] != imp) {
+				if (blockInfo) {
 					break;
 				}
 				superclass = [superclass superclass];

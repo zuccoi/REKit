@@ -497,33 +497,36 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		NSMutableDictionary *blocks;
 		NSMutableArray *blockInfos;
 		NSDictionary *oldBlockInfo;
-		IMP oldImp;
+		IMP oldBlockMethod;
+		IMP currentMethod;
 		blocks = REResponderBlocks(receiver, op, YES);
 		oldBlockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos operation:op];
-		oldImp = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
+		oldBlockMethod = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
+		if (op == REResponderOperationInstances) {
+			currentMethod = [receiver instanceMethodForSelector:selector];
+		}
+		else {
+			currentMethod = [receiver methodForSelector:selector];
+		}
 		
 		// Make blockInfos
 		if (!blockInfos) {
 			blockInfos = [NSMutableArray array];
 			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			if (op == REResponderOperationClass) {
-				IMP originalMethod;
-				originalMethod = [receiver methodForSelector:selector];
-				if (originalMethod
-					&& originalMethod != REResponderForwardingMethod()
-					&& originalMethod != [[receiver superclass] methodForSelector:selector]
+				if (currentMethod
+					&& currentMethod != REResponderForwardingMethod()
+					&& currentMethod != [[receiver superclass] methodForSelector:selector]
 				){
-					[blockInfos setAssociatedValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				}
 			}
 			else if (op == REResponderOperationInstances) {
-				IMP originalMethod;
-				originalMethod = [receiver instanceMethodForSelector:selector];
-				if (originalMethod
-					&& originalMethod != REResponderForwardingMethod()
-					&& originalMethod != [[receiver superclass] instanceMethodForSelector:selector]
+				if (currentMethod
+					&& currentMethod != REResponderForwardingMethod()
+					&& currentMethod != [[receiver superclass] instanceMethodForSelector:selector]
 				){
-					[blockInfos setAssociatedValue:[NSValue valueWithPointer:originalMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				}
 			}
 			[blocks setObject:blockInfos forKey:selectorName];
@@ -555,7 +558,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
 				IMP subImp;
 				subImp = [subclass methodForSelector:selector];
-				if (subImp == oldImp || subImp == REResponderForwardingMethod()) {
+				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
 					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
 				}
 			}
@@ -564,7 +567,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
-				if (subImp == oldImp || subImp == REResponderForwardingMethod()) {
+				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
 					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
 				}
 			}
@@ -573,7 +576,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		// Remove oldBlockInfo
 		if (oldBlockInfo) {
 			[blockInfos removeObject:oldBlockInfo];
-			imp_removeBlock(oldImp);
+			imp_removeBlock(oldBlockMethod);
 		}
 		
 		// Add blockInfo

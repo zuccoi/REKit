@@ -16,7 +16,7 @@
 
 @implementation REResponderClassLogicTests
 
-- (void)tearDown
+- (void)_resetClasses
 {
 	// Reset all classes
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
@@ -44,6 +44,19 @@
 			}];
 		}];
 	}
+}
+
+- (void)setUp
+{
+	// super
+	[super setUp];
+	
+	[self _resetClasses];
+}
+
+- (void)tearDown
+{
+	[self _resetClasses];
 	
 	// super
 	[super tearDown];
@@ -66,7 +79,7 @@
 	}];
 	
 	// Responds to selector?
-	STAssertTrue([[NSObject class] respondsToSelector:sel], @"");
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
 	
 	// Call the sel
 	log = objc_msgSend([NSObject class], sel);
@@ -573,59 +586,69 @@
 
 - (void)test_stackOfDynamicBlocks
 {
-	SEL selector = @selector(log);
+	SEL sel = @selector(log);
 	NSString *log;
 	
+	// Responds?
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	
 	// Add block1
-	[NSObject setBlockForSelector:selector key:@"block1" block:^(id receiver) {
+	[NSObject setBlockForSelector:sel key:@"block1" block:^(id receiver) {
 		return @"block1";
 	}];
-	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [RETestObject methodForSelector:sel], @"");
 	
 	// Call log method
-	log = objc_msgSend([NSObject class], selector);
+	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Add block2
-	[NSObject setBlockForSelector:selector key:@"block2" block:^NSString*(id receiver) {
+	[NSObject setBlockForSelector:sel key:@"block2" block:^NSString*(id receiver) {
 		return @"block2";
 	}];
-	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [RETestObject methodForSelector:sel], @"");
 	
 	// Call log method
-	log = objc_msgSend([NSObject class], selector);
+	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Add block3
-	[NSObject setBlockForSelector:selector key:@"block3" block:^NSString*(id receiver) {
+	[NSObject setBlockForSelector:sel key:@"block3" block:^NSString*(id receiver) {
 		return @"block3";
 	}];
-	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [RETestObject methodForSelector:sel], @"");
 	
 	// Call log method
-	log = objc_msgSend([NSObject class], selector);
+	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block3", @"");
 	
 	// Remove block3
-	[NSObject removeBlockForSelector:selector key:@"block3"];
-	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
+	[NSObject removeBlockForSelector:sel key:@"block3"];
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [RETestObject methodForSelector:sel], @"");
 	
 	// Call log method
-	log = objc_msgSend([NSObject class], selector);
+	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block1
-	[NSObject removeBlockForSelector:selector key:@"block1"];
-	STAssertTrue([[NSObject class] respondsToSelector:selector], @"");
+	[NSObject removeBlockForSelector:sel key:@"block1"];
+	STAssertTrue([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [RETestObject methodForSelector:sel], @"");
 	
 	// Call log method
-	log = objc_msgSend([NSObject class], selector);
+	log = objc_msgSend([NSObject class], sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block2
-	[NSObject removeBlockForSelector:selector key:@"block2"];
-	STAssertFalse([NSObject respondsToSelector:selector], @"");
-	STAssertEquals([NSObject methodForSelector:selector], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	[NSObject removeBlockForSelector:sel key:@"block2"];
+	STAssertFalse([NSObject respondsToSelector:sel], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertEquals([NSObject methodForSelector:sel], [RETestObject methodForSelector:sel], @"");
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
 }
 
 - (void)test_performDummyBlock

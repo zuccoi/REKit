@@ -16,7 +16,7 @@
 
 @implementation REResponderInstanceLogicTests
 
-- (void)tearDown
+- (void)_resetClasses
 {
 	// Reset all classes
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
@@ -44,6 +44,19 @@
 			}];
 		}];
 	}
+}
+
+- (void)setUp
+{
+	// super
+	[super setUp];
+	
+	[self _resetClasses];
+}
+
+- (void)tearDown
+{
+	[self _resetClasses];
 	
 	// super
 	[super tearDown];

@@ -16,7 +16,7 @@
 
 @implementation REResponderLogicTests
 
-- (void)tearDown
+- (void)_resetClasses
 {
 	// Reset all classes
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
@@ -44,6 +44,19 @@
 			}];
 		}];
 	}
+}
+
+- (void)setUp
+{
+	// super
+	[super setUp];
+	
+	[self _resetClasses];
+}
+
+- (void)tearDown
+{
+	[self _resetClasses];
 	
 	// super
 	[super tearDown];
@@ -75,15 +88,19 @@
 {
 	SEL sel = @selector(log);
 	
-	// You can override hardcoded method
-	NSString *log;
+	// Make obj
 	RETestObject *obj;
 	obj = [RETestObject object];
+	
+	// Responds?
+	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
+	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
+	
+	// You can override hardcoded method
 	[obj setBlockForSelector:sel key:nil block:^NSString*(id receiver) {
 		return @"Overridden log";
 	}];
-	log = [obj log];
-	STAssertEqualObjects(log, @"Overridden log", @"");
+	STAssertEqualObjects([obj log], @"Overridden log", @"");
 	
 	// Don't affect to class
 	STAssertTrue(![RETestObject respondsToSelector:sel], @"");

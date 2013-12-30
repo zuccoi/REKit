@@ -21,11 +21,12 @@
 @property (assign, nonatomic) CGRect rect;
 
 // Methods
+- (void)overrideMe;
 - (NSString*)log;
+- (NSString*)overrideLog;
 - (NSString*)say;
 - (void)sayHello;
 - (NSUInteger)ageAfterYears:(NSUInteger)years;
-- (void)overrideMe;
 + (NSInteger)integerWithInteger:(NSInteger)integer;
 + (CGRect)theRect;
 + (void)sayHello;
@@ -34,6 +35,8 @@
 
 @interface RESubTestObject : RETestObject
 - (void)overrideMe;
+- (NSString*)subLog;
+- (NSString*)overrideLog;
 + (CGRect)theRect;
 + (CGRect)subRect;
 @end

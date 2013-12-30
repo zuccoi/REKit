@@ -391,12 +391,20 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 			NSValue *originalMethodValue;
 			originalMethodValue = [blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey];
 			if (originalMethodValue) {
+				// supermethod is original method
 				supermethod = [originalMethodValue pointerValue];
 			}
 			else {
-				supermethod = method_getImplementation(class_getClassMethod([class superclass], selector));
-// Faster ?????
-//				supermethod = class_getMethodImplementation(object_getClass([class superclass]), selector);
+				REResponderOperation op;
+				op = [blockInfo[kBlockInfoOperationKey] integerValue];
+				if (op == REResponderOperationInstances) {
+					// supermethod is superclass's instance method
+					supermethod = method_getImplementation(class_getInstanceMethod([class superclass], selector));
+				}
+				else {
+					// supermethod is superclass's class method
+					supermethod = method_getImplementation(class_getClassMethod([class superclass], selector));
+				}
 			}
 		}
 		else {

@@ -205,4 +205,34 @@
 	STAssertNil(objc_getAssociatedObject(object_getClass([NSObject class]), "key"), @"");
 }
 
+- (void)test_NSStringConcreateClass
+{
+	NSString *string;
+	string = [NSString string];
+	
+	// Check class
+	STAssertEqualObjects(NSStringFromClass([string class]), @"__NSCFConstantString", @"");
+	
+	// Check superclass
+	STAssertEqualObjects(NSStringFromClass([[string class] superclass]), @"__NSCFString", @"");
+	
+	// Check superclass of superclass
+	STAssertEqualObjects(NSStringFromClass([[[string class] superclass] superclass]), @"NSMutableString", @"");
+	
+	// Check superclass of superclass of superclass
+	STAssertEqualObjects(NSStringFromClass([[[[string class] superclass] superclass] superclass]), @"NSString", @"");
+}
+
+- (void)test_NSArrayConcreateClass
+{
+	NSArray *array;
+	array = [NSArray array];
+	
+	// Check class
+	STAssertEqualObjects(NSStringFromClass([array class]), @"__NSArrayI", @"");
+	
+	// Check superclass
+	STAssertEqualObjects(NSStringFromClass([[array class] superclass]), @"NSArray", @"");
+}
+
 @end

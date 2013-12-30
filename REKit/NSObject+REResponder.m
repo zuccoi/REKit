@@ -414,14 +414,19 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 		NSDictionary *blockInfo = nil;
 		NSMutableArray *blockInfos = nil;
 		SEL selector;
+		Class classHavingBlockinfo = NULL;
 		blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
-		if (!blockInfo) {
+		if (blockInfo) {
+			classHavingBlockinfo = [receiver class];
+		}
+		else {
 			// Search blockInfo of superclasses
 			Class superclass;
 			superclass = [[receiver class] superclass];
 			while (superclass) {
 				blockInfo = [superclass REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
 				if (blockInfo) {
+					classHavingBlockinfo = superclass;
 					break;
 				}
 				superclass = [superclass superclass];
@@ -442,15 +447,22 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 				supermethod = [originalMethodValue pointerValue];
 			}
 			else {
+				// supermethod is superclass's method
+				Class superclass;
 				REResponderOperation op;
 				op = [blockInfo[kBlockInfoOperationKey] integerValue];
-				if (op == REResponderOperationClass) {
-					// supermethod is superclass's class method
-					supermethod = method_getImplementation(class_getClassMethod([receiver superclass], selector));
-				}
-				else {
-					// supermethod is superclass's instance method
-					supermethod = method_getImplementation(class_getInstanceMethod([[receiver class] superclass], selector));
+				superclass = [classHavingBlockinfo superclass];
+				while (superclass && !supermethod) {
+					if (op == REResponderOperationClass) {
+						supermethod = method_getImplementation(class_getClassMethod(superclass, selector));
+					}
+					else {
+						supermethod = method_getImplementation(class_getInstanceMethod(superclass, selector));
+					}
+					if (supermethod == imp) {
+						supermethod = NULL;
+					}
+					superclass = [superclass superclass];
 				}
 			}
 		}
@@ -496,11 +508,21 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		return;
 	}
 	
-	// Don't set block to private class // Should I set block to superclass ????? // How about NSKVONotifiyng_ class ?????
-	if (receiver == [receiver class]) {
+	// Don't set block to private class
+	if (op != REResponderOperationObject) {
 		NSString *className;
 		className = NSStringFromClass(receiver);
+//		if ([className hasPrefix:kClassNamePrefix] || [className hasPrefix:@"__"]) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
 		if ([className hasPrefix:kClassNamePrefix]) {
+			// Search valid superclass
+			Class superclass;
+			superclass = [[receiver class] superclass];
+			while (superclass) {
+				if (![NSStringFromClass(superclass) hasPrefix:kClassNamePrefix]) {
+					REResponderSetBlockForSelector(superclass, selector, inKey, block, op);
+					return;
+				}
+			}
 			return;
 		}
 	}
@@ -593,6 +615,15 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		// Replace method of subclasses
 		if (op == REResponderOperationClass) {
 			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+// ?????
+//				// Filter
+//				NSString *subclassName;
+//				subclassName = NSStringFromClass(subclass);
+//				if ([subclassName hasPrefix:kClassNamePrefix]) {
+//					continue;
+//				}
+				
+				// Replace method
 				IMP subImp;
 				subImp = [subclass methodForSelector:selector];
 				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
@@ -602,6 +633,15 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		}
 		else if (op == REResponderOperationInstances) {
 			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+// ?????
+//				// Filter
+//				NSString *subclassName;
+//				subclassName = NSStringFromClass(subclass);
+//				if ([subclassName hasPrefix:kClassNamePrefix]) {
+//					continue;
+//				}
+				
+				// Replace
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
 				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {

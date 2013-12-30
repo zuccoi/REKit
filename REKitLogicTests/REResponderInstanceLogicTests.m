@@ -992,12 +992,145 @@
 			supermethod(receiver, sel);
 		}
 		
+		// Check supermethod
 		STAssertEquals(supermethod, imp, @"");
 	}];
 	
 	// Call
 	objc_msgSend([RETestObject object], sel);
 	STAssertTrue(called, @"");
+}
+
+- (void)test_orderOfSupermethod
+{
+// ?????
+return;
+	SEL sel = _cmd;
+	__block NSMutableArray *imps;
+	imps = [NSMutableArray array];
+	
+	id testObj;
+	id obj;
+	testObj = [RETestObject object];
+	obj = [NSObject object];
+	
+	// Add block to testObj
+	[testObj setBlockForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp1;
+	imp1 = [testObj methodForSelector:sel];
+	
+	// Add block to NSObject
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp2;
+	imp2 = [NSObject instanceMethodForSelector:sel];
+	
+	// Add object block
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp3;
+	imp3 = [obj methodForSelector:sel];
+	
+	// Add block to RETestObject
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp4;
+	imp4 = [RETestObject instanceMethodForSelector:sel];
+	
+	// Add block to NSObject
+	[[obj class] setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp5;
+	imp5 = [NSObject instanceMethodForSelector:sel];
+	
+	// Add object block
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp6;
+	imp6 = [obj methodForSelector:sel];
+	
+	// Add block to testObj
+	[testObj setBlockForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp7;
+	imp7 = [testObj methodForSelector:sel];
+	
+	// Add block to RETestObject
+	[[testObj class] setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		[imps addObject:[NSValue valueWithPointer:supermethod]];
+	}];
+	IMP imp8;
+	imp8 = [RETestObject instanceMethodForSelector:sel];
+// ?????
+NSLog(@"imp7 = %p", imp7);
+NSLog(@"imp1 = %p", imp1);
+NSLog(@"imp8 = %p", imp8);
+NSLog(@"imp4 = %p", imp4);
+NSLog(@"imp5 = %p", imp5);
+NSLog(@"imp2 = %p", imp2);
+	
+	// Call
+	objc_msgSend(testObj, sel);
+	
+	// Check
+	NSArray *expected;
+	expected = @[
+		[NSValue valueWithPointer:imp7],
+		[NSValue valueWithPointer:imp1],
+		[NSValue valueWithPointer:imp8],
+		[NSValue valueWithPointer:imp4],
+		[NSValue valueWithPointer:imp5],
+		[NSValue valueWithPointer:imp2],
+	];
+	STAssertEqualObjects(imps, expected, @"");
 }
 
 - (void)test_supermethodOfDynamicBlock

@@ -1486,334 +1486,84 @@
 	STAssertTrue(![NSObject instancesRespondToSelector:sel], @"");
 }
 
-//- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
-//{
-//	SEL sel = @selector(doSomething);
-//	
-//	// Call removeCurrentBlock
-//	STAssertNoThrow([NSObject removeCurrentBlock], @"");
-//	
-//	// Add doSomething method
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-//		// Do something
-//	}];
-//	
-//	// Call removeCurrentBlock
-//	STAssertNoThrow([NSObject removeCurrentBlock], @"");
-//	
-//	// Check doSomething method
-//	STAssertTrue([NSObject respondsToSelector:sel], @"");
-//}
-//
-//- (void)test_doNotChangeClass
-//{
-//	Class cls;
-//	cls = [NSMutableString class];
-//	
-//	[NSMutableString setBlockForInstanceMethodForSelector:@selector(stringWithString:) key:nil block:^(id receiver, NSString *string) {
-//		// Do something
-//	}];
-//	
-//	// Check class
-//	STAssertEquals([NSMutableString class], cls, @"");
-//	STAssertEquals([NSMutableString superclass], [NSString class], @"");
-//}
-//
-//- (void)test_setConformableToProtocol
-//{
-//	// Make elements
-//	Protocol *protocol;
-//	NSString *key;
-//	id obj;
-//	protocol = @protocol(NSCopying);
-//	key = NSStringFromSelector(_cmd);
-//	obj = [NSObject object];
-//	
-//	// Check
-//	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([obj conformsToProtocol:protocol], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Set NSObject conformable to protocol
-//	[NSObject setConformable:YES toProtocol:protocol key:key];
-//	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([obj conformsToProtocol:protocol], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Set NSObject not-conformable to protocol
-//	[NSObject setConformable:NO toProtocol:protocol key:key];
-//	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([obj conformsToProtocol:protocol], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:protocol], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__conformsToIncorporatedProtocols
-//{
-//	id obj;
-//	obj = [NSObject object];
-//	
-//	[NSObject setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__canNotRemoveIncorporatedProtocol
-//{
-//	id obj;
-//	obj = [NSObject object];
-//	
-//	// Set NSObject conformable to NSSecureCoding
-//	[NSObject setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
-//	
-//	// Set NSobject not conformable to NSCoding
-//	[NSObject setConformable:NO toProtocol:@protocol(NSCoding) key:@"key"];
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__managesProtocolsBySpecifiedProtocol
-//{
-//	id obj;
-//	obj = [NSObject object];
-//	
-//	// Set NSObject conformable to NSSecureCoding and NSCoding then remove NSSecureCoding
-//	[NSObject setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
-//	[NSObject setConformable:YES toProtocol:@protocol(NSCoding) key:@"key"];
-//	[NSObject setConformable:NO toProtocol:@protocol(NSSecureCoding) key:@"key"];
-//	STAssertTrue(![NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue(![obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue(![RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue(![[RETestObject object] conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//	
-//	// Set NSObject conformable to NSSecureCoding and NSCoding then remove NSCoding
-//	[NSObject setConformable:YES toProtocol:@protocol(NSSecureCoding) key:@"key"];
-//	[NSObject setConformable:YES toProtocol:@protocol(NSCoding) key:@"key"];
-//	[NSObject setConformable:NO toProtocol:@protocol(NSCoding) key:@"key"];
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSSecureCoding)], @"");
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__withNilKey
-//{
-//	id obj;
-//	obj = [NSObject object];
-//	
-//	// Set conformable
-//	[NSObject setConformable:YES toProtocol:@protocol(NSCoding) key:nil];
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__withInvalidArguments
-//{
-//	// Make elements
-//	Protocol *protocol;
-//	NSString *key;
-//	id obj;
-//	protocol = @protocol(NSCopying);
-//	key = NSStringFromSelector(_cmd);
-//	obj = [NSObject object];
-//	
-//	// Try to set NSObject conformable with nil-protocol
-//	[NSObject setConformable:YES toProtocol:nil key:key];
-//	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([obj conformsToProtocol:protocol], @"");
-//	
-//	// Set NSObject conformable to protocol
-//	[NSObject setConformable:YES toProtocol:protocol key:key];
-//	
-//	// Try to set NSObject not-conformable with nil-protocol
-//	[NSObject setConformable:NO toProtocol:nil key:key];
-//	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([obj conformsToProtocol:protocol], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Try to set NSObject not-conformable with nil-key
-//	[NSObject setConformable:NO toProtocol:protocol key:nil];
-//	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([obj conformsToProtocol:protocol], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Set NSObject not-conformable
-//	[NSObject setConformable:NO toProtocol:protocol key:key];
-//	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([obj conformsToProtocol:protocol], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__stacksKeys
-//{
-//	// Make elements
-//	Protocol *protocol;
-//	NSString *key;
-//	id obj;
-//	protocol = @protocol(NSCopying);
-//	key = NSStringFromSelector(_cmd);
-//	obj = [NSObject object];
-//	
-//	// Set NSObject conformable to the protocol with key
-//	[NSObject setConformable:YES toProtocol:protocol key:key];
-//	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([obj conformsToProtocol:protocol], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Set NSObject conformable to the protocol with other key
-//	[NSObject setConformable:YES toProtocol:protocol key:@"OtherKey"];
-//	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([obj conformsToProtocol:protocol], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Try to set NSObject not-conformable to the protocol
-//	[NSObject setConformable:NO toProtocol:protocol key:@"OtherKey"];
-//	STAssertTrue([NSObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([obj conformsToProtocol:protocol], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:protocol], @"");
-//	
-//	// Set NSObject not-conformable to the protocol
-//	[NSObject setConformable:NO toProtocol:protocol key:key];
-//	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([obj conformsToProtocol:protocol], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:protocol], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__doesNotStackSameKeyForAProtocol
-//{
-//	Protocol *protocol;
-//	NSString *key;
-//	id obj;
-//	protocol = @protocol(NSCopying);
-//	key = NSStringFromSelector(_cmd);
-//	obj = [NSObject object];
-//	
-//	// Set NSObject conformable to the protocol
-//	[NSObject setConformable:YES toProtocol:protocol key:key];
-//	[NSObject setConformable:YES toProtocol:protocol key:key];
-//	[NSObject setConformable:NO toProtocol:protocol key:key];
-//	STAssertFalse([NSObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([obj conformsToProtocol:protocol], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:protocol], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:protocol], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__allowsSameKeyForOtherProtocol
-//{
-//	// Get elements
-//	NSString *key;
-//	id obj;
-//	key = NSStringFromSelector(_cmd);
-//	obj = [NSObject object];
-//	
-//	// Set obj conformable to NSCopying and NSCoding
-//	[NSObject setConformable:YES toProtocol:@protocol(NSCopying) key:key];
-//	[NSObject setConformable:YES toProtocol:@protocol(NSCoding) key:key];
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//	
-//	// Set obj not-conformable to NSCopying
-//	[NSObject setConformable:NO toProtocol:@protocol(NSCopying) key:key];
-//	STAssertFalse([NSObject conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([obj conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertTrue([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertTrue([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//	
-//	// Set obj not-conformable to NSCoding
-//	[NSObject setConformable:NO toProtocol:@protocol(NSCoding) key:key];
-//	STAssertFalse([NSObject conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([obj conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:@protocol(NSCopying)], @"");
-//	STAssertFalse([NSObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertFalse([obj conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertFalse([RETestObject conformsToProtocol:@protocol(NSCoding)], @"");
-//	STAssertFalse([[RETestObject object] conformsToProtocol:@protocol(NSCoding)], @"");
-//}
-//
-//- (void)test_setConformableToProtocol__keyIsDeallocated
-//{
-//	__block BOOL deallocated = NO;
-//	
-//	@autoreleasepool {
-//		// Prepare key
-//		id key;
-//		key = [NSObject object];
-//		[key setBlockForInstanceMethodForSelector:@selector(dealloc) key:nil block:^(id receiver) {
-//			// Raise deallocated flag
-//			deallocated = YES;
-//			
-//			// super
-//			IMP supermethod;
-//			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//				supermethod(receiver, @selector(dealloc));
-//			}
-//		}];
-//		
-//		// Set NSObject conformable to NSCopying
-//		[NSObject setConformable:YES toProtocol:@protocol(NSCopying) key:key];
-//		
-//		// Reset
-//		[NSObject setConformable:NO toProtocol:@protocol(NSCopying) key:key];
-//	}
-//	
-//	// Check
-//	STAssertTrue(deallocated, @"");
-//}
-//
-//- (void)test_respondsToSelector__callWithNil
-//{
-//	// Make obj
-//	BOOL responds;
-//	STAssertNoThrow(responds = [NSObject respondsToSelector:nil], @"");
-//	STAssertFalse(responds, @"");
-//}
-//
-//- (void)test_conformsToProtocol__callWithNil
-//{
-//	// Make obj
-//	BOOL conforms;
-//	STAssertNoThrow(conforms = [NSObject conformsToProtocol:nil], @"");
-//	STAssertFalse(conforms, @"");
-//}
+- (void)test_removeCurrentBlock__callInSupermethod // Check in other test cases >>>
+{
+	SEL sel = _cmd;
+	NSString *string;
+	
+	// Add block1
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		[receiver removeCurrentBlock];
+		return @"block1-";
+	}];
+	
+	// Add block2
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		NSMutableString *str;
+		str = [NSMutableString string];
+		
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[str appendString:supermethod(receiver, sel)];
+		}
+		
+		[str appendString:@"block2"];
+		
+		return str;
+	}];
+	
+	// Call
+	string = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(string, @"block1-block2", @"");
+	
+	// Call again
+	string = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(string, @"block2", @"");
+}
+
+- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
+{
+	SEL sel = @selector(doSomething);
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Call removeCurrentBlock
+	STAssertNoThrow([obj removeCurrentBlock], @"");
+	
+	// Add doSomething method
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		// Do something
+	}];
+	
+	// Call removeCurrentBlock
+	STAssertNoThrow([obj removeCurrentBlock], @"");
+	
+	// Check doSomething method
+	STAssertTrue([NSObject instancesRespondToSelector:sel], @"");
+}
+
+- (void)test_doNotChangeClass
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Get original class
+	Class class;
+	class = [obj class];
+	
+	// Add block
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+	}];
+	
+	// Check class
+	STAssertEquals([obj class], class, @"");
+	STAssertEquals(object_getClass(obj), class, @"");
+}
 
 @end

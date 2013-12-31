@@ -872,26 +872,6 @@
 	STAssertFalse([[RETestObject object] respondsToSelector:sel], @"");
 }
 
-- (void)test_supermethodOf1stDynamicBlock // Check in other test cases >>>
-{
-	SEL sel = @selector(log);
-	__block BOOL called = NO;
-	
-	// Add block
-	[NSString setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-		// Get supermethod
-		REVoidIMP supermethod;
-		supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock];
-		STAssertNil((id)supermethod, @"");
-		
-		called = YES;
-	}];
-	
-	// Call
-	objc_msgSend([NSString string], sel);
-	STAssertTrue(called, @"");
-}
-
 - (void)test_supermethodPointsToNil // Check in other test cases >>>
 {
 	SEL sel = @selector(log);
@@ -972,20 +952,20 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodPointsToBlockOfSuperclass
+- (void)test_supermethodPointsToInstancesBlockOfSuperclass // Check in other test cases >>>
 {
 	SEL sel = _cmd;
 	__block BOOL called = NO;
 	
 	// Get imp
 	IMP imp;
-	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 		called = YES;
 	}];
 	imp = [NSObject instanceMethodForSelector:sel];
 	
 	// Add block
-	[RETestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
 		REVoidIMP supermethod;
 		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {

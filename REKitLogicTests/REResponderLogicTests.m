@@ -1258,8 +1258,8 @@
 
 - (void)test_supermethodOf1stDynamicBlock
 {
-	SEL sel;
-	sel = @selector(log);
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
 	
 	// Make obj
 	NSObject *obj;
@@ -1267,18 +1267,141 @@
 	
 	// Add log method
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
-		NSMutableString *log;
-		log = [NSMutableString string];
-		
 		IMP supermethod;
 		supermethod = [receiver supermethodOfCurrentBlock];
 		STAssertNil((id)supermethod, @"");
 		
-		return @"Dynamic log";
+		called = YES;
 	}];
 	
-	// Perform log
-	[obj performSelector:@selector(log)];
+	// Call
+	[obj performSelector:sel];
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToNil
+{
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [NSArray array];
+	
+	// Add block
+	[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToOriginalMethod
+{
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	IMP originalMethod;
+	originalMethod = [obj methodForSelector:sel];
+	STAssertNotNil((id)originalMethod, @"");
+	
+	// Override log method
+	[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		NSString *res = nil;
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, originalMethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToMethodOfSuperclass
+{
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [RESubTestObject object];
+	
+	// Add log block
+	[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		NSString *res = nil;
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, [RETestObject instanceMethodForSelector:sel], @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToInstancesBlockOfSuperclass
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add method to NSObject
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		called = YES;
+	}];
+	
+	// Get imp
+	IMP imp;
+	imp = [NSObject instanceMethodForSelector:sel];
+	
+	// Add method to obj
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, imp, @"");
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(called, @"");
 }
 
 - (void)test_supermethodOfDynamicBlock

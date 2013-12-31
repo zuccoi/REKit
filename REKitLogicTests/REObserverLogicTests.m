@@ -550,6 +550,8 @@
 		return @"Dynamic";
 	}];
 	
+	STAssertTrue([[obj class] methodForSelector:@selector(read)] != [[obj class] instanceMethodForSelector:@selector(read)], @"");
+	
 	// Change name
 	obj.name = @"name";
 	//

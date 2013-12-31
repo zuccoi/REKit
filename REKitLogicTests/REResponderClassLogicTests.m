@@ -837,7 +837,7 @@
 	STAssertFalse([NSObject respondsToSelector:sel], @"");
 }
 
-- (void)test_supermethodOf1stDynamicBlock
+- (void)test_supermethodPointsToNil
 {
 	SEL sel = @selector(log);
 	
@@ -851,6 +851,122 @@
 	
 	// Call
 	objc_msgSend([NSString class], sel);
+}
+
+- (void)test_supermethodPointsToOriginalMethod
+{
+	SEL sel = @selector(version);
+	__block BOOL called = NO;
+	
+	// Get originalMethod
+	IMP originalMethod;
+	originalMethod = [NSObject methodForSelector:sel];
+	STAssertNotNil((id)originalMethod, @"");
+	
+	// Override
+	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		// supermethod
+		NSInteger res = -1;
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, originalMethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	[NSObject version];
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToMethodOfSuperclass
+{
+	SEL sel = @selector(version);
+	__block BOOL called = NO;
+	
+	[NSArray setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		NSInteger res = -1;
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, [NSObject methodForSelector:sel], @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	[NSArray version];
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodDoesNotPointToInstancesBlock
+{
+	SEL sel = _cmd;
+	__block BOOL dirty = NO;
+	
+	// Add instances block
+	IMP imp;
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		dirty = YES;
+	}];
+	imp = [NSObject instanceMethodForSelector:sel];
+	
+	STAssertTrue([NSObject methodForSelector:sel] != imp, @"");
+	
+	// Add class block
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+	}];
+	
+	// Call
+	objc_msgSend([NSObject class], sel);
+	STAssertTrue(!dirty, @"");
+}
+
+- (void)test_supermethodDoesNotPointToInstancesBlock2 // rename >>>
+{
+	SEL sel = _cmd;
+	__block BOOL dirty = NO;
+	
+	// Add instances block
+	IMP imp;
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		dirty = YES;
+	}];
+	imp = [RETestObject instanceMethodForSelector:sel];
+	
+	STAssertTrue([RETestObject methodForSelector:sel] != imp, @"");
+	
+	// Add class block
+	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+	}];
+	
+	// Call
+	objc_msgSend([RETestObject class], sel);
+	STAssertTrue(!dirty, @"");
 }
 
 - (void)test_supermethodOfSubclass

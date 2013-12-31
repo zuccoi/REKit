@@ -872,7 +872,7 @@
 	STAssertFalse([[RETestObject object] respondsToSelector:sel], @"");
 }
 
-- (void)test_supermethodPointsToNil // Check in other test cases >>>
+- (void)test_supermethodPointsToNil
 {
 	SEL sel = @selector(log);
 	__block BOOL called = NO;
@@ -896,7 +896,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodPointsToOriginalMethod // Check in other test cases >>>
+- (void)test_supermethodPointsToOriginalMethod
 {
 	SEL sel = @selector(log);
 	__block BOOL called = NO;
@@ -926,7 +926,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodPointsToMethodOfSuperclass // Check in other test cases >>>
+- (void)test_supermethodPointsToMethodOfSuperclass
 {
 	SEL sel = @selector(log);
 	__block BOOL called = NO;

@@ -607,10 +607,20 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 			}
 		}
 		
+		// Get originalClassMethod
+		IMP originalClassMethod;
+		originalClassMethod = [[receiver class] methodForSelector:selector];
+		if (originalClassMethod == [[receiver superclass] methodForSelector:selector]) {
+			originalClassMethod = NULL;
+		}
+		
 		// Replace method
 		IMP imp;
 		imp = imp_implementationWithBlock(block);
 		class_replaceMethod((op == REResponderOperationInstances ? receiver : object_getClass(receiver)), selector, imp, [objCTypes UTF8String]);
+		if (op != REResponderOperationClass && originalClassMethod) {
+			class_replaceMethod(object_getClass([receiver class]), selector, originalClassMethod, [objCTypes UTF8String]);
+		}
 		
 		// Replace method of subclasses
 		if (op == REResponderOperationClass) {

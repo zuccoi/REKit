@@ -91,6 +91,27 @@
 	STAssertEquals(imp, [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
+- (void)test_methodForSelectorDoesNotReturnInstanceMethodForClassInstance
+{
+	SEL sel = @selector(log);
+	
+	IMP imp;
+	imp = [RETestObject methodForSelector:sel];
+	STAssertEquals(imp, [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertTrue(imp != [RETestObject instanceMethodForSelector:sel], @"");
+	STAssertTrue(imp != [[RETestObject object] methodForSelector:sel], @"");
+}
+
+- (void)test_methodForSelectorDoesNotReturnClassMethodForInstance
+{
+	SEL sel = @selector(version);
+	
+	IMP imp;
+	imp = [[NSObject object] methodForSelector:sel];
+	STAssertEquals(imp, [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertTrue(imp != [NSObject methodForSelector:sel], @"");
+}
+
 - (void)test_methodForSelectorReturnsForwardingMethodForInstance
 {
 	SEL sel = @selector(unexistingMethod);

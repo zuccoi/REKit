@@ -615,13 +615,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		// Replace method of subclasses
 		if (op == REResponderOperationClass) {
 			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
-// ?????
-//				// Filter
-//				NSString *subclassName;
-//				subclassName = NSStringFromClass(subclass);
-//				if ([subclassName hasPrefix:kClassNamePrefix]) {
-//					continue;
-//				}
+				// Filter
+				NSString *subclassName;
+				subclassName = NSStringFromClass(subclass);
+				if ([subclassName hasPrefix:kClassNamePrefix]) {
+					continue;
+				}
 				
 				// Replace method
 				IMP subImp;
@@ -633,13 +632,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		}
 		else if (op == REResponderOperationInstances) {
 			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
-// ?????
-//				// Filter
-//				NSString *subclassName;
-//				subclassName = NSStringFromClass(subclass);
-//				if ([subclassName hasPrefix:kClassNamePrefix]) {
-//					continue;
-//				}
+				// Filter
+				NSString *subclassName;
+				subclassName = NSStringFromClass(subclass);
+				if ([subclassName hasPrefix:kClassNamePrefix]) {
+					continue;
+				}
 				
 				// Replace
 				IMP subImp;
@@ -878,8 +876,15 @@ void REResponderRemoveCurrentBlock(id receiver)
 		return;
 	}
 	
-	// Call removeBlockForSelector:forKey:
-	[receiver removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+	// Call REResponderRemoveBlock
+	REResponderOperation op;
+	op = [blockInfo[kBlockInfoOperationKey] integerValue];
+	if (op == REResponderOperationInstances) {
+		[[receiver class] removeBlockForInstanceMethodForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+	}
+	else {
+		[receiver removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+	}
 }
 
 + (void)removeCurrentBlock

@@ -916,33 +916,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodPointsToMethodOfSuperclass // Check in other test cases >>>
-{
-	SEL sel = @selector(log);
-	__block BOOL called = NO;
-	
-	// Add log block to RESubTestObject
-	[RESubTestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-		// supermethod
-		id res = nil;
-		typedef id (*id_IMP)(id, SEL, ...);
-		id_IMP supermethod;
-		if ((supermethod = (id_IMP)[receiver supermethodOfCurrentBlock])) {
-			res = supermethod(receiver, sel);
-		}
-		
-		// Check supermethod
-		STAssertEquals(supermethod, [RETestObject instanceMethodForSelector:sel], @"");
-		
-		called = YES;
-	}];
-	
-	// Call
-	objc_msgSend([RESubTestObject object], sel);
-	STAssertTrue(called, @"");
-}
-
-- (void)test_supermethodPointsToOriginalMethod // Check in other test cases
+- (void)test_supermethodPointsToOriginalMethod // Check in other test cases >>>
 {
 	SEL sel = @selector(log);
 	__block BOOL called = NO;
@@ -969,6 +943,32 @@
 	
 	// Call
 	objc_msgSend([RETestObject object], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToMethodOfSuperclass // Check in other test cases >>>
+{
+	SEL sel = @selector(log);
+	__block BOOL called = NO;
+	
+	// Add log block to RESubTestObject
+	[RESubTestObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		// supermethod
+		id res = nil;
+		typedef id (*id_IMP)(id, SEL, ...);
+		id_IMP supermethod;
+		if ((supermethod = (id_IMP)[receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertEquals(supermethod, [RETestObject instanceMethodForSelector:sel], @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([RESubTestObject object], sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1125,281 +1125,298 @@
 	STAssertEqualObjects(imps, expected, @"");
 }
 
-//- (void)test_supermethodOfDynamicBlock
-//{
-//	SEL sel = @selector(log);
-//	NSString *log;
-//	
-//	// Add block1
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"block1" block:^(id receiver) {
-//		NSMutableString *log;
-//		log = [NSMutableString string];
-//		
-//		// Append supermethod's log
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			[log appendString:supermethod(receiver, sel)];
-//		}
-//		
-//		// Append my log
-//		[log appendString:@"-block1"];
-//		
-//		return log;
-//	}];
-//	
-//	// Call log method
-//	log = objc_msgSend([NSObject object], sel);
-//	STAssertEqualObjects(log, @"-block1", @"");
-//	
-//	// Add block2
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"block2" block:^(id receiver) {
-//		// Make log…
-//		NSMutableString *log;
-//		log = [NSMutableString string];
-//		
-//		// Append supermethod's log
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			[log appendString:supermethod(receiver, sel)];
-//		}
-//		
-//		// Append my log
-//		[log appendString:@"-block2"];
-//		
-//		return log;
-//	}];
-//	
-//	// Call log method
-//	log = objc_msgSend([NSObject object], sel);
-//	STAssertEqualObjects(log, @"-block1-block2", @"");
-//	
-//	// Add block3
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:@"block3" block:^NSString*(id receiver) {
-//		// Make log…
-//		NSMutableString *log;
-//		log = [NSMutableString string];
-//		
-//		// Append super's log
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			[log appendString:supermethod(receiver, sel)];
-//		}
-//		
-//		// Append my log
-//		[log appendString:@"-block3"];
-//		
-//		return log;
-//	}];
-//	
-//	// Call log method
-//	log = objc_msgSend([NSObject object], sel);
-//	STAssertEqualObjects(log, @"-block1-block2-block3", @"");
-//	
-//	// Remove block3
-//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block3"];
-//	
-//	// Call log method
-//	log = objc_msgSend([NSObject object], sel);
-//	STAssertEqualObjects(log, @"-block1-block2", @"");
-//	
-//	// Remove block1
-//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block1"];
-//	
-//	// Call log method
-//	log = objc_msgSend([NSObject object], sel);
-//	STAssertEqualObjects(log, @"-block2", @"");
-//	
-//	// Remove block2
-//	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block2"];
-//	STAssertTrue(![[NSObject object] respondsToSelector:sel], @"");
-//}
+- (void)test_supermethodOfDynamicBlock
+{
+	SEL sel = @selector(log);
+	NSString *log;
+	
+	// Add block1
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"block1" block:^(id receiver) {
+		NSMutableString *log;
+		log = [NSMutableString string];
+		
+		// Append supermethod's log
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[log appendString:supermethod(receiver, sel)];
+		}
+		
+		// Append my log
+		[log appendString:@"-block1"];
+		
+		return log;
+	}];
+	
+	// Call log method
+	log = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(log, @"-block1", @"");
+	
+	// Add block2
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"block2" block:^(id receiver) {
+		// Make log…
+		NSMutableString *log;
+		log = [NSMutableString string];
+		
+		// Append supermethod's log
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[log appendString:supermethod(receiver, sel)];
+		}
+		
+		// Append my log
+		[log appendString:@"-block2"];
+		
+		return log;
+	}];
+	
+	// Call log method
+	log = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(log, @"-block1-block2", @"");
+	
+	// Add block3
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"block3" block:^NSString*(id receiver) {
+		// Make log…
+		NSMutableString *log;
+		log = [NSMutableString string];
+		
+		// Append super's log
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[log appendString:supermethod(receiver, sel)];
+		}
+		
+		// Append my log
+		[log appendString:@"-block3"];
+		
+		return log;
+	}];
+	
+	// Call log method
+	log = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(log, @"-block1-block2-block3", @"");
+	
+	// Remove block3
+	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block3"];
+	
+	// Call log method
+	log = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(log, @"-block1-block2", @"");
+	
+	// Remove block1
+	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block1"];
+	
+	// Call log method
+	log = objc_msgSend([NSObject object], sel);
+	STAssertEqualObjects(log, @"-block2", @"");
+	
+	// Remove block2
+	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"block2"];
+	STAssertTrue(![[NSObject object] respondsToSelector:sel], @"");
+}
 
-//- (void)test_supermethodOfOverrideBlock
-//{
-//	SEL sel = @selector(stringWithString:);
-//	NSString *string;
-//	
-//	// Add block1
-//	[NSString setBlockForInstanceMethodForSelector:sel key:@"block1" block:^(id receiver, NSString *string) {
-//		NSMutableString *str;
-//		str = [NSMutableString string];
-//		
-//		// Append supermethod's string
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			[str appendString:supermethod(receiver, sel, string)];
-//		}
-//		
-//		// Append my string
-//		[str appendString:@"-block1"];
-//		
-//		return str;
-//	}];
-//	
-//	// Call
-//	string = objc_msgSend([NSString class], sel, @"string");
-//	STAssertEqualObjects(string, @"string-block1", @"");
-//	
-//	// Add block2
-//	[NSString setBlockForInstanceMethodForSelector:sel key:@"block2" block:^(id receiver, NSString *string) {
-//		NSMutableString *str;
-//		str = [NSMutableString string];
-//		
-//		// Append supermethod's string
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			[str appendString:supermethod(receiver, sel, string)];
-//		}
-//		
-//		// Append my string
-//		[str appendString:@"-block2"];
-//		
-//		return str;
-//	}];
-//	
-//	// Call
-//	string = objc_msgSend([NSString class], sel, @"string");
-//	STAssertEqualObjects(string, @"string-block1-block2", @"");
-//	
-//	// Add block3
-//	[NSString setBlockForInstanceMethodForSelector:sel key:@"block3" block:^(id receiver, NSString *string) {
-//		NSMutableString *str;
-//		str = [NSMutableString string];
-//		
-//		// Append supermethod's string
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			[str appendString:supermethod(receiver, sel, string)];
-//		}
-//		
-//		// Append my string
-//		[str appendString:@"-block3"];
-//		
-//		return str;
-//	}];
-//	
-//	// Call
-//	string = objc_msgSend([NSString class], sel, @"string");
-//	STAssertEqualObjects(string, @"string-block1-block2-block3", @"");
-//	
-//	// Remove block3
-//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block3"];
-//	
-//	// Call
-//	string = objc_msgSend([NSString class], sel, @"string");
-//	STAssertEqualObjects(string, @"string-block1-block2", @"");
-//	
-//	// Remove block1
-//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block1"];
-//	
-//	// Call
-//	string = objc_msgSend([NSString class], sel, @"string");
-//	STAssertEqualObjects(string, @"string-block2", @"");
-//	
-//	// Remove block2
-//	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block2"];
-//	
-//	// Call
-//	string = objc_msgSend([NSString class], sel, @"string");
-//	STAssertEqualObjects(string, @"string", @"");
-//}
-//
-//- (void)test_supermethodReturningScalar
-//{
-//	SEL sel = @selector(version);
-//	
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-//		NSInteger version = -1;
-//		
-//		// Get original version
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			version = (NSInteger)supermethod(receiver, sel);
-//		}
-//		
-//		// Increase version
-//		version++;
-//		
-//		return version;
-//	}];
-//	
-//	// Call
-//	NSInteger version;
-//	version = [NSObject version];
-//	STAssertEquals(version, (NSInteger)1, @"");
-//}
-//
-//- (void)test_supermethodWithArgumentReturningScalar
-//{
-//	SEL sel = @selector(integerWithInteger:);
-//	
-//	// Override
-//	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
-//		NSInteger intg = -1;
-//		
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			intg = (NSInteger)supermethod(receiver, sel, integer);
-//		}
-//		
-//		// Increase inteer
-//		intg++;
-//		
-//		return intg;
-//	}];
-//	
-//	// Call
-//	NSInteger integer;
-//	integer = [RETestObject integerWithInteger:3];
-//	STAssertEquals(integer, (NSInteger)4, @"");
-//}
-//
-//- (void)test_supermethodReturningStructure
-//{
-//	SEL sel = @selector(theRect);
-//	
-//	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-//		// supermethod
-//		CGRect res;
-//		typedef CGRect (*CGRect_IMP)(id, SEL, ...);
-//		CGRect_IMP supermethod;
-//		if ((supermethod = (CGRect_IMP)[receiver supermethodOfCurrentBlock])) {
-//			res = supermethod(receiver, sel);
-//		}
-//		
-//		// Inset
-//		return CGRectInset(res, 10.0, 20.0);
-//	}];
-//	
-//	// Get rect
-//	CGRect rect;
-//	rect = [RETestObject theRect];
-//	STAssertEquals(rect, CGRectMake(110.0, 220.0, 280.0, 360.0), @"");
-//}
-//
-//- (void)test_supermethodReturningVoid
-//{
-//	SEL sel = @selector(sayHello);
-//	__block BOOL called = NO;
-//	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-//		// supermethod
-//		IMP supermethod;
-//		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-//			supermethod(receiver, sel);
-//			called = YES;
-//		}
-//	}];
-//	[RETestObject sayHello];
-//	
-//	STAssertTrue(called, @"");
-//}
-//
-//- (void)test_getSupermethodFromOutsideOfBlock
-//{
-//	IMP supermethod;
-//	supermethod = [NSObject supermethodOfCurrentBlock];
-//	STAssertNil((id)supermethod, @"");
-//}
+- (void)test_supermethodOfOverrideBlock
+{
+	SEL sel = @selector(stringByAppendingString:);
+	NSString *string;
+	
+	// Add block1
+	[NSString setBlockForInstanceMethodForSelector:sel key:@"block1" block:^(id receiver, NSString *string) {
+		NSMutableString *str;
+		str = [NSMutableString string];
+		
+		// Append supermethod's string
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[str appendString:supermethod(receiver, sel, string)];
+		}
+		
+		// Append my string
+		[str appendString:@"-block1"];
+		
+		return str;
+	}];
+	
+	// Call
+	string = objc_msgSend([NSString string], sel, @"string");
+	STAssertEqualObjects(string, @"string-block1", @"");
+	
+	// Add block2
+	[NSString setBlockForInstanceMethodForSelector:sel key:@"block2" block:^(id receiver, NSString *string) {
+		NSMutableString *str;
+		str = [NSMutableString string];
+		
+		// Append supermethod's string
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[str appendString:supermethod(receiver, sel, string)];
+		}
+		
+		// Append my string
+		[str appendString:@"-block2"];
+		
+		return str;
+	}];
+	
+	// Call
+	string = objc_msgSend([NSString string], sel, @"string");
+	STAssertEqualObjects(string, @"string-block1-block2", @"");
+	
+	// Add block3
+	[NSString setBlockForInstanceMethodForSelector:sel key:@"block3" block:^(id receiver, NSString *string) {
+		NSMutableString *str;
+		str = [NSMutableString string];
+		
+		// Append supermethod's string
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[str appendString:supermethod(receiver, sel, string)];
+		}
+		
+		// Append my string
+		[str appendString:@"-block3"];
+		
+		return str;
+	}];
+	
+	// Call
+	string = objc_msgSend([NSString string], sel, @"string");
+	STAssertEqualObjects(string, @"string-block1-block2-block3", @"");
+	
+	// Remove block3
+	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block3"];
+	
+	// Call
+	string = objc_msgSend([NSString string], sel, @"string");
+	STAssertEqualObjects(string, @"string-block1-block2", @"");
+	
+	// Remove block1
+	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block1"];
+	
+	// Call
+	string = objc_msgSend([NSString string], sel, @"string");
+	STAssertEqualObjects(string, @"string-block2", @"");
+	
+	// Remove block2
+	[NSString removeBlockForInstanceMethodForSelector:sel key:@"block2"];
+	
+	// Call
+	string = objc_msgSend([NSString string], sel, @"string");
+	STAssertEqualObjects(string, @"string", @"");
+}
+
+- (void)test_supermethodReturningScalar
+{
+	SEL sel = @selector(age);
+	
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject object];
+	obj.age = 10;
+	
+	// Override age method
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		NSUInteger age = 0;
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			age = supermethod(receiver, sel);
+		}
+		
+		// Increase age
+		age++;
+		
+		return age;
+	}];
+	
+	// Check age
+	STAssertEquals(obj.age, (NSUInteger)11, @"");
+}
+
+- (void)test_supermethodWithArgumentReturningScalar
+{
+	SEL sel = @selector(ageAfterYears:);
+	
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject object];
+	obj.age = 10;
+	
+	// Override ageAfterYears: method
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSUInteger years) {
+		// supermethod
+		NSUInteger age = 0;
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			age = supermethod(receiver, sel, years);
+		}
+		
+		// Increase age
+		age++;
+		
+		return age;
+	}];
+	
+	// Check age
+	NSUInteger age;
+	age = [obj ageAfterYears:3];
+	STAssertEquals(age, (NSUInteger)14, @"");
+}
+
+- (void)test_supermethodReturningStructure
+{
+	SEL sel = @selector(rect);
+	
+	// Make obj
+	RETestObject *obj;
+	obj = [RETestObject object];
+	obj.rect = CGRectMake(10.0f, 20.0f, 30.0f, 40.0f);
+	
+	// Override rect method
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		CGRect res = CGRectZero;
+		typedef CGRect (*CGRectIMP)(id, SEL, ...);
+		CGRectIMP supermethod;
+		if ((supermethod = (CGRectIMP)[receiver supermethodOfCurrentBlock])) {
+			res = supermethod(receiver, sel);
+		}
+		
+		// Inset
+		return CGRectInset(res, 3.0, 6.0);
+	}];
+	
+	// Get rect
+	CGRect rect;
+	rect = obj.rect;
+	STAssertEquals(rect, CGRectMake(13.0f, 26.0f, 24.0f, 28.0f), @"");
+}
+
+- (void)test_supermethodReturningVoid
+{
+	SEL sel = @selector(sayHello);
+	__block BOOL called = NO;
+	
+	// Override sayHello
+	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+			called = YES;
+		}
+	}];
+	[[RETestObject object] sayHello];
+	
+	// Called?
+	STAssertTrue(called, @"");
+}
+
+- (void)test_getSupermethodFromOutsideOfBlock
+{
+	IMP supermethod;
+	supermethod = [NSObject supermethodOfCurrentBlock];
+	STAssertNil((id)supermethod, @"");
+}
 
 - (void)test_removeBlockForInstanceMethodForSelector_key
 {
@@ -1425,19 +1442,50 @@
 	STAssertEquals(imp, [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
-//- (void)test_removeCurrentBlock
-//{
-//	SEL sel = @selector(doSomething);
-//	
-//	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-//		// Remove currentBlock
-//		[receiver removeCurrentBlock];
-//	}];
-//	STAssertTrue([NSObject respondsToSelector:sel], @"");
-//	objc_msgSend([NSObject class], sel);
-//	STAssertFalse([NSObject respondsToSelector:sel], @"");
-//}
-//
+- (void)test_removeBlockForInstanceMethodForSelector_key__doesNotAffectObjectBlock
+{
+	SEL sel = _cmd;
+	__block NSUInteger count = 0;
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Set object block
+	[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+		count++;
+	}];
+	
+	// Set instances block
+	[NSObject setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
+		STFail(@"");
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertEquals(count, (NSUInteger)1, @"");
+	
+	// Remove instances block
+	[NSObject removeBlockForInstanceMethodForSelector:sel key:@"key"];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertEquals(count, (NSUInteger)2, @"");
+}
+
+- (void)test_removeCurrentBlock
+{
+	SEL sel = @selector(oneShot);
+	
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// Remove currentBlock
+		[receiver removeCurrentBlock];
+	}];
+	STAssertTrue([NSObject instancesRespondToSelector:sel], @"");
+	objc_msgSend([NSObject object], sel);
+	STAssertTrue(![NSObject instancesRespondToSelector:sel], @"");
+}
+
 //- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
 //{
 //	SEL sel = @selector(doSomething);

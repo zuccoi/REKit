@@ -981,6 +981,37 @@
 	STAssertTrue(called, @"");
 }
 
+- (void)test_supermethodDoesNotPointToClassMethod // Check in other test cases >>>
+{
+	SEL sel = _cmd;
+	__block BOOL dirty = NO;
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Add class method
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		dirty = YES;
+	}];
+	
+	// Add instance method
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(!dirty, @"");
+}
+
 - (void)test_orderOfSupermethod
 {
 	SEL sel = _cmd;

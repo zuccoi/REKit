@@ -1566,4 +1566,187 @@
 	STAssertEquals(object_getClass(obj), class, @"");
 }
 
+- (void)test_REIMP__void
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		called = YES;
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		(REIMP(void)[receiver supermethodOfCurrentBlock])(receiver, sel);
+	}];
+	
+	// Call
+	objc_msgSend([NSObject object], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_REIMP__id
+{
+	SEL sel = _cmd;
+	
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		return @"hello";
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		NSString *res;
+		res = (REIMP(id)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		return res;
+	}];
+	
+	STAssertEqualObjects(objc_msgSend([NSObject object], sel), @"hello", @"");
+}
+
+- (void)test_REIMP__scalar
+{
+	SEL sel = _cmd;
+	
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		return 1;
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		NSInteger i;
+		i = (REIMP(NSInteger)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		return i + 1;
+	}];
+	
+	STAssertEquals((NSInteger)objc_msgSend([NSObject object], sel), (NSInteger)2, @"");
+}
+
+- (void)test_REIMP__CGRect
+{
+	SEL sel = _cmd;
+	
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(CGRect)supermethod)(receiver, sel);
+		}
+		
+		return CGRectMake(1.0, 2.0, 3.0, 4.0);
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		CGRect rect;
+		rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		rect.origin.x *= 10.0;
+		rect.origin.y *= 10.0;
+		rect.size.width *= 10.0;
+		rect.size.height *= 10.0;
+		
+		return rect;
+	}];
+	
+	// Check rect
+	CGRect rect;
+	rect = (REIMP(CGRect)objc_msgSend_stret)([NSObject object], sel);
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
+}
+
+- (void)test_RESupermethod__void
+{
+	SEL sel = @selector(checkString:);
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		RESupermethod(receiver, sel, string);
+		STAssertEqualObjects(string, @"block", @"");
+	}];
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		RESupermethod(receiver, sel, @"block");
+		STAssertEqualObjects(string, @"string", @"");
+	}];
+	
+	// Call
+	objc_msgSend([NSObject object], sel, @"string");
+}
+
+- (void)test_RESupermethod__id
+{
+	SEL sel = @selector(appendString:);
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"Wow"), string];
+	}];
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"block1"), string];
+	}];
+	
+	// Call
+	NSString *string;
+	string = objc_msgSend([NSObject object], sel, @"block2");
+	STAssertEqualObjects(string, @"(null)block1block2", @"");
+}
+
+- (void)test_RESupermethod__Scalar
+{
+	SEL sel = @selector(addInteger:);
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+		NSInteger value;
+		value = RESupermethod(receiver, sel, integer);
+		
+		// Check
+		STAssertEquals(integer, (NSInteger)1, @"");
+		STAssertEquals(value, (NSInteger)0, @"");
+		
+		return (value + integer);
+	}];
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+		NSInteger value;
+		value = RESupermethod(receiver, sel, 1);
+		
+		// Check
+		STAssertEquals(integer, (NSInteger)2, @"");
+		STAssertEquals(value, (NSInteger)1, @"");
+		
+		return (value + integer);
+	}];
+	
+	// Call
+	NSInteger value;
+	value = objc_msgSend([NSObject object], sel, 2);
+	STAssertEquals(value, (NSInteger)3, @"");
+}
+
+- (void)test_RESupermethod__CGRect
+{
+	SEL sel = @selector(rectWithOrigin:Size:);
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+		CGRect rect;
+		rect = RESupermethodStret((CGRect){}, receiver, sel, origin, size);
+		STAssertEquals(rect, CGRectZero, @"");
+		
+		return CGRectMake(1.0, 2.0, 3.0, 4.0);
+	}];
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+		CGRect rect;
+		rect = RESupermethodStret(CGRectZero, receiver, sel, origin, size);
+		rect.origin.x *= 10.0;
+		rect.origin.y *= 10.0;
+		rect.size.width *= 10.0;
+		rect.size.height *= 10.0;
+		return rect;
+	}];
+	
+	// Call
+	CGRect rect;
+	rect = (REIMP(CGRect)objc_msgSend_stret)([NSObject object], sel, CGPointMake(1.0, 2.0), CGSizeMake(3.0, 4.0));
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
+}
+
 @end

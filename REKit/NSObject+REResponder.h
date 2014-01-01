@@ -10,17 +10,26 @@
 // REVoidIMP
 typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
 #define REIMP(return_type) (__typeof(return_type (*)(id, SEL, ...)))
-#define RESupermethod(return_type, receiver, selector, ...) \
-^{\
-	IMP supermethod = REResponderSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
-	if (supermethod) {\
-		return (REIMP(return_type)supermethod)(receiver, selector, ##__VA_ARGS__);\
-	}\
-	else {\
-		return (return_type)nil;\
-	}\
-}();
-	
+#define RESupermethod(receiver, selector, ...) \
+	^{\
+		IMP supermethod = REResponderSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
+		if (supermethod) {\
+			return (id)supermethod(receiver, selector, ##__VA_ARGS__);\
+		}\
+		else {\
+			return (id)nil;\
+		}\
+	}()
+#define RESupermethodStret(defaultValue, receiver, selector, ...) \
+	^{\
+		IMP supermethod = REResponderSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
+		if (supermethod) {\
+			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))supermethod)(receiver, selector, ##__VA_ARGS__);\
+		}\
+		else {\
+			return (__typeof(defaultValue))defaultValue;\
+		}\
+	}()
 
 
 @interface NSObject (REResponder)

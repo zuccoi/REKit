@@ -4,8 +4,6 @@
  Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
-#import <dlfcn.h>
-#import "execinfo.h"
 #import "NSObject+REResponder.h"
 #import "REUtil.h"
 
@@ -242,32 +240,6 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 IMP REResponderForwardingMethod()
 {
 	return [NSObject methodForSelector:@selector(REResponder_UnexistingMethod)];
-}
-
-IMP REResponderImplementationWithBacktraceDepth(int depth)
-{
-	// Get trace
-	int num;
-	void *trace[depth + 1];
-	num = backtrace(trace, (depth + 1));
-	if (num < (depth + 1)) {
-		return NULL;
-	}
-	
-	// Get imp
-	IMP imp;
-	Dl_info callerInfo;
-	if (!dladdr(trace[depth], &callerInfo)) {
-		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	imp = callerInfo.dli_saddr;
-	if (!imp) {
-		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	
-	return imp;
 }
 
 NSMutableDictionary* REResponderBlocks(id receiver, REResponderOperation op, BOOL create)
@@ -853,7 +825,7 @@ IMP REResponderSupermethodOfCurrentBlock(id receiver)
 	// Get supermethod
 	IMP supermethod;
 	IMP imp;
-	imp = REResponderImplementationWithBacktraceDepth(3);
+	imp = REImplementationWithBacktraceDepth(3);
 	supermethod = [receiver REResponder_supermethodWithImp:imp];
 	
 	return supermethod;
@@ -873,7 +845,7 @@ void REResponderRemoveCurrentBlock(id receiver)
 {
 	// Get imp of current block
 	IMP imp;
-	imp = REResponderImplementationWithBacktraceDepth(3);
+	imp = REImplementationWithBacktraceDepth(3);
 	if (!imp) {
 		return;
 	}

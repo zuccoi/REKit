@@ -9,7 +9,18 @@
 
 // REVoidIMP
 typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
-#define REIMP(type) (__typeof(type (*)(id, SEL, ...)))
+#define REIMP(return_type) (__typeof(return_type (*)(id, SEL, ...)))
+#define RESupermethod(return_type, receiver, selector, ...) \
+^{\
+	IMP supermethod = REResponderSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
+	if (supermethod) {\
+		return (REIMP(return_type)supermethod)(receiver, selector, ##__VA_ARGS__);\
+	}\
+	else {\
+		return (return_type)nil;\
+	}\
+}();
+	
 
 
 @interface NSObject (REResponder)
@@ -48,3 +59,9 @@ typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
 
 @end
+
+#pragma mark -
+
+
+// Private Function
+extern IMP REResponderSupermethodWithImp(id receiver, IMP imp);

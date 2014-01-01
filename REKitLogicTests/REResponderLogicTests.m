@@ -1782,6 +1782,46 @@
 	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
 }
 
+- (void)test_removeCurrentBlock__callInSupermethod
+{
+	SEL sel = _cmd;
+	NSString *string;
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Add block1
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+		[receiver removeCurrentBlock];
+		return @"block1-";
+	}];
+	
+	// Add block2
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+		NSMutableString *str;
+		str = [NSMutableString string];
+		
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[str appendString:supermethod(receiver, sel)];
+		}
+		
+		[str appendString:@"block2"];
+		
+		return str;
+	}];
+	
+	// Call
+	string = objc_msgSend(obj, sel);
+	STAssertEqualObjects(string, @"block1-block2", @"");
+	
+	// Call again
+	string = objc_msgSend(obj, sel);
+	STAssertEqualObjects(string, @"block2", @"");
+}
+
 - (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
 {
 	SEL sel = @selector(doSomething);

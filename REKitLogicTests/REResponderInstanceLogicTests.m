@@ -952,7 +952,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodPointsToInstancesBlockOfSuperclass // Check in other test cases >>>
+- (void)test_supermethodPointsToInstancesBlockOfSuperclass
 {
 	SEL sel = _cmd;
 	__block BOOL called = NO;
@@ -981,7 +981,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodDoesNotPointToClassMethod // Check in other test cases >>>
+- (void)test_supermethodDoesNotPointToClassMethod
 {
 	SEL sel = _cmd;
 	__block BOOL dirty = NO;
@@ -1497,7 +1497,7 @@
 	STAssertTrue(![NSObject instancesRespondToSelector:sel], @"");
 }
 
-- (void)test_removeCurrentBlock__callInSupermethod // Check in other test cases >>>
+- (void)test_removeCurrentBlock__callInSupermethod
 {
 	SEL sel = _cmd;
 	NSString *string;

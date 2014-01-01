@@ -47,6 +47,16 @@
 	STAssertEquals(object_getClass(object_getClass([NSObject class])), object_getClass([NSObject class]), @"");
 }
 
+- (void)test_superclassOfNSObjectIsNull
+{
+	STAssertNil([NSObject superclass], @"");
+}
+
+- (void)test_class_getSuperclass__ForNSObjectIsNull
+{
+	STAssertNil(class_getSuperclass([NSObject class]), @"");
+}
+
 - (void)test_forwardingMethodsIsSame
 {
 	SEL sel = @selector(unexistingMethod);

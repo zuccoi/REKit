@@ -910,12 +910,11 @@
 - (void)test_supermethodDoesNotPointToInstancesBlock
 {
 	SEL sel = _cmd;
-	__block BOOL dirty = NO;
+	__block BOOL called = NO;
 	
 	// Add instances block
 	IMP imp;
 	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-		dirty = YES;
 	}];
 	imp = [NSObject instanceMethodForSelector:sel];
 	
@@ -931,26 +930,23 @@
 		
 		// Check supermethod
 		STAssertNil((id)supermethod, @"");
+		
+		called = YES;
 	}];
 	
 	// Call
 	objc_msgSend([NSObject class], sel);
-	STAssertTrue(!dirty, @"");
+	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethodDoesNotPointToInstancesBlock2 // rename >>>
+- (void)test_supermethodDoesNotPointToInstancesBlockOfSuperclass
 {
 	SEL sel = _cmd;
-	__block BOOL dirty = NO;
+	__block BOOL called = NO;
 	
 	// Add instances block
-	IMP imp;
-	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-		dirty = YES;
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 	}];
-	imp = [RETestObject instanceMethodForSelector:sel];
-	
-	STAssertTrue([RETestObject methodForSelector:sel] != imp, @"");
 	
 	// Add class block
 	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
@@ -962,11 +958,121 @@
 		
 		// Check supermethod
 		STAssertNil((id)supermethod, @"");
+		
+		called = YES;
 	}];
 	
 	// Call
 	objc_msgSend([RETestObject class], sel);
-	STAssertTrue(!dirty, @"");
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodDoesNotPointToObjectBlock
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Add object block
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+	}];
+	
+	// Add class block
+	[[obj class] setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([obj class], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodDoesNotPointToObjectBlockOfSuperclass
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Add object block
+	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+	}];
+	
+	// Add class block
+	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		REVoidIMP supermethod;
+		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+			supermethod(receiver, sel);
+		}
+		
+		// Check supermethod
+		STAssertNil((id)supermethod, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([RETestObject class], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToClassMethodOfSuperclass
+{
+	SEL sel = @selector(version);
+	__block BOOL called = NO;
+	
+	// Override
+	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// Check supermethod
+		STAssertEquals([receiver supermethodOfCurrentBlock], [NSObject methodForSelector:sel], @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([RETestObject class], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_supermethodPointsToClassBlockOfSuperclass
+{
+	SEL sel = _cmd;
+	__block BOOL called = YES;
+	
+	// Add block
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	}];
+	
+	// Get imp
+	IMP imp;
+	imp = [NSObject methodForSelector:sel];
+	
+	// Add block
+	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// Check supermethod
+		STAssertEquals([receiver supermethodOfCurrentBlock], imp, @"");
+		
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend([RETestObject class], sel);
+	STAssertTrue(called, @"");
 }
 
 - (void)test_supermethodOfSubclass
@@ -1315,6 +1421,42 @@
 	STAssertTrue([NSObject respondsToSelector:sel], @"");
 	objc_msgSend([NSObject class], sel);
 	STAssertFalse([NSObject respondsToSelector:sel], @"");
+}
+
+- (void)test_removeCurrentBlock__callInSupermethod
+{
+	SEL sel = _cmd;
+	NSString *string;
+	
+	// Add block1
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+		[receiver removeCurrentBlock];
+		return @"block1-";
+	}];
+	
+	// Add block2
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+		NSMutableString *str;
+		str = [NSMutableString string];
+		
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			[str appendString:supermethod(receiver, sel)];
+		}
+		
+		[str appendString:@"block2"];
+		
+		return str;
+	}];
+	
+	// Call
+	string = objc_msgSend([NSObject class], sel);
+	STAssertEqualObjects(string, @"block1-block2", @"");
+	
+	// Call again
+	string = objc_msgSend([NSObject class], sel);
+	STAssertEqualObjects(string, @"block2", @"");
 }
 
 - (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock

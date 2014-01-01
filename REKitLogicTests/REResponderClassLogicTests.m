@@ -500,7 +500,7 @@
 	}];
 	
 	// Check rect
-	rect = ((CGRect(*)(id, SEL, ...))objc_msgSend_stret)([NSObject class], sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
+	rect = (REIMP(CGRect)objc_msgSend_stret)([NSObject class], sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
@@ -1346,6 +1346,31 @@
 	CGRect rect;
 	rect = [RETestObject theRect];
 	STAssertEquals(rect, CGRectMake(110.0, 220.0, 280.0, 360.0), @"");
+}
+
+- (void)test_superBlockReturningStructure
+{
+	SEL sel = @selector(rect);
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		return CGRectMake(1.0, 2.0, 3.0, 4.0);
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		CGRect rect = CGRectZero;
+		if ([receiver supermethodOfCurrentBlock]) {
+			rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		}
+		rect.origin.x *= 10.0;
+		rect.origin.y *= 10.0;
+		rect.size.width *= 10.0;
+		rect.size.height *= 10.0;
+		
+		return rect;
+	}];
+	
+	// Get rect
+	CGRect rect;
+	rect = (REIMP(CGRect)objc_msgSend_stret)([NSObject class], sel);
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
 - (void)test_supermethodReturningVoid

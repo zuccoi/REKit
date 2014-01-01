@@ -562,7 +562,7 @@
 	}];
 	
 	// Check rect
-	rect = ((CGRect(*)(id, SEL, ...))objc_msgSend_stret)([NSObject object], sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
+	rect = (REIMP(CGRect)objc_msgSend_stret)([NSObject object], sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 

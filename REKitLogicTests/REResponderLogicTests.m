@@ -62,6 +62,83 @@
 	[super tearDown];
 }
 
+- (void)test_REIMP__void
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		called = YES;
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		(REIMP(void)[receiver supermethodOfCurrentBlock])(receiver, sel);
+	}];
+	
+	// Call
+	objc_msgSend([NSObject class], sel);
+	STAssertTrue(called, @"");
+}
+
+- (void)test_REIMP__id
+{
+	SEL sel = _cmd;
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		return @"hello";
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		NSString *res;
+		res = (REIMP(id)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		return res;
+	}];
+	
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"hello", @"");
+}
+
+- (void)test_REIMP__NSString
+{
+	SEL sel = _cmd;
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		return @"hello";
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		NSString *res;
+		res = (REIMP(NSString*)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		return res;
+	}];
+	
+	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"hello", @"");
+}
+
+- (void)test_REIMP__CGRect
+{
+	SEL sel = _cmd;
+	
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(CGRect)supermethod)(receiver, sel);
+		}
+		
+		return CGRectMake(1.0, 2.0, 3.0, 4.0);
+	}];
+	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+		CGRect rect;
+		rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		rect.origin.x *= 10.0;
+		rect.origin.y *= 10.0;
+		rect.size.width *= 10.0;
+		rect.size.height *= 10.0;
+		
+		return rect;
+	}];
+	
+	// Check rect
+	CGRect rect;
+	rect = (REIMP(CGRect)objc_msgSend_stret)([NSObject class], sel);
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
+}
+
 - (void)test_respondsToUnimplementedMethod
 {
 	SEL sel = @selector(log);
@@ -814,7 +891,7 @@
 	}];
 	
 	// Check rect
-	rect = ((CGRect(*)(id, SEL, ...))objc_msgSend_stret)(obj, sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
+	rect = (REIMP(CGRect)objc_msgSend_stret)(obj, sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 

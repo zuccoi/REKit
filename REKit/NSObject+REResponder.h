@@ -8,7 +8,8 @@
 
 
 // REVoidIMP
-typedef void (*REVoidIMP)(id, SEL, ...);
+typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
+#define REIMP(type) (__typeof(type (*)(id, SEL, ...)))
 
 
 @interface NSObject (REResponder)

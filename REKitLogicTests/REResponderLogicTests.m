@@ -168,9 +168,9 @@
 			deallocated = YES;
 			
 			// supermethod
-			REVoidIMP supermethod;
-			if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(dealloc));
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+				(REIMP(void)supermethod)(receiver, @selector(dealloc));
 			}
 		}];
 	}
@@ -201,9 +201,9 @@
 			deallocated = YES;
 			
 			// supermethod
-			REVoidIMP supermethod;
-			if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-				supermethod(receiver, @selector(dealloc));
+			IMP supermethod;
+			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+				(REIMP(void)supermethod)(receiver, @selector(dealloc));
 			}
 		}];
 	}
@@ -832,9 +832,9 @@
 	}];
 	
 	// Call imp
-	REVoidIMP imp;
-	imp = (REVoidIMP)[obj methodForSelector:@selector(doSomething)];
-	imp(obj, @selector(doSomething));
+	IMP imp;
+	imp = [obj methodForSelector:@selector(doSomething)];
+	(REIMP(void)imp)(obj, @selector(doSomething));
 	STAssertTrue(called, @"");
 }
 
@@ -1279,14 +1279,8 @@
 	
 	// Add block
 	[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
-		}
-		
 		// Check supermethod
-		STAssertNil((id)supermethod, @"");
+		STAssertNil((id)[receiver supermethodOfCurrentBlock], @"");
 		
 		called = YES;
 	}];
@@ -1378,10 +1372,9 @@
 	
 	// Add method to obj
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod(receiver, sel));
 		}
 		
 		// Check supermethod
@@ -1409,10 +1402,9 @@
 	
 	// Add object method
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod(receiver, sel));
 		}
 		
 		// Check supermethod
@@ -2302,13 +2294,13 @@
 	
 	// Add block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(receiver, sel, string);
+		RESupermethod(id, receiver, sel, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(receiver, sel, @"block");
+		RESupermethod(id, receiver, sel, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
 	
@@ -2326,12 +2318,12 @@
 	
 	// Add block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"Wow"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"Wow"), string];
 	}];
 	
 	// Add block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"block1"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"block1"), string];
 	}];
 	
 	// Call
@@ -2351,7 +2343,7 @@
 	// Add block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(receiver, sel, integer);
+		value = RESupermethod(NSInteger, receiver, sel, integer);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)1, @"");
@@ -2363,7 +2355,7 @@
 	// Add block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(receiver, sel, 1);
+		value = RESupermethod(NSInteger, receiver, sel, 1);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)2, @"");

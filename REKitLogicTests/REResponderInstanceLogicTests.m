@@ -577,9 +577,9 @@
 	}];
 	
 	// Call imp
-	REVoidIMP imp;
-	imp = (REVoidIMP)[NSObject instanceMethodForSelector:sel];
-	imp([NSObject object], sel);
+	IMP imp;
+	imp = [NSObject instanceMethodForSelector:sel];
+	(REIMP(void)imp)([NSObject object], sel);
 	STAssertTrue(called, @"");
 }
 
@@ -868,14 +868,8 @@
 	
 	// Add block
 	[NSArray setBlockForInstanceMethodForSelector:sel key:@"key" block:^(id receiver) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
-		}
-		
 		// Check supermethod
-		STAssertNil((id)supermethod, @"");
+		STAssertNil((id)[receiver supermethodOfCurrentBlock], @"");
 		
 		called = YES;
 	}];
@@ -955,10 +949,9 @@
 	
 	// Add block
 	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
 		// Check supermethod
@@ -986,14 +979,8 @@
 	
 	// Add instance method
 	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
-		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
-		}
-		
 		// Check supermethod
-		STAssertNil((id)supermethod, @"");
+		STAssertNil((id)[receiver supermethodOfCurrentBlock], @"");
 	}];
 	
 	// Call
@@ -1015,10 +1002,11 @@
 	// Add block to testObj
 	[testObj setBlockForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp1;
@@ -1027,10 +1015,11 @@
 	// Add block to NSObject
 	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp2;
@@ -1039,10 +1028,11 @@
 	// Add object block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp3;
@@ -1051,10 +1041,11 @@
 	// Add block to RETestObject
 	[RETestObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp4;
@@ -1063,10 +1054,11 @@
 	// Add block to NSObject
 	[[obj class] setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp5;
@@ -1075,10 +1067,11 @@
 	// Add object block
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp6;
@@ -1087,10 +1080,11 @@
 	// Add block to testObj
 	[testObj setBlockForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp7;
@@ -1099,10 +1093,11 @@
 	// Add block to RETestObject
 	[[testObj class] setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			supermethod(receiver, sel);
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 	}];
 	IMP imp8;
@@ -1571,10 +1566,10 @@
 	SEL sel = _cmd;
 	__block BOOL called = NO;
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		called = YES;
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		(REIMP(void)[receiver supermethodOfCurrentBlock])(receiver, sel);
 	}];
 	
@@ -1587,10 +1582,10 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		return @"hello";
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		NSString *res;
 		res = (REIMP(id)[receiver supermethodOfCurrentBlock])(receiver, sel);
 		return res;
@@ -1603,10 +1598,10 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		return 1;
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		NSInteger i;
 		i = (REIMP(NSInteger)[receiver supermethodOfCurrentBlock])(receiver, sel);
 		return i + 1;
@@ -1619,18 +1614,17 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
-		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-			(REIMP(CGRect)supermethod)(receiver, sel);
-		}
+		CGRect res;
+		res = RESupermethodStret(CGRectZero, receiver, sel);
 		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
+		// supermethod
 		CGRect rect;
-		rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		rect = RESupermethodStret(CGRectZero, receiver, sel);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;
@@ -1650,14 +1644,14 @@
 	SEL sel = @selector(checkString:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(receiver, sel, string);
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		RESupermethod(void, receiver, sel, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(receiver, sel, @"block");
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		RESupermethod(void, receiver, sel, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
 	
@@ -1670,13 +1664,13 @@
 	SEL sel = @selector(appendString:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"Wow"), string];
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"Wow"), string];
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"block1"), string];
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSString *string) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"block1"), string];
 	}];
 	
 	// Call
@@ -1690,9 +1684,9 @@
 	SEL sel = @selector(addInteger:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(receiver, sel, integer);
+		value = RESupermethod(NSInteger, receiver, sel, integer);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)1, @"");
@@ -1702,9 +1696,9 @@
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(receiver, sel, 1);
+		value = RESupermethod(NSInteger, receiver, sel, 1);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)2, @"");
@@ -1724,7 +1718,7 @@
 	SEL sel = @selector(rectWithOrigin:Size:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
 		rect = RESupermethodStret((CGRect){}, receiver, sel, origin, size);
 		STAssertEquals(rect, CGRectZero, @"");
@@ -1733,7 +1727,7 @@
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
 		rect = RESupermethodStret(CGRectZero, receiver, sel, origin, size);
 		rect.origin.x *= 10.0;

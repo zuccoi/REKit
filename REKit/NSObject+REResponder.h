@@ -6,18 +6,15 @@
 
 #import <Foundation/Foundation.h>
 
-
-// REVoidIMP
-typedef void (*REVoidIMP)(id, SEL, ...); // Needed ?????
-#define REIMP(return_type) (__typeof(return_type (*)(id, SEL, ...)))
-#define RESupermethod(receiver, selector, ...) \
+#define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
+#define RESupermethod(ReturnType, receiver, selector, ...) \
 	^{\
 		IMP supermethod = REResponderSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
 		if (supermethod) {\
-			return (id)supermethod(receiver, selector, ##__VA_ARGS__);\
+			return (REIMP(ReturnType)supermethod)(receiver, selector, ##__VA_ARGS__);\
 		}\
 		else {\
-			return (id)nil;\
+			return (ReturnType)nil;\
 		}\
 	}()
 #define RESupermethodStret(defaultValue, receiver, selector, ...) \

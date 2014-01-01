@@ -47,10 +47,7 @@
 		self_.observer = nil;
 		
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, @selector(setView:), view);
-		}
+		RESupermethod(void, self_, @selector(setView:), view);
 		
 		// Start observing
 		if (!view) {

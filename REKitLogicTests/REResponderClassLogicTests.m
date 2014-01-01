@@ -515,9 +515,9 @@
 	}];
 	
 	// Call imp
-	REVoidIMP imp;
-	imp = (REVoidIMP)[NSObject methodForSelector:selector];
-	imp([NSObject class], selector);
+	IMP imp;
+	imp = [NSObject methodForSelector:selector];
+	(REIMP(void)imp)([NSObject class], selector);
 	STAssertTrue(called, @"");
 }
 
@@ -833,8 +833,8 @@
 	// Add block
 	[NSString setBlockForSelector:sel key:nil block:^(id receiver) {
 		// Get supermethod
-		REVoidIMP supermethod;
-		supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock];
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
 		STAssertNil((id)supermethod, @"");
 	}];
 	
@@ -912,9 +912,9 @@
 	// Add class block
 	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
 		// Check supermethod
@@ -940,9 +940,9 @@
 	// Add class block
 	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
 		// Check supermethod
@@ -972,9 +972,9 @@
 	// Add class block
 	[[obj class] setBlockForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
 		// Check supermethod
@@ -1004,9 +1004,9 @@
 	// Add class block
 	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
-		REVoidIMP supermethod;
-		if ((supermethod = (REVoidIMP)[receiver supermethodOfCurrentBlock])) {
-			supermethod(receiver, sel);
+		IMP supermethod;
+		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
 		// Check supermethod
@@ -1886,13 +1886,13 @@
 	
 	// Add block
 	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(receiver, sel, string);
+		RESupermethod(void, receiver, sel, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
 	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(receiver, sel, @"block");
+		RESupermethod(void, receiver, sel, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
 	
@@ -1906,12 +1906,12 @@
 	
 	// Add block
 	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"Wow"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"Wow"), string];
 	}];
 	
 	// Add block
 	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(receiver, sel, @"block1"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"block1"), string];
 	}];
 	
 	// Call
@@ -1927,7 +1927,7 @@
 	// Add block
 	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(receiver, sel, integer);
+		value = RESupermethod(NSInteger, receiver, sel, integer);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)1, @"");
@@ -1939,7 +1939,7 @@
 	// Add block
 	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(receiver, sel, 1);
+		value = RESupermethod(NSInteger, receiver, sel, 1);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)2, @"");

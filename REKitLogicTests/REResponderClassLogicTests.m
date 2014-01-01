@@ -1355,10 +1355,11 @@
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
 	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
-		CGRect rect = CGRectZero;
-		if ([receiver supermethodOfCurrentBlock]) {
-			rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
-		}
+		// supermethod
+		CGRect rect;
+		rect = RESupermethodStret(CGRectZero, receiver, sel);
+		
+		// Modify rect
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

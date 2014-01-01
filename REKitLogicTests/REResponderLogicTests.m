@@ -168,10 +168,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-				(REIMP(void)supermethod)(receiver, @selector(dealloc));
-			}
+			RESupermethod(void, receiver, @selector(dealloc));
 		}];
 	}
 	
@@ -201,10 +198,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
-				(REIMP(void)supermethod)(receiver, @selector(dealloc));
-			}
+			RESupermethod(void, receiver, @selector(dealloc));
 		}];
 	}
 	
@@ -1372,6 +1366,7 @@
 	
 	// Add method to obj
 	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
 			(REIMP(void)supermethod(receiver, sel));

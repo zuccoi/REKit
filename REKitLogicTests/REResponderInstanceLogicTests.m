@@ -1617,14 +1617,18 @@
 	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
 		CGRect res;
-		res = RESupermethodStret(CGRectZero, receiver, sel);
+		IMP supermethod;
+		supermethod = [receiver supermethodOfCurrentBlock];
+		if (supermethod) {
+			res = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
+		}
 		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
 	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(Class receiver) {
 		// supermethod
 		CGRect rect;
-		rect = RESupermethodStret(CGRectZero, receiver, sel);
+		rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

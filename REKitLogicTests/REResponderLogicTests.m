@@ -813,20 +813,9 @@
 		return (CGRect){.origin = origin, .size = size};
 	}];
 	
-	// Call the method
-	NSInvocation *invocation;
-	CGPoint origin;
-	CGSize size;
-	origin = CGPointMake(10.0f, 20.0f);
-	size = CGSizeMake(30.0f, 40.0f);
-	invocation = [NSInvocation invocationWithMethodSignature:[obj methodSignatureForSelector:sel]];
-	[invocation setTarget:obj];
-	[invocation setSelector:sel];
-	[invocation setArgument:&origin atIndex:2];
-	[invocation setArgument:&size atIndex:3];
-	[invocation invoke];
-	[invocation getReturnValue:&rect];
-	STAssertEquals(rect, CGRectMake(10.0f, 20.0f, 30.0f, 40.0f), @"");
+	// Check rect
+	rect = ((CGRect(*)(id, SEL, ...))objc_msgSend_stret)(obj, sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
 - (void)test_methodForSelector__executeReturnedIMP

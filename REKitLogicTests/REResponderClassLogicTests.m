@@ -491,28 +491,17 @@
 
 - (void)test_allowStructures
 {
-	SEL selector = @selector(makeRectWithOrigin:size:);
+	SEL sel = @selector(makeRectWithOrigin:size:);
 	CGRect rect;
 	
 	// Add block
-	[NSObject setBlockForSelector:selector key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		return (CGRect){.origin = origin, .size = size};
 	}];
 	
-	// Call the method
-	NSInvocation *invocation;
-	CGPoint origin;
-	CGSize size;
-	origin = CGPointMake(10.0f, 20.0f);
-	size = CGSizeMake(30.0f, 40.0f);
-	invocation = [NSInvocation invocationWithMethodSignature:[NSObject methodSignatureForSelector:selector]];
-	[invocation setTarget:[NSObject class]];
-	[invocation setSelector:selector];
-	[invocation setArgument:&origin atIndex:2];
-	[invocation setArgument:&size atIndex:3];
-	[invocation invoke];
-	[invocation getReturnValue:&rect];
-	STAssertEquals(rect, CGRectMake(10.0f, 20.0f, 30.0f, 40.0f), @"");
+	// Check rect
+	rect = ((CGRect(*)(id, SEL, ...))objc_msgSend_stret)([NSObject class], sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
+	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
 - (void)test_methodForSelector__executeReturnedIMP

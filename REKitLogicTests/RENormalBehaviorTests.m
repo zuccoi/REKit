@@ -266,4 +266,17 @@
 	STAssertEqualObjects(NSStringFromClass([[array class] superclass]), @"NSArray", @"");
 }
 
+- (void)_reconnectString:(NSString*)string
+{
+	string = @"reconnected";
+}
+
+- (void)test_canReconnectArgument
+{
+	NSString *string;
+	string = @"original";
+	[self _reconnectString:string];
+	STAssertEqualObjects(string, @"original", @"");
+}
+
 @end

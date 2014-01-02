@@ -425,7 +425,7 @@ IMP REResponderGetSupermethodWithImp(id receiver, IMP imp)
 	return supermethod;
 }
 
-void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id block, REResponderOperation op)
+void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block, REResponderOperation op)
 {
 	// Filter
 	if (!selector || !block) {
@@ -443,7 +443,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 			superclass = [[receiver class] superclass];
 			while (superclass) {
 				if (![NSStringFromClass(superclass) hasPrefix:kClassNamePrefix]) {
-					REResponderSetBlockForSelector(superclass, selector, inKey, block, op);
+					REResponderSetBlockForSelector(superclass, selector, key, block, op);
 					return;
 				}
 			}
@@ -452,8 +452,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	}
 	
 	// Get key
-	id key;
-	key = (inKey ? inKey : REUUIDString());
+	key = (key ? key : REUUIDString());
 	
 	// Get selectorName
 	NSString *selectorName;
@@ -842,16 +841,15 @@ void REResponderRemoveCurrentBlock(id receiver)
 #pragma mark -- Conformance --
 //--------------------------------------------------------------//
 
-void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol *protocol, id inKey)
+void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol *protocol, id key)
 {
 	// Filter
-	if (!protocol || (!conformable && !inKey)) {
+	if (!protocol || (!conformable && !key)) {
 		return;
 	}
 	
 	// Get key
-	id key;
-	key = inKey ? inKey : REUUIDString();
+	key = key ? key : REUUIDString();
 	
 	// Update REResponder_protocols
 	@synchronized (receiver) {
@@ -925,24 +923,24 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 	}
 }
 
-+ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
++ (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)key
 {
 	// Filter
 	if (self != [self class]) {
 		return;
 	}
 	
-	REResponderSetConformableToProtocol(self, conformable, protocol, inKey);
+	REResponderSetConformableToProtocol(self, conformable, protocol, key);
 }
 
-- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)inKey
+- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)key
 {
 	// Filter
 	if (self == [self class]) {
 		return;
 	}
 	
-	REResponderSetConformableToProtocol(self, conformable, protocol, inKey);
+	REResponderSetConformableToProtocol(self, conformable, protocol, key);
 }
 
 @end

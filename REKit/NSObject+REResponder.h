@@ -63,16 +63,11 @@
 // Private Function
 extern IMP REResponderSupermethodWithImp(id receiver, IMP imp);
 
-// Private Methods
-@interface NSObject (REResponderPrivate)
-+ (IMP)supermethodOfCurrentBlock;
-- (IMP)supermethodOfCurrentBlock;
-@end
-
 // Deprecated Methods
 @interface NSObject (REResponderDeprecated)
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
+- (IMP)supermethodOfCurrentBlock __attribute__((deprecated));
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
 @end

@@ -959,6 +959,10 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 #pragma mark -
 
 
+@interface NSObject (REResponderPrivate)
++ (IMP)supermethodOfCurrentBlock;
+@end
+
 @implementation NSObject (REResponderPrivate)
 
 IMP REResponderSupermethodOfCurrentBlock(id receiver)
@@ -973,11 +977,6 @@ IMP REResponderSupermethodOfCurrentBlock(id receiver)
 }
 
 + (IMP)supermethodOfCurrentBlock
-{
-	return REResponderSupermethodOfCurrentBlock(self);
-}
-
-- (IMP)supermethodOfCurrentBlock
 {
 	return REResponderSupermethodOfCurrentBlock(self);
 }
@@ -1002,6 +1001,11 @@ IMP REResponderSupermethodOfCurrentBlock(id receiver)
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
 	[self removeBlockForInstanceMethod:selector key:key];
+}
+
+- (IMP)supermethodOfCurrentBlock
+{
+	return REResponderSupermethodOfCurrentBlock(self);
 }
 
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated))

@@ -977,7 +977,7 @@
 			
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
 				supermethod(receiver, sel);
 			}
 		}];
@@ -1010,7 +1010,7 @@
 			
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
 				supermethod(receiver, sel);
 			}
 		}];

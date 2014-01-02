@@ -41,7 +41,7 @@
 	__block typeof(self) self_ = self;
 	
 	#pragma mark └ [self setView:]
-	[self setBlockForSelector:@selector(setView:) key:nil block:^(id receiver, NSView *view) {
+	[self setBlockForInstanceMethod:@selector(setView:) key:nil block:^(id receiver, NSView *view) {
 		// Stop observing
 		[self_.observer stopObserving];
 		self_.observer = nil;
@@ -107,7 +107,7 @@
 	[alert setInformativeText:@"This alert's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature."];
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
-	[alert setBlockForSelector:selector key:nil block:^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
+	[alert setBlockForInstanceMethod:selector key:nil block:^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
 		// Cancel
 		if (returnCode == NSAlertSecondButtonReturn) {
 			return;

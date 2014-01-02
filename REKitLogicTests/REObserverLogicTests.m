@@ -27,7 +27,7 @@
 	// Make observer
 	id observer;
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -155,7 +155,7 @@
 	// Make observer
 	id observer;
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -230,7 +230,7 @@
 	// Make observer
 	id observer;
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -479,7 +479,7 @@
 	
 	// Make observer
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -547,7 +547,7 @@
 	// Add read method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(read) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(read) key:key block:^(id receiver) {
 		return @"Dynamic";
 	}];
 	
@@ -625,7 +625,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
 		return @"Overridden";
 	}];
 	
@@ -672,7 +672,7 @@
 	id observer;
 	__block NSString *recognizedName = nil;
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	[obj addObserver:observer forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
@@ -680,7 +680,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
 		return @"Dynamic";
 	}];
 	
@@ -725,7 +725,7 @@
 	id observer;
 	__block NSString *recognizedName = nil;
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	[obj addObserver:observer forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
@@ -733,7 +733,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
 		return @"Overridden";
 	}];
 	
@@ -779,13 +779,13 @@
 	id observer;
 	__block NSString *recognizedName = nil;
 	observer = [NSObject object];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	[objs addObserver:observer toObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 1)] forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
 	
 	// Override log method
-	[obj0 setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
+	[obj0 setBlockForInstanceMethod:@selector(log) key:nil block:^(id receiver) {
 		return @"Overrideen";
 	}];
 	
@@ -936,13 +936,13 @@
 		block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
 		
 		// Override methods
-		[block setBlockForSelector:@selector(release) key:nil block:^(id receiver) {
+		[block setBlockForInstanceMethod:@selector(release) key:nil block:^(id receiver) {
 			released = YES;
 		}];
-		[block setBlockForSelector:@selector(copy) key:nil block:^(id receiver) {
+		[block setBlockForInstanceMethod:@selector(copy) key:nil block:^(id receiver) {
 			STFail(@"");
 		}];
-		[block setBlockForSelector:@selector(retain) key:nil block:^(id receiver) {
+		[block setBlockForInstanceMethod:@selector(retain) key:nil block:^(id receiver) {
 			STFail(@"");
 		}];
 		
@@ -971,7 +971,7 @@
 		
 		// Override dealloc method of observingInfos
 		SEL sel = @selector(dealloc);
-		[[observer observingInfos] setBlockForSelector:sel key:nil block:^(id receiver) {
+		[[observer observingInfos] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
 			
@@ -1004,7 +1004,7 @@
 		
 		// Override dealloc method of observedInfos
 		SEL sel = @selector(dealloc);
-		[[obj observedInfos] setBlockForSelector:sel key:nil block:^(id receiver) {
+		[[obj observedInfos] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
 			

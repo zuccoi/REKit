@@ -71,7 +71,7 @@
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 	
 	// Responds to log method dynamically
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		// Check receiver
 		STAssertTrue(receiver == [NSObject class], @"");
 		
@@ -96,7 +96,7 @@
 	SEL selector = @selector(object);
 	
 	// Override
-	[RETestObject setBlockForSelector:selector key:nil block:^(id receiver) {
+	[RETestObject setBlockForClassMethod:selector key:nil block:^(id receiver) {
 		RETestObject *obj;
 		obj = [[[RETestObject alloc] init] autorelease];
 		obj.name = @"overridden";
@@ -114,7 +114,7 @@
 	NSString *log;
 	
 	// Responds to log method dynamically
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return @"block";
 	}];
 	
@@ -135,10 +135,10 @@
 	SEL sel = _cmd;
 	
 	// Add block
-	[RETestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"RETestObject";
 	}];
-	[RESubTestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[RESubTestObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"RESubTestObject";
 	}];
 	
@@ -149,7 +149,7 @@
 	STAssertEquals([RESubTestObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 	
 	// Add block to NSObject
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -165,7 +165,7 @@
 	NSInteger version;
 	
 	// Override +[NSObject version]
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return 3;
 	}];
 	
@@ -186,7 +186,7 @@
 	SEL selector = @selector(log);
 	
 	// Override
-	[RETestObject setBlockForSelector:selector key:nil block:^(id receiver) {
+	[RETestObject setBlockForClassMethod:selector key:nil block:^(id receiver) {
 		return @"block";
 	}];
 	
@@ -200,7 +200,7 @@
 	SEL selector = @selector(integerWithInteger:);
 	
 	// Override
-	[RESubTestObject setBlockForSelector:selector key:nil block:^(id receiver, NSInteger integer) {
+	[RESubTestObject setBlockForClassMethod:selector key:nil block:^(id receiver, NSInteger integer) {
 		return integer + 3;
 	}];
 	
@@ -212,7 +212,7 @@
 	SEL sel = @selector(subRect);
 	
 	// Add subRect method
-	[RETestObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return CGRectZero;
 	}];
 	
@@ -227,7 +227,7 @@
 	SEL sel = @selector(theRect);
 	
 	// Override theRect
-	[RETestObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return CGRectZero;
 	}];
 	
@@ -242,13 +242,13 @@
 	SEL sel = _cmd;
 	
 	// Add _cmd
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"NSObject";
 	}];
-	[RETestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"RETestObject";
 	}];
-	[RESubTestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[RESubTestObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"RESubTestObject";
 	}];
 	
@@ -287,13 +287,13 @@
 	SEL sel = _cmd;
 	
 	// Add _cmd
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"block";
 	}];
-	[RETestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"block";
 	}];
-	[RESubTestObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[RESubTestObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -304,7 +304,7 @@
 	[RESubTestObject removeBlockForSelector:sel key:@"key"];
 	
 	// Override block of NSObject
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return @"overridden";
 	}];
 	
@@ -333,16 +333,16 @@
 	};
 	
 	// Set block
-	[NSObject setBlockForSelector:sel key:@"key" block:block];
-	[RETestObject setBlockForSelector:sel key:@"key" block:block];
-	[RESubTestObject setBlockForSelector:sel key:@"key" block:block];
+	[NSObject setBlockForClassMethod:sel key:@"key" block:block];
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:block];
+	[RESubTestObject setBlockForClassMethod:sel key:@"key" block:block];
 	
 	// Remove block
 	[RETestObject removeBlockForSelector:sel key:@"key"];
 	[RESubTestObject removeBlockForSelector:sel key:@"key"];
 	
 	// Override block
-	[NSObject setBlockForSelector:sel key:@"key" block:block];
+	[NSObject setBlockForClassMethod:sel key:@"key" block:block];
 	
 	// Check returned string
 	STAssertEqualObjects(objc_msgSend([NSObject class], sel), @"block", @"");
@@ -364,7 +364,7 @@
 	
 	// Add block
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
-		[aClass setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		[aClass setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 			return @"block";
 		}];
 	}
@@ -402,7 +402,7 @@
 - (void)test_receiverIsClass
 {
 	SEL sel = @selector(version);
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		STAssertEquals(receiver, [NSObject class], @"");
 	}];
 	[NSObject version];
@@ -411,7 +411,7 @@
 - (void)test_receiverCanBeSubclass
 {
 	SEL sel = @selector(version);
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		STAssertEquals(receiver, [NSArray class], @"");
 	}];
 	[NSArray version];
@@ -423,7 +423,7 @@
 	NSString *log;
 	
 	// Add log method
-	[NSObject setBlockForSelector:selector key:[NSObject class] block:^(id receiver) {
+	[NSObject setBlockForClassMethod:selector key:[NSObject class] block:^(id receiver) {
 		return @"block";
 	}];
 	log = objc_msgSend([NSObject class], selector);
@@ -441,7 +441,7 @@
 		// Make context
 		id context;
 		context = [NSObject object];
-		[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
+		[context setBlockForInstanceMethod:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
@@ -453,13 +453,13 @@
 		}];
 		
 		// Add log method
-		[NSObject setBlockForSelector:selector key:@"key1" block:^(id receiver) {
+		[NSObject setBlockForClassMethod:selector key:@"key1" block:^(id receiver) {
 			id ctx;
 			ctx = context;
 		}];
 		
 		// Override log method
-		[NSObject setBlockForSelector:selector key:@"key2" block:^(id receiver) {
+		[NSObject setBlockForClassMethod:selector key:@"key2" block:^(id receiver) {
 			id ctx;
 			ctx = context;
 		}];
@@ -480,7 +480,7 @@
 	NSString *log;
 	
 	// Add block
-	[NSObject setBlockForSelector:selector key:nil block:^(id receiver, NSString *suffix) {
+	[NSObject setBlockForClassMethod:selector key:nil block:^(id receiver, NSString *suffix) {
 		return [NSString stringWithFormat:@"block1-%@", suffix];
 	}];
 	
@@ -495,7 +495,7 @@
 	CGRect rect;
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		return (CGRect){.origin = origin, .size = size};
 	}];
 	
@@ -510,7 +510,7 @@
 	__block BOOL called = NO;
 	
 	// Add block
-	[NSObject setBlockForSelector:selector key:nil block:^(id receiver) {
+	[NSObject setBlockForClassMethod:selector key:nil block:^(id receiver) {
 		called = YES;
 	}];
 	
@@ -526,7 +526,7 @@
 	SEL selector = @selector(log);
 	
 	// Add block
-	[NSObject setBlockForSelector:selector key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:selector key:@"key" block:^(id receiver) {
 		// Do something
 	}];
 	
@@ -545,12 +545,12 @@
 	NSString *string;
 	
 	// Add block for log method with key
-	[NSObject setBlockForSelector:@selector(log) key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:@selector(log) key:@"key" block:^(id receiver) {
 		return @"log";
 	}];
 	
 	// Add block for say method with key
-	[NSObject setBlockForSelector:@selector(say) key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:@selector(say) key:@"key" block:^(id receiver) {
 		return @"say";
 	}];
 	
@@ -582,7 +582,7 @@
 	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
 	
 	// Add block1
-	[NSObject setBlockForSelector:sel key:@"block1" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
 		return @"block1";
 	}];
 	STAssertTrue([NSObject respondsToSelector:sel], @"");
@@ -593,7 +593,7 @@
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Add block2
-	[NSObject setBlockForSelector:sel key:@"block2" block:^NSString*(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"block2" block:^NSString*(id receiver) {
 		return @"block2";
 	}];
 	STAssertTrue([NSObject respondsToSelector:sel], @"");
@@ -604,7 +604,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Add block3
-	[NSObject setBlockForSelector:sel key:@"block3" block:^NSString*(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"block3" block:^NSString*(id receiver) {
 		return @"block3";
 	}];
 	STAssertTrue([NSObject respondsToSelector:sel], @"");
@@ -645,7 +645,7 @@
 	SEL sel = @selector(readThis:);
 	NSString *string = nil;
 	
-	[NSObject setBlockForSelector:sel key:@"block1" block:^(id receiver, NSString *string) {
+	[NSObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver, NSString *string) {
 		return string;
 	}];
 	string = objc_msgSend([NSObject class], sel, @"Read");
@@ -663,7 +663,7 @@
 	NSString *string;
 	
 	// Add block1
-	[NSString setBlockForSelector:sel key:@"block1" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"block1" block:^(id receiver, NSString *string) {
 		return @"block1";
 	}];
 	
@@ -672,7 +672,7 @@
 	STAssertEqualObjects(string, @"block1", @"");
 	
 	// Add block2
-	[NSString setBlockForSelector:sel key:@"block2" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"block2" block:^(id receiver, NSString *string) {
 		return @"block2";
 	}];
 	
@@ -681,7 +681,7 @@
 	STAssertEqualObjects(string, @"block2", @"");
 	
 	// Add block3
-	[NSString setBlockForSelector:sel key:@"block3" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"block3" block:^(id receiver, NSString *string) {
 		return @"block3";
 	}];
 	
@@ -718,12 +718,12 @@
 	NSString *log;
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return @"block1";
 	}];
 	
 	// Override the block
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		return @"block2";
 	}];
 	
@@ -741,12 +741,12 @@
 	SEL sel = @selector(stringWithString:);
 	
 	// Override
-	[NSString setBlockForSelector:sel key:@"key" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"key" block:^(id receiver, NSString *string) {
 		return @"block1";
 	}];
 	
 	// Override block
-	[NSString setBlockForSelector:sel key:@"key" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"key" block:^(id receiver, NSString *string) {
 		return @"block2";
 	}];
 	
@@ -764,7 +764,7 @@
 	SEL sel = @selector(log);
 	
 	for (Class cls in @[[NSObject class], [NSObject class]]) {
-		[cls setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		[cls setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 			return @"block";
 		}];
 	}
@@ -784,7 +784,7 @@
 	
 	// Share block
 	for (Class cls in @[[NSObject class], [NSObject class], [RETestObject class]]) {
-		[cls setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+		[cls setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 			return @"block";
 		}];
 	}
@@ -815,7 +815,7 @@
 	};
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:@"key" block:block];
+	[NSObject setBlockForClassMethod:sel key:@"key" block:block];
 	
 	// Call
 	STAssertTrue([NSObject respondsToSelector:sel], @"");
@@ -831,7 +831,7 @@
 	SEL sel = @selector(log);
 	
 	// Add block
-	[NSString setBlockForSelector:sel key:nil block:^(id receiver) {
+	[NSString setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		// Get supermethod
 		IMP supermethod;
 		supermethod = [receiver supermethodOfCurrentBlock];
@@ -853,7 +853,7 @@
 	STAssertNotNil((id)originalMethod, @"");
 	
 	// Override
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		// supermethod
 		NSInteger res = -1;
 		IMP supermethod;
@@ -877,7 +877,7 @@
 	SEL sel = @selector(version);
 	__block BOOL called = NO;
 	
-	[NSArray setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSArray setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		NSInteger res = -1;
 		IMP supermethod;
@@ -910,7 +910,7 @@
 	STAssertTrue([NSObject methodForSelector:sel] != imp, @"");
 	
 	// Add class block
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -938,7 +938,7 @@
 	}];
 	
 	// Add class block
-	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -966,11 +966,11 @@
 	obj = [NSObject object];
 	
 	// Add object block
-	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 	}];
 	
 	// Add class block
-	[[obj class] setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[[obj class] setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -998,11 +998,11 @@
 	obj = [NSObject object];
 	
 	// Add object block
-	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 	}];
 	
 	// Add class block
-	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -1026,7 +1026,7 @@
 	__block BOOL called = NO;
 	
 	// Override
-	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// Check supermethod
 		STAssertEquals([receiver supermethodOfCurrentBlock], [NSObject methodForSelector:sel], @"");
 		
@@ -1044,7 +1044,7 @@
 	__block BOOL called = YES;
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 	}];
 	
 	// Get imp
@@ -1052,7 +1052,7 @@
 	imp = [NSObject methodForSelector:sel];
 	
 	// Add block
-	[RETestObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// Check supermethod
 		STAssertEquals([receiver supermethodOfCurrentBlock], imp, @"");
 		
@@ -1074,7 +1074,7 @@
 	originalVersion = [NSArray version];
 	
 	// Override version
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		// supermethod
 		NSInteger res = -1;
 		typedef NSInteger (*NSInteger_IMP)(id, SEL, ...);
@@ -1102,7 +1102,7 @@
 	NSString *log;
 	
 	// Add block1
-	[NSObject setBlockForSelector:sel key:@"block1" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
 		NSMutableString *log;
 		log = [NSMutableString string];
 		
@@ -1123,7 +1123,7 @@
 	STAssertEqualObjects(log, @"-block1", @"");
 	
 	// Add block2
-	[NSObject setBlockForSelector:sel key:@"block2" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
@@ -1145,7 +1145,7 @@
 	STAssertEqualObjects(log, @"-block1-block2", @"");
 	
 	// Add block3
-	[NSObject setBlockForSelector:sel key:@"block3" block:^NSString*(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"block3" block:^NSString*(id receiver) {
 		// Make log…
 		NSMutableString *log;
 		log = [NSMutableString string];
@@ -1191,7 +1191,7 @@
 	NSString *string;
 	
 	// Add block1
-	[NSString setBlockForSelector:sel key:@"block1" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"block1" block:^(id receiver, NSString *string) {
 		NSMutableString *str;
 		str = [NSMutableString string];
 		
@@ -1212,7 +1212,7 @@
 	STAssertEqualObjects(string, @"string-block1", @"");
 	
 	// Add block2
-	[NSString setBlockForSelector:sel key:@"block2" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"block2" block:^(id receiver, NSString *string) {
 		NSMutableString *str;
 		str = [NSMutableString string];
 		
@@ -1233,7 +1233,7 @@
 	STAssertEqualObjects(string, @"string-block1-block2", @"");
 	
 	// Add block3
-	[NSString setBlockForSelector:sel key:@"block3" block:^(id receiver, NSString *string) {
+	[NSString setBlockForClassMethod:sel key:@"block3" block:^(id receiver, NSString *string) {
 		NSMutableString *str;
 		str = [NSMutableString string];
 		
@@ -1279,7 +1279,7 @@
 {
 	SEL sel = @selector(version);
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		NSInteger version = -1;
 		
 		// Get original version
@@ -1305,7 +1305,7 @@
 	SEL sel = @selector(integerWithInteger:);
 	
 	// Override
-	[RETestObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger intg = -1;
 		
 		IMP supermethod;
@@ -1329,7 +1329,7 @@
 {
 	SEL sel = @selector(theRect);
 	
-	[RETestObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		CGRect res;
 		typedef CGRect (*CGRect_IMP)(id, SEL, ...);
@@ -1351,10 +1351,10 @@
 - (void)test_superBlockReturningStructure
 {
 	SEL sel = @selector(rect);
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		CGRect rect;
 		rect = RESupermethodStret(CGRectZero, receiver, sel);
@@ -1378,7 +1378,7 @@
 {
 	SEL sel = @selector(sayHello);
 	__block BOOL called = NO;
-	[RETestObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -1406,7 +1406,7 @@
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 	
 	// Responds to log method dynamically
-	[NSObject setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
 		// Check receiver
 		STAssertTrue(receiver == [NSObject class], @"");
 		
@@ -1429,7 +1429,7 @@
 {
 	SEL sel = @selector(doSomething);
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		// Remove currentBlock
 		[receiver removeCurrentBlock];
 	}];
@@ -1444,13 +1444,13 @@
 	NSString *string;
 	
 	// Add block1
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		[receiver removeCurrentBlock];
 		return @"block1-";
 	}];
 	
 	// Add block2
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
 		NSMutableString *str;
 		str = [NSMutableString string];
 		
@@ -1482,7 +1482,7 @@
 	STAssertNoThrow([NSObject removeCurrentBlock], @"");
 	
 	// Add doSomething method
-	[NSObject setBlockForSelector:sel key:@"key" block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		// Do something
 	}];
 	
@@ -1498,7 +1498,7 @@
 	Class cls;
 	cls = [NSMutableString class];
 	
-	[NSMutableString setBlockForSelector:@selector(stringWithString:) key:nil block:^(id receiver, NSString *string) {
+	[NSMutableString setBlockForClassMethod:@selector(stringWithString:) key:nil block:^(id receiver, NSString *string) {
 		// Do something
 	}];
 	
@@ -1766,7 +1766,7 @@
 		// Prepare key
 		id key;
 		key = [NSObject object];
-		[key setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
+		[key setBlockForInstanceMethod:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
 			
@@ -1809,10 +1809,10 @@
 	SEL sel = _cmd;
 	__block BOOL called = NO;
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		called = YES;
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		(REIMP(void)[receiver supermethodOfCurrentBlock])(receiver, sel);
 	}];
 	
@@ -1824,10 +1824,10 @@
 - (void)test_REIMP__id
 {
 	SEL sel = _cmd;
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return @"hello";
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		NSString *res;
 		res = (REIMP(id)[receiver supermethodOfCurrentBlock])(receiver, sel);
 		return res;
@@ -1839,10 +1839,10 @@
 - (void)test_REIMP__scalar
 {
 	SEL sel = _cmd;
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return 1;
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		NSInteger i;
 		i = (REIMP(NSInteger)[receiver supermethodOfCurrentBlock])(receiver, sel);
 		return i + 1;
@@ -1855,7 +1855,7 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = [receiver supermethodOfCurrentBlock])) {
@@ -1864,7 +1864,7 @@
 		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		CGRect rect;
 		rect = (REIMP(CGRect)[receiver supermethodOfCurrentBlock])(receiver, sel);
 		rect.origin.x *= 10.0;
@@ -1886,13 +1886,13 @@
 	SEL sel = @selector(checkString:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSString *string) {
 		RESupermethod(void, receiver, sel, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSString *string) {
 		RESupermethod(void, receiver, sel, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
@@ -1906,12 +1906,12 @@
 	SEL sel = @selector(appendString:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSString *string) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"Wow"), string];
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSString *string) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSString *string) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"block1"), string];
 	}];
 	
@@ -1926,7 +1926,7 @@
 	SEL sel = @selector(addInteger:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
 		value = RESupermethod(NSInteger, receiver, sel, integer);
 		
@@ -1938,7 +1938,7 @@
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, NSInteger integer) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
 		value = RESupermethod(NSInteger, receiver, sel, 1);
 		
@@ -1960,7 +1960,7 @@
 	SEL sel = @selector(rectWithOrigin:Size:);
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
 		rect = RESupermethodStret((CGRect){}, receiver, sel, origin, size);
 		STAssertEquals(rect, CGRectZero, @"");
@@ -1969,7 +1969,7 @@
 	}];
 	
 	// Add block
-	[NSObject setBlockForSelector:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
 		rect = RESupermethodStret(CGRectZero, receiver, sel, origin, size);
 		rect.origin.x *= 10.0;

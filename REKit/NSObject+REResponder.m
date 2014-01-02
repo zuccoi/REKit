@@ -647,7 +647,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	}
 }
 
-+ (void)setBlockForSelector:(SEL)selector key:(id)key block:(id)block
++ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
 	if (self != [self class]) {
@@ -667,7 +667,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstances);
 }
 
-- (void)setBlockForSelector:(SEL)selector key:(id)key block:(id)block
+- (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
 	if (self == [self class]) {
@@ -1005,7 +1005,7 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated))
 {
-	[self setBlockForSelector:selector key:key block:block];
+	[self setBlockForInstanceMethod:selector key:key block:block];
 }
 
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))

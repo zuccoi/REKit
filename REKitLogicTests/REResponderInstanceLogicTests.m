@@ -503,7 +503,7 @@
 		// Make context
 		id context;
 		context = [NSObject object];
-		[context setBlockForSelector:@selector(dealloc) key:nil block:^(id receiver) {
+		[context setBlockForInstanceMethod:@selector(dealloc) key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
@@ -973,7 +973,7 @@
 	obj = [NSObject object];
 	
 	// Add class method
-	[NSObject setBlockForSelector:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		dirty = YES;
 	}];
 	
@@ -1000,7 +1000,7 @@
 	obj = [NSObject object];
 	
 	// Add block to testObj
-	[testObj setBlockForSelector:sel key:nil block:^(id receiver) {
+	[testObj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		IMP supermethod;
 		supermethod = [receiver supermethodOfCurrentBlock];
@@ -1026,7 +1026,7 @@
 	imp2 = [NSObject instanceMethodForSelector:sel];
 	
 	// Add object block
-	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		IMP supermethod;
 		supermethod = [receiver supermethodOfCurrentBlock];
@@ -1065,7 +1065,7 @@
 	imp5 = [NSObject instanceMethodForSelector:sel];
 	
 	// Add object block
-	[obj setBlockForSelector:sel key:nil block:^(id receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		IMP supermethod;
 		supermethod = [receiver supermethodOfCurrentBlock];
@@ -1078,7 +1078,7 @@
 	imp6 = [obj methodForSelector:sel];
 	
 	// Add block to testObj
-	[testObj setBlockForSelector:sel key:nil block:^(id receiver) {
+	[testObj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		IMP supermethod;
 		supermethod = [receiver supermethodOfCurrentBlock];
@@ -1447,7 +1447,7 @@
 	obj = [NSObject object];
 	
 	// Set object block
-	[obj setBlockForSelector:sel key:@"key" block:^(id receiver) {
+	[obj setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
 		count++;
 	}];
 	

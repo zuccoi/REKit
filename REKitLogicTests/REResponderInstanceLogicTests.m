@@ -583,12 +583,12 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_hasBlockForInstanceMethodForSelector_key
+- (void)test_hasBlockForInstanceMethod_key
 {
 	SEL sel = @selector(log);
 	
 	// Has block?
-	STAssertTrue(![RETestObject hasBlockForInstanceMethodForSelector:sel key:@"key"], @"");
+	STAssertTrue(![RETestObject hasBlockForInstanceMethod:sel key:@"key"], @"");
 	
 	// Add block
 	[RETestObject setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
@@ -596,11 +596,11 @@
 	}];
 	
 	// Has block?
-	STAssertTrue(![NSObject hasBlockForInstanceMethodForSelector:sel key:@"key"], @"");
-	STAssertTrue([RETestObject hasBlockForInstanceMethodForSelector:sel key:@"key"], @"");
-	STAssertTrue(![RETestObject hasBlockForInstanceMethodForSelector:sel key:@""], @"");
-	STAssertTrue(![RETestObject hasBlockForInstanceMethodForSelector:sel key:nil], @"");
-	STAssertTrue(![RESubTestObject hasBlockForInstanceMethodForSelector:sel key:@"key"], @"");
+	STAssertTrue(![NSObject hasBlockForInstanceMethod:sel key:@"key"], @"");
+	STAssertTrue([RETestObject hasBlockForInstanceMethod:sel key:@"key"], @"");
+	STAssertTrue(![RETestObject hasBlockForInstanceMethod:sel key:@""], @"");
+	STAssertTrue(![RETestObject hasBlockForInstanceMethod:sel key:nil], @"");
+	STAssertTrue(![RESubTestObject hasBlockForInstanceMethod:sel key:@"key"], @"");
 }
 
 - (void)test_stackBlockPerSelector

@@ -702,7 +702,7 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClass);
 }
 
-+ (BOOL)hasBlockForInstanceMethodForSelector:(SEL)selector key:(id)key
++ (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstances);
 }
@@ -729,7 +729,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	if (!selector
 		|| !key
 		|| (op == REResponderOperationClass && ![receiver hasBlockForClassMethod:selector key:key])
-		|| (op == REResponderOperationInstances && ![receiver hasBlockForInstanceMethodForSelector:selector key:key])
+		|| (op == REResponderOperationInstances && ![receiver hasBlockForInstanceMethod:selector key:key])
 		|| (op == REResponderOperationObject && ![receiver hasBlockForInstanceMethod:selector key:key])
 	){
 		return;

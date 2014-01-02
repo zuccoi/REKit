@@ -697,7 +697,7 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	}
 }
 
-+ (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
++ (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
 {
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClass);
 }
@@ -707,7 +707,13 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstances);
 }
 
-- (BOOL)hasBlockForSelector:(SEL)selector key:(id)key
+- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
+{
+	// Not Implemented >>>
+	return NO;
+}
+
+- (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	// Filter
 	if (self == [self class]) {
@@ -722,8 +728,9 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	// Filter
 	if (!selector
 		|| !key
+		|| (op == REResponderOperationClass && ![receiver hasBlockForClassMethod:selector key:key])
 		|| (op == REResponderOperationInstances && ![receiver hasBlockForInstanceMethodForSelector:selector key:key])
-		|| (op != REResponderOperationInstances && ![receiver hasBlockForSelector:selector key:key])
+		|| (op == REResponderOperationObject && ![receiver hasBlockForInstanceMethod:selector key:key])
 	){
 		return;
 	}
@@ -1010,7 +1017,7 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
-	return [self hasBlockForSelector:selector key:key];
+	return [self hasBlockForInstanceMethod:selector key:key];
 }
 
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))

@@ -35,9 +35,10 @@
 + (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
-+ (BOOL)hasBlockForSelector:(SEL)selector key:(id)key;
++ (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
 + (BOOL)hasBlockForInstanceMethodForSelector:(SEL)selector key:(id)key;
-- (BOOL)hasBlockForSelector:(SEL)selector key:(id)key;
+- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
+- (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
 + (void)removeBlockForSelector:(SEL)selector key:(id)key;
 + (void)removeBlockForInstanceMethodForSelector:(SEL)selector key:(id)key;
 - (void)removeBlockForSelector:(SEL)selector key:(id)key;

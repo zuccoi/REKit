@@ -832,7 +832,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_hasBlockForSelector_forKey
+- (void)test_hasBlockForInstanceMethod_key
 {
 	// Make obj
 	id obj;
@@ -843,11 +843,11 @@
 		// Do something
 		receiver = receiver;
 	}];
-	STAssertTrue([obj hasBlockForSelector:@selector(log) key:@"key"], @"");
+	STAssertTrue([obj hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
 	
 	// Remove log block
 	[obj removeBlockForSelector:@selector(log) key:@"key"];
-	STAssertTrue(![obj hasBlockForSelector:@selector(log) key:@"key"], @"");
+	STAssertTrue(![obj hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
 }
 
 - (void)test_stackBlockPerSelector

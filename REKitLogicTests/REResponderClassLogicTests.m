@@ -521,7 +521,7 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_hasBlockForSelector_forKey
+- (void)test_hasBlockForClassMethod_key
 {
 	SEL selector = @selector(log);
 	
@@ -531,13 +531,13 @@
 	}];
 	
 	// Has block?
-	STAssertTrue([NSObject hasBlockForSelector:selector key:@"key"], @"");
+	STAssertTrue([NSObject hasBlockForClassMethod:selector key:@"key"], @"");
 	
 	// Remove block
 	[NSObject removeBlockForSelector:selector key:@"key"];
 	
 	// Has block?
-	STAssertFalse([NSObject hasBlockForSelector:selector key:@"key"], @"");
+	STAssertFalse([NSObject hasBlockForClassMethod:selector key:@"key"], @"");
 }
 
 - (void)test_stackBlockPerSelector

@@ -664,16 +664,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfClass);
 }
 
-+ (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
-{
-	// Filter
-	if (self != [self class]) {
-		return;
-	}
-	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
-}
-
 - (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
@@ -682,6 +672,16 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	}
 	
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject);
+}
+
++ (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
+{
+	// Filter
+	if (self != [self class]) {
+		return;
+	}
+	
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
 }
 
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
@@ -719,15 +719,15 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
 }
 
-+ (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
-{
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
-}
-
 - (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Not Implemented >>>
 	return NO;
+}
+
++ (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
+{
+	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
 - (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
@@ -819,16 +819,6 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
 }
 
-+ (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
-{
-	// Filter
-	if (self != [self class]) {
-		return;
-	}
-	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
-}
-
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Filter
@@ -837,6 +827,16 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	}
 	
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
+}
+
++ (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (self != [self class]) {
+		return;
+	}
+	
+	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key

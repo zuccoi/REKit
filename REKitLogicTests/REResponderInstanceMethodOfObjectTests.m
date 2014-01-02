@@ -1,11 +1,11 @@
 /*
- REResponderLogicTests.m
+ REResponderInstanceMethodOfObjectTests.m
  
  Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
 #import "REKit.h"
-#import "REResponderLogicTests.h"
+#import "REResponderInstanceMethodOfObjectTests.h"
 #import "RETestObject.h"
 #import <objc/message.h>
 
@@ -14,7 +14,7 @@
 #endif
 
 
-@implementation REResponderLogicTests
+@implementation REResponderInstanceMethodOfObjectTests
 
 - (void)_resetClasses
 {

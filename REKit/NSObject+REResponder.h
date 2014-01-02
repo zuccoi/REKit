@@ -31,24 +31,24 @@
 
 @interface NSObject (REResponder)
 
-// Block
+// Block Management for Class
 + (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
-- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
-- (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 + (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
-- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
-- (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
-- (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
 + (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
-- (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
-
-// Current Block
 + (IMP)supermethodOfCurrentBlock;
-- (IMP)supermethodOfCurrentBlock;
 + (void)removeCurrentBlock;
+
+// Block Management for Specific Instance
+- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
+- (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
+- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
+- (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
+- (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
+- (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
+- (IMP)supermethodOfCurrentBlock;
 - (void)removeCurrentBlock;
 
 // Conformance
@@ -61,12 +61,10 @@
 
 
 @interface NSObject (REResponder_Deprecated)
-
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)removeBlockForInstanceMethod:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
-
 @end
 
 #pragma mark -

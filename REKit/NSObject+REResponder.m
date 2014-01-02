@@ -476,9 +476,47 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 	return REResponderSupermethodWithImp(self, imp);
 }
 
-//--------------------------------------------------------------//
-#pragma mark -- Block --
-//--------------------------------------------------------------//
+IMP REResponderSupermethodOfCurrentBlock(id receiver)
+{
+	// Get supermethod
+	IMP supermethod;
+	IMP imp;
+	imp = REImplementationWithBacktraceDepth(3);
+	supermethod = [receiver REResponder_supermethodWithImp:imp];
+	
+	return supermethod;
+}
+
+void REResponderRemoveCurrentBlock(id receiver)
+{
+	// Get imp of current block
+	IMP imp;
+	imp = REImplementationWithBacktraceDepth(3);
+	if (!imp) {
+		return;
+	}
+	
+	// Get elements
+	NSDictionary *blockInfo;
+	SEL selector;
+	blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
+	if (!blockInfo || !selector) {
+		return;
+	}
+	
+	// Call REResponderRemoveBlock
+	REResponderOperation op;
+	op = [blockInfo[kBlockInfoOperationKey] integerValue];
+	if (~op & REResponderOperationObjectTargetMask) {
+		receiver = [receiver class];
+	}
+	if (~op & REResponderOperationInstanceMethodMask) {
+		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
+	}
+	else {
+		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
+	}
+}
 
 void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id block, REResponderOperation op)
 {
@@ -654,46 +692,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	}
 }
 
-+ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
-{
-	// Filter
-	if (self != [self class]) {
-		return;
-	}
-	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfClass);
-}
-
-- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
-{
-	// Filter
-	if (self == [self class]) {
-		return;
-	}
-	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject);
-}
-
-+ (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
-{
-	// Filter
-	if (self != [self class]) {
-		return;
-	}
-	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
-}
-
-- (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
-{
-	// Filter
-	if (self == [self class]) {
-		return;
-	}
-	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfObject);
-}
-
 BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, REResponderOperation op)
 {
 	// Filter
@@ -712,31 +710,6 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 		
 		return (blockImp != NULL);
 	}
-}
-
-+ (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
-{
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
-}
-
-- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
-{
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
-}
-
-+ (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
-{
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
-}
-
-- (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
-{
-	// Filter
-	if (self == [self class]) {
-		return NO;
-	}
-	
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
 }
 
 void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResponderOperation op)
@@ -808,6 +781,40 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	}
 }
 
+//--------------------------------------------------------------//
+#pragma mark -- Block Management for Class --
+//--------------------------------------------------------------//
+
++ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
+{
+	// Filter
+	if (self != [self class]) {
+		return;
+	}
+	
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfClass);
+}
+
++ (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
+{
+	// Filter
+	if (self != [self class]) {
+		return;
+	}
+	
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
+}
+
++ (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
+{
+	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
+}
+
++ (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
+{
+	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
+}
+
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Filter
@@ -816,16 +823,6 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	}
 	
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
-}
-
-- (void)removeBlockForClassMethod:(SEL)selector key:(id)key
-{
-	// Filter
-	if (self == [self class]) {
-		return;
-	}
-	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
 }
 
 + (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
@@ -838,70 +835,9 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
-- (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
-{
-	// Filter
-	if (self == [self class]) {
-		return;
-	}
-	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Current Block --
-//--------------------------------------------------------------//
-
-IMP REResponderSupermethodOfCurrentBlock(id receiver)
-{
-	// Get supermethod
-	IMP supermethod;
-	IMP imp;
-	imp = REImplementationWithBacktraceDepth(3);
-	supermethod = [receiver REResponder_supermethodWithImp:imp];
-	
-	return supermethod;
-}
-
 + (IMP)supermethodOfCurrentBlock
 {
 	return REResponderSupermethodOfCurrentBlock(self);
-}
-
-- (IMP)supermethodOfCurrentBlock
-{
-	return REResponderSupermethodOfCurrentBlock(self);
-}
-
-void REResponderRemoveCurrentBlock(id receiver)
-{
-	// Get imp of current block
-	IMP imp;
-	imp = REImplementationWithBacktraceDepth(3);
-	if (!imp) {
-		return;
-	}
-	
-	// Get elements
-	NSDictionary *blockInfo;
-	SEL selector;
-	blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
-	if (!blockInfo || !selector) {
-		return;
-	}
-	
-	// Call REResponderRemoveBlock
-	REResponderOperation op;
-	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (~op & REResponderOperationObjectTargetMask) {
-		receiver = [receiver class];
-	}
-	if (~op & REResponderOperationInstanceMethodMask) {
-		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
-	}
-	else {
-		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
-	}
 }
 
 + (void)removeCurrentBlock
@@ -912,6 +848,70 @@ void REResponderRemoveCurrentBlock(id receiver)
 	}
 	
 	REResponderRemoveCurrentBlock(self);
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- Block Management for Specific Instance --
+//--------------------------------------------------------------//
+
+- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
+{
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject);
+}
+
+- (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
+{
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfObject);
+}
+
+- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
+{
+	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
+}
+
+- (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (self == [self class]) {
+		return NO;
+	}
+	
+	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
+}
+
+- (void)removeBlockForClassMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
+	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
+}
+
+- (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
+	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
+}
+
+- (IMP)supermethodOfCurrentBlock
+{
+	return REResponderSupermethodOfCurrentBlock(self);
 }
 
 - (void)removeCurrentBlock

@@ -424,7 +424,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	}
 	
 	// Don't set block to private class
-	if (~op & REObjectTargetMask) {
+	if (!(op & REObjectTargetMask)) {
 		NSString *className;
 		className = NSStringFromClass([receiver class]);
 //		if ([className hasPrefix:kClassNamePrefix] || [className hasPrefix:@"__"]) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
@@ -476,22 +476,11 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		blocks = REResponderGetBlocks(receiver, op, YES);
 		oldBlockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
 		oldBlockMethod = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
-		switch (op) { // Format >>>
-			case REClassMethodOfClass: {
-				currentMethod = [[receiver class] methodForSelector:selector];
-			} break;
-			case REInstanceMethodOfClass: {
-				currentMethod = [[receiver class] instanceMethodForSelector:selector];
-			} break;
-			case REClassMethodOfObject: {
-				currentMethod = [[receiver class] methodForSelector:selector];
-			} break;
-			case REInstanceMethodOfObject: {
-				currentMethod =  [receiver methodForSelector:selector];
-			} break;
-			default: {
-				currentMethod = NULL;
-			}
+		if (op & REInstanceMethodMask) {
+			currentMethod = [[receiver class] instanceMethodForSelector:selector];
+		}
+		else {
+			currentMethod = [[receiver class] methodForSelector:selector];
 		}
 		
 		// Become subclass
@@ -544,21 +533,13 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		IMP imp;
 		imp = imp_implementationWithBlock(block);
 		class_replaceMethod((op & REInstanceMethodMask ? [receiver class] : object_getClass([receiver class])), selector, imp, [objCTypes UTF8String]);
-		if (op & REInstanceMethodMask && originalClassMethod) { // Needed ?????
+		if (op & REInstanceMethodMask && originalClassMethod) {
 			class_replaceMethod(object_getClass([receiver class]), selector, originalClassMethod, [objCTypes UTF8String]);
 		}
 		
 		// Replace method of subclasses
 		if (op & REInstanceMethodMask) {
 			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
-// ?????
-//				// Filter
-//				NSString *subclassName;
-//				subclassName = NSStringFromClass(subclass);
-//				if ([subclassName hasPrefix:kClassNamePrefix]) {
-//					continue;
-//				}
-				
 				// Replace
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
@@ -569,14 +550,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		}
 		else {
 			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
-// ?????
-//				// Filter
-//				NSString *subclassName;
-//				subclassName = NSStringFromClass(subclass);
-//				if ([subclassName hasPrefix:kClassNamePrefix]) {
-//					continue;
-//				}
-				
 				// Replace method
 				IMP subImp;
 				subImp = [subclass methodForSelector:selector];
@@ -825,7 +798,7 @@ void REResponderRemoveCurrentBlock(id receiver)
 	// Call REResponderRemoveBlock
 	REResponderOperation op;
 	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (~op & REObjectTargetMask) {
+	if (!(op & REObjectTargetMask)) {
 		receiver = [receiver class];
 	}
 	if (op & REInstanceMethodMask) {

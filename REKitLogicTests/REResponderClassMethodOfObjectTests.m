@@ -61,7 +61,8 @@
 	// super
 	[super tearDown];
 }
-//
+
+// >>>
 //- (void)test_respondsToUnimplementedMethod
 //{
 //	SEL sel = @selector(log);

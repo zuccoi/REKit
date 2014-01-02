@@ -31,8 +31,8 @@ static NSString* const kBlockInfoOperationKey = @"op";
 
 // REResponderOperationMask
 typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
-	REResponderOperationMaskInstanceMethod = (1UL << 0),
-	REResponderOperationMaskObjectTarget = (1UL << 1),
+	REResponderOperationInstanceMethodMask = (1UL << 0),
+	REResponderOperationObjectTargetMask = (1UL << 1),
 };
 
 // REResponderOperation
@@ -183,15 +183,15 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			
 			// Remove blocks
 			NSDictionary *blocks;
-			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kClassMethodBlocksAssociationKey]];
-			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) { // Needed ????? // Should I remove blocks of class methods ?????
+			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kInstanceMethodBlocksAssociationKey]];
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) { // Should I remove blocks of class methods ?????
 				while ([blockInfos count]) {
 					NSDictionary *blockInfo;
 					blockInfo = [blockInfos lastObject];
 					[self removeBlockForInstanceMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 				}
 			}];
-			[self setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			
 			// Dispose classes
 			NSString *className;
@@ -253,7 +253,7 @@ NSMutableDictionary* REResponderBlocks(id receiver, REResponderOperation op, BOO
 {
 	NSMutableDictionary *blocks;
 	NSString *key;
-	key = (op == REResponderOperationInstanceMethodOfClass ? kInstanceMethodBlocksAssociationKey : kClassMethodBlocksAssociationKey);
+	key = (op & REResponderOperationInstanceMethodMask ? kInstanceMethodBlocksAssociationKey : kClassMethodBlocksAssociationKey);
 	blocks = [receiver associatedValueForKey:key];
 	if (!blocks && create) {
 		blocks = [NSMutableDictionary dictionary];
@@ -721,8 +721,7 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 
 - (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
 {
-	// Not Implemented >>>
-	return NO;
+	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
 }
 
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
@@ -745,8 +744,8 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	// Filter
 	if (!selector
 		|| !key
-		|| (~op & REResponderOperationMaskInstanceMethod && ![receiver hasBlockForClassMethod:selector key:key])
-		|| (op & REResponderOperationMaskInstanceMethod && ![receiver hasBlockForInstanceMethod:selector key:key])
+		|| (~op & REResponderOperationInstanceMethodMask && ![receiver hasBlockForClassMethod:selector key:key])
+		|| (op & REResponderOperationInstanceMethodMask && ![receiver hasBlockForInstanceMethod:selector key:key])
 	){
 		return;
 	}
@@ -894,10 +893,10 @@ void REResponderRemoveCurrentBlock(id receiver)
 	// Call REResponderRemoveBlock
 	REResponderOperation op;
 	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (~op & REResponderOperationMaskObjectTarget) {
+	if (~op & REResponderOperationObjectTargetMask) {
 		receiver = [receiver class];
 	}
-	if (~op & REResponderOperationMaskInstanceMethod) {
+	if (~op & REResponderOperationInstanceMethodMask) {
 		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
 	}
 	else {

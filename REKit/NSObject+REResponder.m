@@ -241,7 +241,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Util --
+#pragma mark -- Block Management --
 //--------------------------------------------------------------//
 
 IMP REResponderForwardingMethod()
@@ -286,26 +286,6 @@ NSDictionary* REResponderBlockInfoForSelector(id receiver, SEL selector, id key,
 		
 		return blockInfo;
 	}
-}
-
-+ (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos operation:(REResponderOperation)op
-{
-	// Filter
-	if (self != [self class]) {
-		return nil;
-	}
-	
-	return REResponderBlockInfoForSelector(self, selector, key, outBlockInfos, op);
-}
-
-- (NSDictionary*)REResponder_blockInfoForSelector:(SEL)selector key:(id)key blockInfos:(NSMutableArray**)outBlockInfos operation:(REResponderOperation)op
-{
-	// Filter
-	if (self == [self class]) {
-		return nil;
-	}
-	
-	return REResponderBlockInfoForSelector(self, selector, key, outBlockInfos, op);
 }
 
 NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMutableArray **outBlockInfos, SEL *outSelector)
@@ -359,26 +339,6 @@ NSDictionary* REResponderBlockInfoWithImplementation(id receiver, IMP imp, NSMut
 	}
 }
 
-+ (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
-{
-	// Filter
-	if (self != [self class]) {
-		return nil;
-	}
-	
-	return REResponderBlockInfoWithImplementation(self, imp, outBlockInfos, outSelector);
-}
-
-- (NSDictionary*)REResponder_blockInfoWithImplementation:(IMP)imp blockInfos:(NSMutableArray**)outBlockInfos selector:(SEL*)outSelector
-{
-	// Filter
-	if (self == [self class]) {
-		return nil;
-	}
-	
-	return REResponderBlockInfoWithImplementation(self, imp, outBlockInfos, outSelector);
-}
-
 IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 {
 	// Filter
@@ -394,7 +354,7 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 		NSMutableArray *blockInfos = nil;
 		SEL selector;
 		Class classHavingBlockinfo = NULL;
-		blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+		blockInfo = REResponderBlockInfoWithImplementation(receiver, imp, &blockInfos, &selector);
 		if (blockInfo) {
 			classHavingBlockinfo = [receiver class];
 		}
@@ -403,7 +363,7 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 			Class superclass;
 			superclass = [[receiver class] superclass];
 			while (superclass) {
-				blockInfo = [superclass REResponder_blockInfoWithImplementation:imp blockInfos:&blockInfos selector:&selector];
+				blockInfo = REResponderBlockInfoWithImplementation(superclass, imp, &blockInfos, &selector);
 				if (blockInfo) {
 					classHavingBlockinfo = superclass;
 					break;
@@ -454,68 +414,6 @@ IMP REResponderSupermethodWithImp(id receiver, IMP imp)
 	}
 	
 	return supermethod;
-}
-
-+ (IMP)REResponder_supermethodWithImp:(IMP)imp
-{
-	// Filter
-	if (self != [self class]) {
-		return NULL;
-	}
-	
-	return REResponderSupermethodWithImp(self, imp);
-}
-
-- (IMP)REResponder_supermethodWithImp:(IMP)imp
-{
-	// Filter
-	if (self == [self class]) {
-		return NULL;
-	}
-	
-	return REResponderSupermethodWithImp(self, imp);
-}
-
-IMP REResponderSupermethodOfCurrentBlock(id receiver)
-{
-	// Get supermethod
-	IMP supermethod;
-	IMP imp;
-	imp = REImplementationWithBacktraceDepth(3);
-	supermethod = [receiver REResponder_supermethodWithImp:imp];
-	
-	return supermethod;
-}
-
-void REResponderRemoveCurrentBlock(id receiver)
-{
-	// Get imp of current block
-	IMP imp;
-	imp = REImplementationWithBacktraceDepth(3);
-	if (!imp) {
-		return;
-	}
-	
-	// Get elements
-	NSDictionary *blockInfo;
-	SEL selector;
-	blockInfo = [receiver REResponder_blockInfoWithImplementation:imp blockInfos:nil selector:&selector];
-	if (!blockInfo || !selector) {
-		return;
-	}
-	
-	// Call REResponderRemoveBlock
-	REResponderOperation op;
-	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (~op & REResponderOperationObjectTargetMask) {
-		receiver = [receiver class];
-	}
-	if (~op & REResponderOperationInstanceMethodMask) {
-		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
-	}
-	else {
-		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
-	}
 }
 
 void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id block, REResponderOperation op)
@@ -576,7 +474,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		IMP oldBlockMethod;
 		IMP currentMethod;
 		blocks = REResponderBlocks(receiver, op, YES);
-		oldBlockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos operation:op];
+		oldBlockInfo = REResponderBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
 		oldBlockMethod = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
 		if (op == REResponderOperationInstanceMethodOfClass) {
 			currentMethod = [receiver instanceMethodForSelector:selector];
@@ -705,7 +603,7 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 		
 		// Get blockInfo
 		NSDictionary *blockInfo;
-		blockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:nil operation:op];
+		blockInfo = REResponderBlockInfoForSelector(receiver, selector, key, nil, op);
 		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
 		
 		return (blockImp != NULL);
@@ -730,12 +628,12 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		IMP supermethod;
 		NSDictionary *blockInfo;
 		NSMutableArray *blockInfos;
-		blockInfo = [receiver REResponder_blockInfoForSelector:selector key:key blockInfos:&blockInfos operation:op];
+		blockInfo = REResponderBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
 		if (!blockInfo || !blockInfos) {
 			return;
 		}
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-		supermethod = [receiver REResponder_supermethodWithImp:imp];
+		supermethod = REResponderSupermethodWithImp(receiver, imp);
 		if (!supermethod) {
 			supermethod = REResponderForwardingMethod();
 		}
@@ -835,21 +733,6 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
-+ (IMP)supermethodOfCurrentBlock
-{
-	return REResponderSupermethodOfCurrentBlock(self);
-}
-
-+ (void)removeCurrentBlock
-{
-	// Filter
-	if (self != [self class]) {
-		return;
-	}
-	
-	REResponderRemoveCurrentBlock(self);
-}
-
 //--------------------------------------------------------------//
 #pragma mark -- Block Management for Specific Instance --
 //--------------------------------------------------------------//
@@ -909,9 +792,49 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
 }
 
-- (IMP)supermethodOfCurrentBlock
+//--------------------------------------------------------------//
+#pragma mark -- Current Block Management --
+//--------------------------------------------------------------//
+
+void REResponderRemoveCurrentBlock(id receiver)
 {
-	return REResponderSupermethodOfCurrentBlock(self);
+	// Get imp of current block
+	IMP imp;
+	imp = REImplementationWithBacktraceDepth(3);
+	if (!imp) {
+		return;
+	}
+	
+	// Get elements
+	NSDictionary *blockInfo;
+	SEL selector;
+	blockInfo = REResponderBlockInfoWithImplementation(receiver, imp, nil, &selector);
+	if (!blockInfo || !selector) {
+		return;
+	}
+	
+	// Call REResponderRemoveBlock
+	REResponderOperation op;
+	op = [blockInfo[kBlockInfoOperationKey] integerValue];
+	if (~op & REResponderOperationObjectTargetMask) {
+		receiver = [receiver class];
+	}
+	if (~op & REResponderOperationInstanceMethodMask) {
+		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
+	}
+	else {
+		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
+	}
+}
+
++ (void)removeCurrentBlock
+{
+	// Filter
+	if (self != [self class]) {
+		return;
+	}
+	
+	REResponderRemoveCurrentBlock(self);
 }
 
 - (void)removeCurrentBlock
@@ -1036,7 +959,35 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 #pragma mark -
 
 
-@implementation NSObject (REResponder_Deprecated)
+@implementation NSObject (REResponderPrivate)
+
+IMP REResponderSupermethodOfCurrentBlock(id receiver)
+{
+	// Get supermethod
+	IMP supermethod;
+	IMP imp;
+	imp = REImplementationWithBacktraceDepth(3);
+	supermethod = REResponderSupermethodWithImp(receiver, imp);
+	
+	return supermethod;
+}
+
++ (IMP)supermethodOfCurrentBlock
+{
+	return REResponderSupermethodOfCurrentBlock(self);
+}
+
+- (IMP)supermethodOfCurrentBlock
+{
+	return REResponderSupermethodOfCurrentBlock(self);
+}
+
+@end
+
+#pragma mark -
+
+
+@implementation NSObject (REResponderDeprecated)
 
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated))
 {
@@ -1048,7 +999,7 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 	return [self hasBlockForInstanceMethod:selector key:key];
 }
 
-- (void)removeBlockForInstanceMethod:(SEL)selector withKey:(id)key __attribute__((deprecated))
+- (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
 	[self removeBlockForInstanceMethod:selector key:key];
 }

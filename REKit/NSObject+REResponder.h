@@ -38,8 +38,6 @@
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
 + (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
-+ (IMP)supermethodOfCurrentBlock;
-+ (void)removeCurrentBlock;
 
 // Block Management for Specific Instance
 - (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
@@ -48,7 +46,9 @@
 - (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
-- (IMP)supermethodOfCurrentBlock;
+
+// Current Block Management (Call from Block)
++ (void)removeCurrentBlock;
 - (void)removeCurrentBlock;
 
 // Conformance
@@ -60,15 +60,19 @@
 #pragma mark -
 
 
-@interface NSObject (REResponder_Deprecated)
-- (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
-- (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
-- (void)removeBlockForInstanceMethod:(SEL)selector withKey:(id)key __attribute__((deprecated));
-- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
-@end
-
-#pragma mark -
-
-
 // Private Function
 extern IMP REResponderSupermethodWithImp(id receiver, IMP imp);
+
+// Private Methods
+@interface NSObject (REResponderPrivate)
++ (IMP)supermethodOfCurrentBlock;
+- (IMP)supermethodOfCurrentBlock;
+@end
+
+// Deprecated Methods
+@interface NSObject (REResponderDeprecated)
+- (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
+- (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
+- (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
+- (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
+@end

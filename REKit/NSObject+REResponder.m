@@ -183,8 +183,17 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			
 			// Remove blocks
 			NSDictionary *blocks;
-			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kInstanceMethodBlocksAssociationKey]];
-			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) { // Should I remove blocks of class methods ?????
+			blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REClassMethodOfObject, NO)];
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+				while ([blockInfos count]) {
+					NSDictionary *blockInfo;
+					blockInfo = [blockInfos lastObject];
+					[self removeBlockForClassMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
+				}
+			}];
+			[self setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REInstanceMethodOfObject, NO)];
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
 				while ([blockInfos count]) {
 					NSDictionary *blockInfo;
 					blockInfo = [blockInfos lastObject];
@@ -193,7 +202,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			}];
 			[self setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			
-			// Dispose classes
+			// Dispose classes // Should I delay ?????
 			NSString *className;
 			className = [NSString stringWithUTF8String:class_getName([self class])];
 			if ([className hasPrefix:kClassNamePrefix]) {

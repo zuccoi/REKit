@@ -15,8 +15,8 @@
 // Constants
 static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
-static NSString* const kBlocksAssociationKey = @"REResponder_blocks";
-static NSString* const kInstancesBlocksAssociationKey = @"REResponder_instaceBlocks";
+static NSString* const kClassMethodBlocksAssociationKey = @"REResponder_classMethodBlocks";
+static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_instanceMethodBlocks";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
@@ -183,7 +183,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			
 			// Remove blocks
 			NSDictionary *blocks;
-			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kBlocksAssociationKey]];
+			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kClassMethodBlocksAssociationKey]];
 			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) { // Needed ????? // Should I remove blocks of class methods ?????
 				while ([blockInfos count]) {
 					NSDictionary *blockInfo;
@@ -191,7 +191,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					[self removeBlockForInstanceMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 				}
 			}];
-			[self setAssociatedValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[self setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			
 			// Dispose classes
 			NSString *className;
@@ -253,7 +253,7 @@ NSMutableDictionary* REResponderBlocks(id receiver, REResponderOperation op, BOO
 {
 	NSMutableDictionary *blocks;
 	NSString *key;
-	key = (op == REResponderOperationInstanceMethodOfClass ? kInstancesBlocksAssociationKey : kBlocksAssociationKey);
+	key = (op == REResponderOperationInstanceMethodOfClass ? kInstanceMethodBlocksAssociationKey : kClassMethodBlocksAssociationKey);
 	blocks = [receiver associatedValueForKey:key];
 	if (!blocks && create) {
 		blocks = [NSMutableDictionary dictionary];

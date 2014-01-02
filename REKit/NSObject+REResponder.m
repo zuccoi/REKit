@@ -549,25 +549,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		}
 		
 		// Replace method of subclasses
-		if (~op & REInstanceMethodMask) {
-			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
-// ?????
-//				// Filter
-//				NSString *subclassName;
-//				subclassName = NSStringFromClass(subclass);
-//				if ([subclassName hasPrefix:kClassNamePrefix]) {
-//					continue;
-//				}
-				
-				// Replace method
-				IMP subImp;
-				subImp = [subclass methodForSelector:selector];
-				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
-					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
-				}
-			}
-		}
-		else {
+		if (op & REInstanceMethodMask) {
 			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
 // ?????
 //				// Filter
@@ -582,6 +564,24 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 				subImp = [subclass instanceMethodForSelector:selector];
 				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
 					class_replaceMethod(subclass, selector, imp, [objCTypes UTF8String]);
+				}
+			}
+		}
+		else {
+			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
+// ?????
+//				// Filter
+//				NSString *subclassName;
+//				subclassName = NSStringFromClass(subclass);
+//				if ([subclassName hasPrefix:kClassNamePrefix]) {
+//					continue;
+//				}
+				
+				// Replace method
+				IMP subImp;
+				subImp = [subclass methodForSelector:selector];
+				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
+					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
 				}
 			}
 		}
@@ -657,17 +657,17 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 			class_replaceMethod((op & REInstanceMethodMask ? [receiver class] : object_getClass([receiver class])), selector, supermethod, objCTypes);
 			
 			// Replace method of subclasses
-			if (~op & REInstanceMethodMask) {
+			if (op & REInstanceMethodMask) {
 				for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
-					if ([subclass methodForSelector:selector] == imp) {
-						class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
+					if ([subclass instanceMethodForSelector:selector] == imp) {
+						class_replaceMethod(subclass, selector, supermethod, objCTypes);
 					}
 				}
 			}
 			else {
 				for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
-					if ([subclass instanceMethodForSelector:selector] == imp) {
-						class_replaceMethod(subclass, selector, supermethod, objCTypes);
+					if ([subclass methodForSelector:selector] == imp) {
+						class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
 					}
 				}
 			}

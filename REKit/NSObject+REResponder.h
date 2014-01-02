@@ -34,14 +34,16 @@
 // Block
 + (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
+- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 + (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
 - (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
 - (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
-+ (void)removeBlockForSelector:(SEL)selector key:(id)key;
-+ (void)removeBlockForInstanceMethodForSelector:(SEL)selector key:(id)key;
-- (void)removeBlockForSelector:(SEL)selector key:(id)key;
++ (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
++ (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
+- (void)removeBlockForClassMethod:(SEL)selector key:(id)key;
+- (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
 
 // Current Block
 + (IMP)supermethodOfCurrentBlock;
@@ -62,7 +64,7 @@
 
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
-- (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
+- (void)removeBlockForInstanceMethod:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
 
 @end

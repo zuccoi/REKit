@@ -596,7 +596,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, @selector(read)), @"Dynamic", @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(read) key:key];
+	[obj removeBlockForInstanceMethod:@selector(read) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -653,7 +653,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:key];
+	[obj removeBlockForInstanceMethod:@selector(log) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -706,7 +706,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:key];
+	[obj removeBlockForInstanceMethod:@selector(log) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -759,7 +759,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:key];
+	[obj removeBlockForInstanceMethod:@selector(log) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -813,7 +813,7 @@
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj0 removeBlockForSelector:@selector(log) key:@"key"];
+	[obj0 removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	

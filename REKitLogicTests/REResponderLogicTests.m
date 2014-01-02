@@ -25,13 +25,13 @@
 		blocks = [NSDictionary dictionaryWithDictionary:[aClass associatedValueForKey:@"REResponder_blocks"]];
 		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
 			[[NSArray arrayWithArray:blockInfos] enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
-				objc_msgSend(aClass, @selector(removeBlockForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
+				objc_msgSend(aClass, @selector(removeBlockForClassMethod:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
 			}];
 		}];
 		blocks = [NSDictionary dictionaryWithDictionary:[aClass associatedValueForKey:@"REResponder_instaceBlocks"]];
 		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSArray *blockInfos, BOOL *stop) {
 			[[NSArray arrayWithArray:blockInfos] enumerateObjectsUsingBlock:^(NSDictionary *blockInfo, NSUInteger idx, BOOL *stop) {
-				objc_msgSend(aClass, @selector(removeBlockForInstanceMethodForSelector:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
+				objc_msgSend(aClass, @selector(removeBlockForInstanceMethod:key:), NSSelectorFromString(selectorName), blockInfo[@"key"]);
 			}];
 		}];
 		
@@ -466,7 +466,7 @@
 //		}];
 //		
 //		// Remove top log block
-//		[obj removeBlockForSelector:@selector(log) key:@"key"];
+//		[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 //		
 //		// Check retain count of block
 //		STAssertEquals(CFGetRetainCount(block), (signed long)1, @"");
@@ -623,7 +623,7 @@
 		}];
 		
 		// Remove top log block
-		[obj removeBlockForSelector:@selector(log) key:@"key"];
+		[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	}
 	
 	// Check
@@ -665,7 +665,7 @@
 		[obj performSelector:@selector(log)];
 		
 		// Remove block
-		[obj removeBlockForSelector:@selector(log) key:@"key"];
+		[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 		
 		// Check
 		STAssertTrue(!isContextDeallocated, @"");
@@ -846,7 +846,7 @@
 	STAssertTrue([obj hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
 	
 	// Remove log block
-	[obj removeBlockForSelector:@selector(log) key:@"key"];
+	[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	STAssertTrue(![obj hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
 }
 
@@ -877,13 +877,13 @@
 	STAssertEqualObjects(string, @"say", @"");
 	
 	// Remove log block
-	[obj removeBlockForSelector:@selector(log) key:@"key"];
+	[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	STAssertFalse([obj respondsToSelector:@selector(log)], @"");
 	string = [obj performSelector:@selector(say)];
 	STAssertEqualObjects(string, @"say", @"");
 	
 	// Remove say block
-	[obj removeBlockForSelector:@selector(say) key:@"key"];
+	[obj removeBlockForInstanceMethod:@selector(say) key:@"key"];
 	STAssertFalse([obj respondsToSelector:@selector(say)], @"");
 }
 
@@ -906,7 +906,7 @@
 	}];
 	
 	// Remove block for key
-	[obj removeBlockForSelector:@selector(log) key:@"key"];
+	[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	string = [obj log];
 	STAssertEqualObjects(string, @"log", @"");
 }
@@ -952,7 +952,7 @@
 	STAssertEqualObjects(log, @"block3", @"");
 	
 	// Remove block3
-	[obj removeBlockForSelector:sel key:@"block3"];
+	[obj removeBlockForInstanceMethod:sel key:@"block3"];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Call log method
@@ -960,7 +960,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block1
-	[obj removeBlockForSelector:sel key:@"block1"];
+	[obj removeBlockForInstanceMethod:sel key:@"block1"];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Call log method
@@ -968,7 +968,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block2
-	[obj removeBlockForSelector:sel key:@"block2"];
+	[obj removeBlockForInstanceMethod:sel key:@"block2"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 	STAssertNotNil((id)[obj methodForSelector:sel], @"");
 	STAssertEquals([obj methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
@@ -991,7 +991,7 @@
 	STAssertEqualObjects(string, @"Read", @"");
 	
 	// Remove block1
-	[obj removeBlockForSelector:sel key:@"block1"];
+	[obj removeBlockForInstanceMethod:sel key:@"block1"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 	STAssertNotNil((id)[obj methodForSelector:sel], @"");
 	STAssertEquals([obj methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
@@ -1038,7 +1038,7 @@
 	STAssertEqualObjects(log, @"block3", @"");
 	
 	// Remove block3
-	[obj removeBlockForSelector:sel key:@"block3"];
+	[obj removeBlockForInstanceMethod:sel key:@"block3"];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Call log method
@@ -1046,7 +1046,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block1
-	[obj removeBlockForSelector:sel key:@"block1"];
+	[obj removeBlockForInstanceMethod:sel key:@"block1"];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Call log method
@@ -1054,7 +1054,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block2
-	[obj removeBlockForSelector:sel key:@"block2"];
+	[obj removeBlockForInstanceMethod:sel key:@"block2"];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	
 	// Call log method
@@ -1090,7 +1090,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:sel key:@"key"];
+	[obj removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 }
 
@@ -1122,7 +1122,7 @@
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:sel key:@"key"];
+	[obj removeBlockForInstanceMethod:sel key:@"key"];
 	
 	// Call log method
 	log = [obj log];
@@ -1146,7 +1146,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:sel key:@"key"];
+	[obj removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 }
 
@@ -1167,7 +1167,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:sel key:@"key"];
+	[obj removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertTrue([obj respondsToSelector:sel], @"");
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"log", @"");
 }
@@ -1195,19 +1195,19 @@
 	STAssertEqualObjects(objc_msgSend(obj3, sel), @"block", @"");
 	
 	// Remove block from obj2
-	[obj2 removeBlockForSelector:sel key:@"key"];
+	[obj2 removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertEqualObjects(objc_msgSend(obj1, sel), @"block", @"");
 	STAssertFalse([obj2 respondsToSelector:sel], @"");
 	STAssertEqualObjects(objc_msgSend(obj3, sel), @"block", @"");
 	
 	// Remove block from obj3
-	[obj3 removeBlockForSelector:sel key:@"key"];
+	[obj3 removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertEqualObjects(objc_msgSend(obj1, sel), @"block", @"");
 	STAssertFalse([obj2 respondsToSelector:sel], @"");
 	STAssertEqualObjects(objc_msgSend(obj3, sel), @"log", @"");
 	
 	// Remove block from obj1
-	[obj1 removeBlockForSelector:sel key:@"key"];
+	[obj1 removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertFalse([obj1 respondsToSelector:sel], @"");
 	STAssertFalse([obj2 respondsToSelector:sel], @"");
 	STAssertEqualObjects(objc_msgSend(obj3, sel), @"log", @"");
@@ -1235,7 +1235,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:sel key:@"key"];
+	[obj removeBlockForInstanceMethod:sel key:@"key"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 }
 
@@ -1487,21 +1487,21 @@
 	STAssertEqualObjects(log, @"-block1-block2-block3", @"");
 	
 	// Remove block3
-	[obj removeBlockForSelector:sel key:@"block3"];
+	[obj removeBlockForInstanceMethod:sel key:@"block3"];
 	
 	// Call log method
 	log = [obj performSelector:sel];
 	STAssertEqualObjects(log, @"-block1-block2", @"");
 	
 	// Remove block1
-	[obj removeBlockForSelector:sel key:@"block1"];
+	[obj removeBlockForInstanceMethod:sel key:@"block1"];
 	
 	// Call log method
 	log = [obj performSelector:sel];
 	STAssertEqualObjects(log, @"-block2", @"");
 	
 	// Remove block2
-	[obj removeBlockForSelector:sel key:@"block2"];
+	[obj removeBlockForInstanceMethod:sel key:@"block2"];
 	STAssertFalse([obj respondsToSelector:sel], @"");
 }
 
@@ -1581,21 +1581,21 @@
 	STAssertEqualObjects(log, @"log-block1-block2-block3", @"");
 	
 	// Remove block3
-	[obj removeBlockForSelector:sel key:@"block3"];
+	[obj removeBlockForInstanceMethod:sel key:@"block3"];
 	
 	// Call log method
 	log = [obj log];
 	STAssertEqualObjects(log, @"log-block1-block2", @"");
 	
 	// Remove block1
-	[obj removeBlockForSelector:sel key:@"block1"];
+	[obj removeBlockForInstanceMethod:sel key:@"block1"];
 	
 	// Call log method
 	log = [obj log];
 	STAssertEqualObjects(log, @"log-block2", @"");
 	
 	// Remove block2
-	[obj removeBlockForSelector:sel key:@"block2"];
+	[obj removeBlockForInstanceMethod:sel key:@"block2"];
 	
 	// Call log method
 	log = [obj log];
@@ -1718,7 +1718,7 @@
 	STAssertNil((id)supermethod, @"");
 }
 
-- (void)test_removeBlockForSelector_key
+- (void)test_removeBlockForInstanceMethod_key
 {
 	// Make obj
 	id obj;
@@ -1731,7 +1731,7 @@
 	STAssertTrue([obj respondsToSelector:@selector(log)], @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:@"key"];
+	[obj removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	STAssertTrue(![obj respondsToSelector:@selector(log)], @"");
 	
 	// Check imp
@@ -1844,8 +1844,8 @@
 	STAssertEquals([obj class], newClass, @"");
 	
 	// Remove blocks
-	[obj removeBlockForSelector:@selector(log) key:@"logBlock"];
-	[obj removeBlockForSelector:@selector(say) key:@"sayBlock"];
+	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
+	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
 	STAssertEquals([obj class], newClass, @"");
 }
 
@@ -1872,8 +1872,8 @@
 	STAssertEquals([obj class], newClass, @"");
 	
 	// Remove blocks
-	[obj removeBlockForSelector:@selector(log) key:@"logBlock"];
-	[obj removeBlockForSelector:@selector(say) key:@"sayBlock"];
+	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
+	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
 	STAssertEquals([obj class], newClass, @"");
 }
 
@@ -2158,11 +2158,11 @@
 	STAssertFalse([obj respondsToSelector:sel], @"");
 	
 	// Remove block
-	[NSObject removeBlockForSelector:sel key:@"key"];
+	[NSObject removeBlockForClassMethod:sel key:@"key"];
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 }
 
-- (void)test_removeBlockForSelector_key_class
+- (void)test_removeBlockForInstanceMethod_key_class
 {
 	SEL sel = @selector(log);
 	
@@ -2178,7 +2178,7 @@
 	}];
 	
 	// Remove block
-	[NSObject removeBlockForSelector:sel key:@"key"];
+	[NSObject removeBlockForClassMethod:sel key:@"key"];
 	
 	// Responds?
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");

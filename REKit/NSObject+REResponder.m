@@ -184,11 +184,11 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			// Remove blocks
 			NSDictionary *blocks;
 			blocks = [NSDictionary dictionaryWithDictionary:[self associatedValueForKey:kBlocksAssociationKey]];
-			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) { // Needed ????? // Should I remove blocks of class methods ?????
 				while ([blockInfos count]) {
 					NSDictionary *blockInfo;
 					blockInfo = [blockInfos lastObject];
-					[self removeBlockForSelector:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
+					[self removeBlockForInstanceMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 				}
 			}];
 			[self setAssociatedValue:nil forKey:kBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -674,6 +674,16 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
 }
 
+- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
+{
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject);
+}
+
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
@@ -799,7 +809,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	}
 }
 
-+ (void)removeBlockForSelector:(SEL)selector key:(id)key
++ (void)removeBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Filter
 	if (self != [self class]) {
@@ -809,7 +819,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
 }
 
-+ (void)removeBlockForInstanceMethodForSelector:(SEL)selector key:(id)key
++ (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	// Filter
 	if (self != [self class]) {
@@ -819,7 +829,17 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
-- (void)removeBlockForSelector:(SEL)selector key:(id)key
+- (void)removeBlockForClassMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (self == [self class]) {
+		return;
+	}
+	
+	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
+}
+
+- (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	// Filter
 	if (self == [self class]) {
@@ -874,11 +894,14 @@ void REResponderRemoveCurrentBlock(id receiver)
 	// Call REResponderRemoveBlock
 	REResponderOperation op;
 	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (op == REResponderOperationInstanceMethodOfClass) {
-		[[receiver class] removeBlockForInstanceMethodForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+	if (~op & REResponderOperationMaskObjectTarget) {
+		receiver = [receiver class];
+	}
+	if (~op & REResponderOperationMaskInstanceMethod) {
+		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
 	}
 	else {
-		[receiver removeBlockForSelector:selector key:blockInfo[kBlockInfoKeyKey]];
+		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
 	}
 }
 
@@ -1026,9 +1049,9 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 	return [self hasBlockForInstanceMethod:selector key:key];
 }
 
-- (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
+- (void)removeBlockForInstanceMethod:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
-	[self removeBlockForSelector:selector key:key];
+	[self removeBlockForInstanceMethod:selector key:key];
 }
 
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated))

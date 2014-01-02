@@ -657,7 +657,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClass);
 }
 
-+ (void)setBlockForInstanceMethodForSelector:(SEL)selector key:(id)key block:(id)block
++ (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
 	if (self != [self class]) {

@@ -903,7 +903,7 @@
 	
 	// Add instances block
 	IMP imp;
-	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 	}];
 	imp = [NSObject instanceMethodForSelector:sel];
 	
@@ -934,7 +934,7 @@
 	__block BOOL called = NO;
 	
 	// Add instances block
-	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 	}];
 	
 	// Add class block

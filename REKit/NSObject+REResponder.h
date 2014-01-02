@@ -33,7 +33,7 @@
 
 // Block
 + (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
-+ (void)setBlockForInstanceMethodForSelector:(SEL)selector key:(id)key block:(id)block;
++ (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 + (BOOL)hasBlockForSelector:(SEL)selector key:(id)key;
 + (BOOL)hasBlockForInstanceMethodForSelector:(SEL)selector key:(id)key;

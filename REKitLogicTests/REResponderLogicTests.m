@@ -1356,7 +1356,7 @@
 	obj = [RETestObject object];
 	
 	// Add method to NSObject
-	[NSObject setBlockForInstanceMethodForSelector:sel key:nil block:^(id receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		called = YES;
 	}];
 	

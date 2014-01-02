@@ -29,6 +29,12 @@ static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 static NSString* const kBlockInfoOperationKey = @"op";
 
+// REResponderOperationMask
+typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
+	REResponderOperationMaskInstanceMethod = (1UL << 0),
+	REResponderOperationMaskObjectTarget = (1UL << 1),
+};
+
 // REResponderOperation
 typedef NS_ENUM(NSInteger, REResponderOperation) {
 	REResponderOperationClassMethodOfClass,
@@ -729,10 +735,8 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	// Filter
 	if (!selector
 		|| !key
-		|| (op == REResponderOperationClassMethodOfClass && ![receiver hasBlockForClassMethod:selector key:key])
-		|| (op == REResponderOperationInstanceMethodOfClass && ![receiver hasBlockForInstanceMethod:selector key:key])
-		|| (op == REResponderOperationClassMethodOfObject && ![receiver hasBlockForClassMethod:selector key:key])
-		|| (op == REResponderOperationInstanceMethodOfObject && ![receiver hasBlockForInstanceMethod:selector key:key])
+		|| (~op & REResponderOperationMaskInstanceMethod && ![receiver hasBlockForClassMethod:selector key:key])
+		|| (op & REResponderOperationMaskInstanceMethod && ![receiver hasBlockForInstanceMethod:selector key:key])
 	){
 		return;
 	}

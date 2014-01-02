@@ -31,16 +31,16 @@ static NSString* const kBlockInfoOperationKey = @"op";
 
 // REResponderOperationMask
 typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
-	REResponderOperationInstanceMethodMask = (1UL << 0),
-	REResponderOperationObjectTargetMask = (1UL << 1),
+	REInstanceMethodMask = (1UL << 0), // Rename >>>
+	REObjectTargetMask = (1UL << 1), // Rename >>>
 };
 
 // REResponderOperation
 typedef NS_ENUM(NSInteger, REResponderOperation) {
-	REResponderOperationClassMethodOfClass,
-	REResponderOperationInstanceMethodOfClass,
-	REResponderOperationClassMethodOfObject,
-	REResponderOperationInstanceMethodOfObject,
+	REClassMethodOfClass, // Rename >>>
+	REInstanceMethodOfClass, // Rename >>>
+	REClassMethodOfObject, // Rename >>>
+	REInstanceMethodOfObject, // Rename >>>
 };
 
 
@@ -121,20 +121,20 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 {
 	@synchronized (receiver) {
 		BOOL responds;
-		if (op == REResponderOperationInstanceMethodOfClass) {
-			responds = [receiver REResponder_X_instancesRespondToSelector:aSelector];
+		if (op & REInstanceMethodMask) {
+			responds = [[receiver class] REResponder_X_instancesRespondToSelector:aSelector];
 			if (responds) {
 				// Forwarding method?
-				if ([receiver instanceMethodForSelector:aSelector] == REResponderForwardingMethod()) {
+				if ([[receiver class] instanceMethodForSelector:aSelector] == REResponderForwardingMethod()) {
 					responds = NO;
 				}
 			}
 		}
 		else {
-			responds = [receiver REResponder_X_respondsToSelector:aSelector];
+			responds = [[receiver class] REResponder_X_respondsToSelector:aSelector];
 			if (responds) {
 				// Forwarding method?
-				if ([receiver methodForSelector:aSelector] == REResponderForwardingMethod()) {
+				if ([[receiver class] methodForSelector:aSelector] == REResponderForwardingMethod()) {
 					responds = NO;
 				}
 			}
@@ -151,7 +151,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		return NO;
 	}
 	
-	return REResponderRespondsToSelector(self, aSelector, REResponderOperationClassMethodOfClass);
+	return REResponderRespondsToSelector(self, aSelector, REClassMethodOfClass);
 }
 
 + (BOOL)REResponder_X_instancesRespondToSelector:(SEL)aSelector
@@ -161,7 +161,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		return NO;
 	}
 	
-	return REResponderRespondsToSelector(self, aSelector, REResponderOperationInstanceMethodOfClass);
+	return REResponderRespondsToSelector(self, aSelector, REInstanceMethodOfClass);
 }
 
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
@@ -171,7 +171,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		return NO;
 	}
 	
-	return REResponderRespondsToSelector(self, aSelector, REResponderOperationInstanceMethodOfObject);
+	return REResponderRespondsToSelector(self, aSelector, REInstanceMethodOfObject);
 }
 
 - (void)REResponder_X_dealloc
@@ -253,7 +253,7 @@ NSMutableDictionary* REResponderGetBlocks(id receiver, REResponderOperation op, 
 {
 	NSMutableDictionary *blocks;
 	NSString *key;
-	key = (op & REResponderOperationInstanceMethodMask ? kInstanceMethodBlocksAssociationKey : kClassMethodBlocksAssociationKey);
+	key = (op & REInstanceMethodMask ? kInstanceMethodBlocksAssociationKey : kClassMethodBlocksAssociationKey);
 	blocks = [receiver associatedValueForKey:key];
 	if (!blocks && create) {
 		blocks = [NSMutableDictionary dictionary];
@@ -318,22 +318,22 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 			}];
 		};
 		
-		// Search object block
+		// Search blockInfo of object
 		if (receiver != [receiver class]) {
-			blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationInstanceMethodOfObject, NO));
+			blockInfoBlock(REResponderGetBlocks(receiver, REInstanceMethodOfObject, NO));
+			if (!blockInfo) {
+				blockInfoBlock(REResponderGetBlocks(receiver, REClassMethodOfObject, NO));
+			}
 		}
 		if (blockInfo) {
 			return blockInfo;
 		}
 		
-		// Search instances block
-		blockInfoBlock(REResponderGetBlocks([receiver class], REResponderOperationInstanceMethodOfClass, NO));
-		if (blockInfo) {
-			return blockInfo;
+		// Search blockInfo of class
+		blockInfoBlock(REResponderGetBlocks([receiver class], REInstanceMethodOfClass, NO));
+		if (!blockInfo) {
+			blockInfoBlock(REResponderGetBlocks([receiver class], REClassMethodOfClass, NO));
 		}
-		
-		// Search class block
-		blockInfoBlock(REResponderGetBlocks([receiver class], REResponderOperationClassMethodOfClass, NO));
 		
 		return blockInfo;
 	}
@@ -392,11 +392,11 @@ IMP REResponderGetSupermethodWithImp(id receiver, IMP imp)
 				op = [blockInfo[kBlockInfoOperationKey] integerValue];
 				superclass = [classHavingBlockinfo superclass];
 				while (superclass && !supermethod) {
-					if (op == REResponderOperationClassMethodOfClass) {
-						supermethod = method_getImplementation(class_getClassMethod(superclass, selector));
+					if (op & REInstanceMethodMask) {
+						supermethod = method_getImplementation(class_getInstanceMethod(superclass, selector));
 					}
 					else {
-						supermethod = method_getImplementation(class_getInstanceMethod(superclass, selector));
+						supermethod = method_getImplementation(class_getClassMethod(superclass, selector));
 					}
 					if (supermethod == imp) {
 						supermethod = NULL;
@@ -424,9 +424,9 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 	}
 	
 	// Don't set block to private class
-	if (op != REResponderOperationInstanceMethodOfObject) {
+	if (~op & REObjectTargetMask) {
 		NSString *className;
-		className = NSStringFromClass(receiver);
+		className = NSStringFromClass([receiver class]);
 //		if ([className hasPrefix:kClassNamePrefix] || [className hasPrefix:@"__"]) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
 		if ([className hasPrefix:kClassNamePrefix]) {
 			// Search valid superclass
@@ -476,38 +476,26 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 		blocks = REResponderGetBlocks(receiver, op, YES);
 		oldBlockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
 		oldBlockMethod = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
-		if (op == REResponderOperationInstanceMethodOfClass) {
-			currentMethod = [receiver instanceMethodForSelector:selector];
-		}
-		else {
-			currentMethod = [receiver methodForSelector:selector];
-		}
-		
-		// Make blockInfos
-		if (!blockInfos) {
-			blockInfos = [NSMutableArray array];
-			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			if (op == REResponderOperationClassMethodOfClass) {
-				if (currentMethod
-					&& currentMethod != REResponderForwardingMethod()
-					&& currentMethod != [[receiver superclass] methodForSelector:selector]
-				){
-					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-				}
+		switch (op) { // Format >>>
+			case REClassMethodOfClass: {
+				currentMethod = [[receiver class] methodForSelector:selector];
+			} break;
+			case REInstanceMethodOfClass: {
+				currentMethod = [[receiver class] instanceMethodForSelector:selector];
+			} break;
+			case REClassMethodOfObject: {
+				currentMethod = [[receiver class] methodForSelector:selector];
+			} break;
+			case REInstanceMethodOfObject: {
+				currentMethod =  [receiver methodForSelector:selector];
+			} break;
+			default: {
+				currentMethod = NULL;
 			}
-			else if (op == REResponderOperationInstanceMethodOfClass) {
-				if (currentMethod
-					&& currentMethod != REResponderForwardingMethod()
-					&& currentMethod != [[receiver superclass] instanceMethodForSelector:selector]
-				){
-					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-				}
-			}
-			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
 		// Become subclass
-		if (op == REResponderOperationInstanceMethodOfObject) {
+		if (op & REObjectTargetMask) {
 			if (![NSStringFromClass([receiver class]) hasPrefix:kClassNamePrefix]) {
 				Class originalClass;
 				Class subclass;
@@ -522,30 +510,54 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 			}
 		}
 		
+		// Make blockInfos
+		if (!blockInfos) {
+			blockInfos = [NSMutableArray array];
+			[blockInfos setAssociatedValue:methodSignature forKey:kBlockInfosMethodSignatureAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			if (op & REInstanceMethodMask) {
+				if (currentMethod
+					&& currentMethod != REResponderForwardingMethod()
+					&& currentMethod != [[[receiver class] superclass] instanceMethodForSelector:selector]
+				){
+					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				}
+			}
+			else {
+				if (currentMethod
+					&& currentMethod != REResponderForwardingMethod()
+					&& currentMethod != [[[receiver class] superclass] methodForSelector:selector]
+				){
+					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				}
+			}
+			[blocks setObject:blockInfos forKey:selectorName];
+		}
+		
 		// Get originalClassMethod
 		IMP originalClassMethod;
 		originalClassMethod = [[receiver class] methodForSelector:selector];
-		if (originalClassMethod == [[receiver superclass] methodForSelector:selector]) {
+		if (originalClassMethod == [[[receiver class] superclass] methodForSelector:selector]) {
 			originalClassMethod = NULL;
 		}
 		
 		// Replace method
 		IMP imp;
 		imp = imp_implementationWithBlock(block);
-		class_replaceMethod((op == REResponderOperationInstanceMethodOfClass ? receiver : object_getClass(receiver)), selector, imp, [objCTypes UTF8String]);
-		if (op != REResponderOperationClassMethodOfClass && originalClassMethod) {
+		class_replaceMethod((op & REInstanceMethodMask ? [receiver class] : object_getClass([receiver class])), selector, imp, [objCTypes UTF8String]);
+		if (op & REInstanceMethodMask && originalClassMethod) { // Needed ?????
 			class_replaceMethod(object_getClass([receiver class]), selector, originalClassMethod, [objCTypes UTF8String]);
 		}
 		
 		// Replace method of subclasses
-		if (op == REResponderOperationClassMethodOfClass) {
-			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
-				// Filter
-				NSString *subclassName;
-				subclassName = NSStringFromClass(subclass);
-				if ([subclassName hasPrefix:kClassNamePrefix]) {
-					continue;
-				}
+		if (~op & REInstanceMethodMask) {
+			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
+// ?????
+//				// Filter
+//				NSString *subclassName;
+//				subclassName = NSStringFromClass(subclass);
+//				if ([subclassName hasPrefix:kClassNamePrefix]) {
+//					continue;
+//				}
 				
 				// Replace method
 				IMP subImp;
@@ -555,14 +567,15 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id inKey, id bloc
 				}
 			}
 		}
-		else if (op == REResponderOperationInstanceMethodOfClass) {
-			for (Class subclass in RESubclassesOfClass(receiver, NO)) {
-				// Filter
-				NSString *subclassName;
-				subclassName = NSStringFromClass(subclass);
-				if ([subclassName hasPrefix:kClassNamePrefix]) {
-					continue;
-				}
+		else {
+			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
+// ?????
+//				// Filter
+//				NSString *subclassName;
+//				subclassName = NSStringFromClass(subclass);
+//				if ([subclassName hasPrefix:kClassNamePrefix]) {
+//					continue;
+//				}
 				
 				// Replace
 				IMP subImp;
@@ -613,11 +626,7 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResponderOperation op)
 {
 	// Filter
-	if (!selector
-		|| !key
-		|| (~op & REResponderOperationInstanceMethodMask && ![receiver hasBlockForClassMethod:selector key:key])
-		|| (op & REResponderOperationInstanceMethodMask && ![receiver hasBlockForInstanceMethod:selector key:key])
-	){
+	if (!selector || !key) {
 		return;
 	}
 	
@@ -645,18 +654,18 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 			
 			// Replace method of receiver
-			class_replaceMethod((op == REResponderOperationInstanceMethodOfClass ? receiver : object_getClass(receiver)), selector, supermethod, objCTypes);
+			class_replaceMethod((op & REInstanceMethodMask ? [receiver class] : object_getClass([receiver class])), selector, supermethod, objCTypes);
 			
 			// Replace method of subclasses
-			if (op == REResponderOperationClassMethodOfClass) {
-				for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+			if (~op & REInstanceMethodMask) {
+				for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
 					if ([subclass methodForSelector:selector] == imp) {
 						class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
 					}
 				}
 			}
-			else if (op == REResponderOperationInstanceMethodOfClass) {
-				for (Class subclass in RESubclassesOfClass(receiver, NO)) {
+			else {
+				for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
 					if ([subclass instanceMethodForSelector:selector] == imp) {
 						class_replaceMethod(subclass, selector, supermethod, objCTypes);
 					}
@@ -690,7 +699,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfClass);
+	REResponderSetBlockForSelector(self, selector, key, block, REClassMethodOfClass);
 }
 
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
@@ -700,17 +709,17 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
+	REResponderSetBlockForSelector(self, selector, key, block, REInstanceMethodOfClass);
 }
 
 + (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
 {
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
+	return REResponderHasBlockForSelector(self, selector, key, REClassMethodOfClass);
 }
 
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
 {
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
+	return REResponderHasBlockForSelector(self, selector, key, REInstanceMethodOfClass);
 }
 
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key
@@ -720,7 +729,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfClass);
+	REResponderRemoveBlockForSelector(self, selector, key, REClassMethodOfClass);
 }
 
 + (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
@@ -730,7 +739,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
+	REResponderRemoveBlockForSelector(self, selector, key, REInstanceMethodOfClass);
 }
 
 //--------------------------------------------------------------//
@@ -744,7 +753,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject);
+	REResponderSetBlockForSelector(self, selector, key, block, REClassMethodOfObject);
 }
 
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
@@ -754,12 +763,12 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfObject);
+	REResponderSetBlockForSelector(self, selector, key, block, REInstanceMethodOfObject);
 }
 
 - (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
 {
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
+	return REResponderHasBlockForSelector(self, selector, key, REClassMethodOfObject);
 }
 
 - (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
@@ -769,7 +778,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return NO;
 	}
 	
-	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
+	return REResponderHasBlockForSelector(self, selector, key, REInstanceMethodOfObject);
 }
 
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key
@@ -779,7 +788,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
+	REResponderRemoveBlockForSelector(self, selector, key, REClassMethodOfObject);
 }
 
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
@@ -789,7 +798,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
+	REResponderRemoveBlockForSelector(self, selector, key, REInstanceMethodOfObject);
 }
 
 //--------------------------------------------------------------//
@@ -816,14 +825,14 @@ void REResponderRemoveCurrentBlock(id receiver)
 	// Call REResponderRemoveBlock
 	REResponderOperation op;
 	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (~op & REResponderOperationObjectTargetMask) {
+	if (~op & REObjectTargetMask) {
 		receiver = [receiver class];
 	}
-	if (~op & REResponderOperationInstanceMethodMask) {
-		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
+	if (op & REInstanceMethodMask) {
+		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
 	}
 	else {
-		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
+		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
 	}
 }
 

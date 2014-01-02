@@ -731,6 +731,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		|| !key
 		|| (op == REResponderOperationClassMethodOfClass && ![receiver hasBlockForClassMethod:selector key:key])
 		|| (op == REResponderOperationInstanceMethodOfClass && ![receiver hasBlockForInstanceMethod:selector key:key])
+		|| (op == REResponderOperationClassMethodOfObject && ![receiver hasBlockForClassMethod:selector key:key])
 		|| (op == REResponderOperationInstanceMethodOfObject && ![receiver hasBlockForInstanceMethod:selector key:key])
 	){
 		return;

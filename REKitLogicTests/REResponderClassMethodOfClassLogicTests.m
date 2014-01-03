@@ -1411,11 +1411,6 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethod__order
-{
-	// Not Implemented >>>
-}
-
 - (void)test_supermethod__obtainFromOutsideOfBlock
 {
 	IMP supermethod;

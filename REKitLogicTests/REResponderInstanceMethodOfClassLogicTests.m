@@ -475,7 +475,23 @@
 
 - (void)test_setBlockToPublicClass
 {
-	// Not Implemented >>>
+	SEL sel = _cmd;
+	
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add Block
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		return @"private";
+	}];
+	[[obj class] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		return @"public";
+	}];
+	
+	// Check
+	STAssertTrue([RETestObject instancesRespondToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"private", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject object], sel), @"public", @"");
 }
 
 - (void)test_canPsssReceiverAsKey

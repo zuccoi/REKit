@@ -399,6 +399,26 @@
 	STAssertTrue(![RESubTestObject respondsToSelector:sel], @"");
 }
 
+- (void)test_setBlockToPublicClass
+{
+	SEL sel = _cmd;
+	
+	id obj;
+	obj = [RETestObject object];
+	
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
+		return @"private";
+	}];
+	
+	[[obj class] setBlockForClassMethod:@selector(otherMethod) key:nil block:^(Class receiver) {
+		return @"public";
+	}];
+	STAssertTrue([RETestObject respondsToSelector:@selector(otherMethod)], @"");
+	
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"private", @"");
+	STAssertEqualObjects(objc_msgSend([RETestObject class], @selector(otherMethod)), @"public", @"");
+}
+
 - (void)test_receiverIsClass
 {
 	SEL sel = @selector(version);
@@ -1391,7 +1411,12 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_getSupermethodFromOutsideOfBlock
+- (void)test_supermethod__order
+{
+	// Not Implemented >>>
+}
+
+- (void)test_supermethod__obtainFromOutsideOfBlock
 {
 	IMP supermethod;
 	supermethod = (IMP)objc_msgSend([NSObject class], @selector(supermethodOfCurrentBlock));

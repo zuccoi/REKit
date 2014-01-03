@@ -1670,7 +1670,7 @@
 	[obj sayHello];
 }
 
-- (void)test_getSupermethodFromOutsideOfBlock
+- (void)test_supermethod__obtainFromOutsideOfBlock
 {
 	// Make obj
 	id obj;

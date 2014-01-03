@@ -473,6 +473,11 @@
 	STAssertTrue(![RESubTestObject instancesRespondToSelector:sel], @"");
 }
 
+- (void)test_setBlockToPublicClass
+{
+	// Not Implemented >>>
+}
+
 - (void)test_canPsssReceiverAsKey
 {
 	SEL sel = @selector(log);
@@ -988,138 +993,6 @@
 	STAssertTrue(!dirty, @"");
 }
 
-- (void)test_orderOfSupermethod
-{
-	SEL sel = _cmd;
-	__block NSMutableArray *imps;
-	imps = [NSMutableArray array];
-	
-	id testObj;
-	id obj;
-	testObj = [RETestObject object];
-	obj = [NSObject object];
-	
-	// Add block to testObj
-	[testObj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp1;
-	imp1 = [testObj methodForSelector:sel];
-	
-	// Add block to NSObject
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp2;
-	imp2 = [NSObject instanceMethodForSelector:sel];
-	
-	// Add object block
-	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp3;
-	imp3 = [obj methodForSelector:sel];
-	
-	// Add block to RETestObject
-	[RETestObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp4;
-	imp4 = [RETestObject instanceMethodForSelector:sel];
-	
-	// Add block to NSObject
-	[[obj class] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp5;
-	imp5 = [NSObject instanceMethodForSelector:sel];
-	
-	// Add object block
-	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp6;
-	imp6 = [obj methodForSelector:sel];
-	
-	// Add block to testObj
-	[testObj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp7;
-	imp7 = [testObj methodForSelector:sel];
-	
-	// Add block to RETestObject
-	[[testObj class] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			[imps addObject:[NSValue valueWithPointer:supermethod]];
-			(REIMP(void)supermethod)(receiver, sel);
-		}
-	}];
-	IMP imp8;
-	imp8 = [RETestObject instanceMethodForSelector:sel];
-	
-	// Call
-	[imps addObject:[NSValue valueWithPointer:[testObj methodForSelector:sel]]];
-	objc_msgSend(testObj, sel);
-	
-	// Check
-	NSArray *expected;
-	expected = @[
-		[NSValue valueWithPointer:imp7],
-		[NSValue valueWithPointer:imp1],
-		[NSValue valueWithPointer:imp8],
-		[NSValue valueWithPointer:imp4],
-		[NSValue valueWithPointer:imp5],
-		[NSValue valueWithPointer:imp2],
-	];
-	STAssertEqualObjects(imps, expected, @"");
-}
-
 - (void)test_supermethodOfDynamicBlock
 {
 	SEL sel = @selector(log);
@@ -1406,7 +1279,139 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_getSupermethodFromOutsideOfBlock
+- (void)test_supermethod__order
+{
+	SEL sel = _cmd;
+	__block NSMutableArray *imps;
+	imps = [NSMutableArray array];
+	
+	id testObj;
+	id obj;
+	testObj = [RETestObject object];
+	obj = [NSObject object];
+	
+	// Add block to testObj
+	[testObj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp1;
+	imp1 = [testObj methodForSelector:sel];
+	
+	// Add block to NSObject
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp2;
+	imp2 = [NSObject instanceMethodForSelector:sel];
+	
+	// Add object block
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp3;
+	imp3 = [obj methodForSelector:sel];
+	
+	// Add block to RETestObject
+	[RETestObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp4;
+	imp4 = [RETestObject instanceMethodForSelector:sel];
+	
+	// Add block to NSObject
+	[[obj class] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp5;
+	imp5 = [NSObject instanceMethodForSelector:sel];
+	
+	// Add object block
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp6;
+	imp6 = [obj methodForSelector:sel];
+	
+	// Add block to testObj
+	[testObj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp7;
+	imp7 = [testObj methodForSelector:sel];
+	
+	// Add block to RETestObject
+	[[testObj class] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		// supermethod
+		IMP supermethod;
+		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		if (supermethod) {
+			[imps addObject:[NSValue valueWithPointer:supermethod]];
+			(REIMP(void)supermethod)(receiver, sel);
+		}
+	}];
+	IMP imp8;
+	imp8 = [RETestObject instanceMethodForSelector:sel];
+	
+	// Call
+	[imps addObject:[NSValue valueWithPointer:[testObj methodForSelector:sel]]];
+	objc_msgSend(testObj, sel);
+	
+	// Check
+	NSArray *expected;
+	expected = @[
+		[NSValue valueWithPointer:imp7],
+		[NSValue valueWithPointer:imp1],
+		[NSValue valueWithPointer:imp8],
+		[NSValue valueWithPointer:imp4],
+		[NSValue valueWithPointer:imp5],
+		[NSValue valueWithPointer:imp2],
+	];
+	STAssertEqualObjects(imps, expected, @"");
+}
+
+- (void)test_supermethod__obtainFromOutsideOfBlock
 {
 	IMP supermethod;
 	supermethod = (IMP)objc_msgSend([NSObject class], @selector(supermethodOfCurrentBlock));

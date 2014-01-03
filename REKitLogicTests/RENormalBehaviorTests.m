@@ -287,7 +287,7 @@
 	STAssertEqualObjects(string, @"original", @"");
 }
 
-- (void)test_classInstanceIsChangedAfterKVO
+- (void)test_classInstanceIsChangedWhenStartingAndStoppingKVO
 {
 	// Make obj
 	id obj;
@@ -340,7 +340,7 @@
 	STAssertTrue(class6 == [NSObject class], @"");
 }
 
-- (void)test_metaClassIsChangedAfterKVO
+- (void)test_metaClassIsChangedWhenStartingAndStoppingKVO
 {
 	// Make obj
 	id obj;

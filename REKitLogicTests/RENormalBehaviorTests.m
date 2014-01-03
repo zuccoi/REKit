@@ -465,4 +465,23 @@
 	objc_setAssociatedObject(object_getClass(object_getClass(obj)), "key", nil, OBJC_ASSOCIATION_RETAIN);
 }
 
+- (void)test_valueAssociatedToInstanceIsSameAfterKVO
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	objc_setAssociatedObject(obj, "key", @(1), OBJC_ASSOCIATION_RETAIN);
+	
+	// Start observing
+	[obj addObserver:obj forKeyPath:@"version" options:0 context:nil];
+	
+	// Get associatedValue
+	id associatedValue;
+	associatedValue = objc_getAssociatedObject(obj, "key");
+	STAssertEqualObjects(associatedValue, @(1), @"");
+	
+	// Tear down
+	[obj removeObserver:obj forKeyPath:@"version"];
+}
+
 @end

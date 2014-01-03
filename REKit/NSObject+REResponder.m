@@ -344,7 +344,7 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 		if (blockInfo) {
 			return blockInfo;
 		}
-		blockInfoBlock(REResponderGetBlocks([receiver class], REClassMethodOfClass, NO));
+		blockInfoBlock(REResponderGetBlocks([receiver class], REClassMethodOfClass, NO)); // Not needed 'cos blocks is associated with class instance >>>
 		
 		return blockInfo;
 	}
@@ -809,7 +809,7 @@ void REResponderRemoveCurrentBlock(id receiver)
 	if (!(op & REObjectTargetMask)) {
 		receiver = [receiver class];
 	}
-	REResponderRemoveBlockForSelector(receiver, selector, blockInfo[kBlockInfoKeyKey], op);
+	REResponderRemoveBlockForSelector(receiver, selector, blockInfo[kBlockInfoKeyKey], op); // Call REResponderRemoveBlockWithBlockInfo for performance >>>
 }
 
 + (void)removeCurrentBlock

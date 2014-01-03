@@ -1789,7 +1789,7 @@
 {
 	// Make obj
 	NSObject *obj;
-	obj = [NSObject object];
+	obj = [RETestObject object];
 	
 	// Add log method
 	[obj setBlockForInstanceMethod:@selector(log) key:@"logBlock" block:^(id receiver) {

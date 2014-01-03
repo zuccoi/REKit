@@ -27,6 +27,7 @@
 - (NSString*)say;
 - (void)sayHello;
 - (NSUInteger)ageAfterYears:(NSUInteger)years;
++ (NSString*)classLog;
 + (NSInteger)integerWithInteger:(NSInteger)integer;
 + (CGRect)theRect;
 + (void)sayHello;

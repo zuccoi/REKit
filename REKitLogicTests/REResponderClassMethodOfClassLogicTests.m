@@ -640,7 +640,7 @@
 	STAssertTrue(![RETestObject respondsToSelector:sel], @"");
 }
 
-- (void)test_recoonectedToForwardingMethod
+- (void)test_connectToForwardingMethod
 {
 	SEL sel = @selector(readThis:);
 	NSString *string = nil;

@@ -313,42 +313,6 @@
 		}];
 	}
 	
-	STAssertTrue(deallocated, @"");
-}
-
-- (void)test_keyOfBlockIsDeallocatedWhenObjectIsDeallocated
-{
-	__block BOOL deallocated = NO;
-	
-	@autoreleasepool {
-		// Prepare key
-		id key;
-		key = [NSObject object];
-		[key setBlockForInstanceMethod:@selector(dealloc) key:nil block:^(id receiver) {
-			// Raise deallocated flag
-			deallocated = YES;
-			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
-		}];
-		
-		// Make obj
-		RETestObject *obj;
-		obj = [RETestObject object];
-		
-		// Override log method using key
-		[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
-			// supermethod
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(log));
-			}
-		}];
-	}
-	
 	// Check
 	STAssertTrue(deallocated, @"");
 }
@@ -974,7 +938,7 @@
 	STAssertEquals([obj methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
-- (void)test_recoonectedToForwardingMethod
+- (void)test_connectToForwardingMethod
 {
 	NSString *string = nil;
 	SEL sel;

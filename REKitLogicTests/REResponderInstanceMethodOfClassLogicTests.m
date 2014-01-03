@@ -693,7 +693,7 @@
 	STAssertEquals([NSObject methodForSelector:sel], [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
-- (void)test_recoonectedToForwardingMethod
+- (void)test_connectToForwardingMethod
 {
 	SEL sel = @selector(readThis:);
 	NSString *string = nil;

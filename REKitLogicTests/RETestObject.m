@@ -73,6 +73,11 @@
 	return self.age + years;
 }
 
++ (NSString*)classLog
+{
+	return @"classLog";
+}
+
 + (NSInteger)integerWithInteger:(NSInteger)integer
 {
 	return integer;

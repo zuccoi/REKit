@@ -478,19 +478,17 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 	// Update blocks
 	@synchronized (receiver) {
 		// Become subclass
-		if (op & REObjectTargetMask) {
-			if (![NSStringFromClass([receiver class]) hasPrefix:kClassNamePrefix]) {
-				Class originalClass;
-				Class subclass;
-				NSString *className;
-				originalClass = [receiver class];
-				className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass([receiver class])];
-				subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
-				objc_registerClassPair(subclass);
-				[receiver willChangeClass:subclass];
-				object_setClass(receiver, subclass);
-				[receiver didChangeClass:originalClass];
-			}
+		if (op & REObjectTargetMask && ![NSStringFromClass([receiver class]) hasPrefix:kClassNamePrefix]) {
+			Class originalClass;
+			Class subclass;
+			NSString *className;
+			originalClass = [receiver class];
+			className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass([receiver class])];
+			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
+			objc_registerClassPair(subclass);
+			[receiver willChangeClass:subclass];
+			object_setClass(receiver, subclass);
+			[receiver didChangeClass:originalClass];
 		}
 		
 		// Get elements

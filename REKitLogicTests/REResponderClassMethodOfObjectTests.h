@@ -1,5 +1,5 @@
 /*
- REResponderClassLogicTests.h
+ REResponderClassMethodOfObjectTests.h
  
  Copyright ©2013 Kazki Miura. All rights reserved.
 */
@@ -7,5 +7,5 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 
-@interface REResponderClassLogicTests : SenTestCase
+@interface REResponderClassMethodOfObjectTests : SenTestCase
 @end

@@ -7,6 +7,7 @@
 #import "REKit.h"
 #import "REObserverLogicTests.h"
 #import "RETestObject.h"
+#import <objc/message.h>
 
 #if __has_feature(objc_arc)
 	#error This code needs compiler option -fno-objc-arc
@@ -21,12 +22,12 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -149,12 +150,12 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -224,12 +225,12 @@
 	// Make objs
 	NSArray *objs;
 	RETestObject *obj0, *obj1;
-	objs = @[(obj0 = [RETestObject testObject]), (obj1 = [RETestObject testObject])];
+	objs = @[(obj0 = [RETestObject object]), (obj1 = [RETestObject object])];
 	
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -367,7 +368,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	__block BOOL observed = NO;
@@ -388,7 +389,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	[obj addObserverForKeyPath:@"name" options:NSKeyValueObservingOptionNew usingBlock:^(NSDictionary *change) {
@@ -406,7 +407,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	obj.name = @"old name";
 	
 	// Add observer
@@ -425,7 +426,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	__block BOOL observed = NO;
@@ -439,7 +440,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer
 	__block NSUInteger count = 0;
@@ -474,11 +475,11 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		observed = YES;
 	}];
 	
@@ -510,7 +511,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer then remove it
 	id observer;
@@ -530,7 +531,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer for name
 	__block NSString *recognizedName = nil;
@@ -546,9 +547,27 @@
 	// Add read method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(read) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(read) key:key block:^(id receiver) {
 		return @"Dynamic";
 	}];
+	
+// ?????
+//	STAssertTrue([obj methodForSelector:@selector(read)] != [[obj class] methodForSelector:@selector(read)], @"");
+//	{
+//		IMP imp;
+//		imp = [obj methodForSelector:@selector(read)];
+//		STAssertTrue(imp != [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+//		STAssertTrue(imp == method_getImplementation(class_getInstanceMethod(object_getClass(obj), @selector(read))), @"");
+//		STAssertEquals([NSObject instanceMethodForSelector:@selector(methodForSelector:)], [obj methodForSelector:@selector(methodForSelector:)], @"");
+//		
+//		IMP classImp;
+//		classImp = [[obj class] methodForSelector:@selector(read)];
+//		STAssertTrue(classImp != imp, @"");
+//		
+//		IMP classImp2;
+//		classImp2 = method_getImplementation(class_getInstanceMethod(object_getClass(obj), @selector(read)));
+//		STAssertEquals(classImp, classImp2, @"");
+//	}
 	
 	// Change name
 	obj.name = @"name";
@@ -573,8 +592,11 @@
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
+	// Call read
+	STAssertEqualObjects(objc_msgSend(obj, @selector(read)), @"Dynamic", @"");
+	
 	// Remove block
-	[obj removeBlockForSelector:@selector(read) key:key];
+	[obj removeBlockForInstanceMethod:@selector(read) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -587,7 +609,7 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Add observer for name
 	__block NSString *recognizedName = nil;
@@ -603,7 +625,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
 		return @"Overridden";
 	}];
 	
@@ -631,7 +653,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:key];
+	[obj removeBlockForInstanceMethod:@selector(log) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -644,13 +666,13 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
 	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	[obj addObserver:observer forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
@@ -658,7 +680,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
 		return @"Dynamic";
 	}];
 	
@@ -684,7 +706,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:key];
+	[obj removeBlockForInstanceMethod:@selector(log) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -697,13 +719,13 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	// Make observer
 	id observer;
 	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	[obj addObserver:observer forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
@@ -711,7 +733,7 @@
 	// Override log method
 	NSString *key;
 	key = @"key";
-	[obj setBlockForSelector:@selector(log) key:key block:^(id receiver) {
+	[obj setBlockForInstanceMethod:@selector(log) key:key block:^(id receiver) {
 		return @"Overridden";
 	}];
 	
@@ -737,7 +759,7 @@
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj removeBlockForSelector:@selector(log) key:key];
+	[obj removeBlockForInstanceMethod:@selector(log) key:key];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj observedInfos], observedInfos, @"");
 	
@@ -751,19 +773,19 @@
 	// Make objs
 	NSArray *objs;
 	RETestObject *obj0, *obj1;
-	objs = @[(obj0 = [RETestObject testObject]), (obj1 = [RETestObject testObject])];
+	objs = @[(obj0 = [RETestObject object]), (obj1 = [RETestObject object])];
 	
 	// Add observer for name
 	id observer;
 	__block NSString *recognizedName = nil;
-	observer = [[[NSObject alloc] init] autorelease];
-	[observer setBlockForSelector:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
+	observer = [NSObject object];
+	[observer setBlockForInstanceMethod:@selector(observeValueForKeyPath:ofObject:change:context:) key:@"key" block:^(id receiver, NSString *keyPath, id object, NSDictionary *change, void *context) {
 		recognizedName = change[NSKeyValueChangeNewKey];
 	}];
 	[objs addObserver:observer toObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 1)] forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
 	
 	// Override log method
-	[obj0 setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
+	[obj0 setBlockForInstanceMethod:@selector(log) key:nil block:^(id receiver) {
 		return @"Overrideen";
 	}];
 	
@@ -791,7 +813,7 @@
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	
 	// Remove block
-	[obj0 removeBlockForSelector:@selector(log) key:@"key"];
+	[obj0 removeBlockForInstanceMethod:@selector(log) key:@"key"];
 	STAssertEqualObjects([observer observingInfos], observingInfos, @"");
 	STAssertEqualObjects([obj0 observedInfos], observedInfos, @"");
 	
@@ -806,7 +828,7 @@
 	
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	@autoreleasepool {
 		// Start observing
@@ -830,12 +852,12 @@
 {
 	// Make obj
 	RETestObject *obj;
-	obj = [RETestObject testObject];
+	obj = [RETestObject object];
 	
 	@autoreleasepool {
 		// Start observing
 		id observer;
-		observer = [[[NSObject alloc] init] autorelease];
+		observer = [NSObject object];
 		[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 		
 		// observer will be deallocated…
@@ -851,7 +873,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Start observing
 		observer = [obj addObserverForKeyPath:@"name" options:0 usingBlock:^(NSDictionary *change) {
@@ -879,12 +901,12 @@
 {
 	// Make observer
 	id observer;
-	observer = [[[NSObject alloc] init] autorelease];
+	observer = [NSObject object];
 	
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Start observing
 		[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
@@ -901,7 +923,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Start observing
 		id observer;
@@ -914,13 +936,13 @@
 		block = [[obj associatedValueForKey:@"REObserver_observedInfos"] lastObject][@"block"];
 		
 		// Override methods
-		[block setBlockForSelector:@selector(release) key:nil block:^(id receiver) {
+		[block setBlockForInstanceMethod:@selector(release) key:nil block:^(id receiver) {
 			released = YES;
 		}];
-		[block setBlockForSelector:@selector(copy) key:nil block:^(id receiver) {
+		[block setBlockForInstanceMethod:@selector(copy) key:nil block:^(id receiver) {
 			STFail(@"");
 		}];
-		[block setBlockForSelector:@selector(retain) key:nil block:^(id receiver) {
+		[block setBlockForInstanceMethod:@selector(retain) key:nil block:^(id receiver) {
 			STFail(@"");
 		}];
 		
@@ -939,7 +961,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Strt observing
 		id observer;
@@ -949,13 +971,13 @@
 		
 		// Override dealloc method of observingInfos
 		SEL sel = @selector(dealloc);
-		[[observer observingInfos] setBlockForSelector:sel key:nil block:^(id receiver) {
+		[[observer observingInfos] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
 			
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
 				supermethod(receiver, sel);
 			}
 		}];
@@ -972,7 +994,7 @@
 	@autoreleasepool {
 		// Make obj
 		RETestObject *obj;
-		obj = [RETestObject testObject];
+		obj = [RETestObject object];
 		
 		// Strt observing
 		id observer;
@@ -982,13 +1004,13 @@
 		
 		// Override dealloc method of observedInfos
 		SEL sel = @selector(dealloc);
-		[[obj observedInfos] setBlockForSelector:sel key:nil block:^(id receiver) {
+		[[obj observedInfos] setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 			// Raise deallocated flag
 			deallocated = YES;
 			
 			// supermethod
 			IMP supermethod;
-			if ((supermethod = [receiver supermethodOfCurrentBlock])) {
+			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
 				supermethod(receiver, sel);
 			}
 		}];

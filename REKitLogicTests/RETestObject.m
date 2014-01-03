@@ -11,16 +11,25 @@
 #endif
 
 
-@implementation RETestObject
+@implementation NSObject (RETest)
 
 //--------------------------------------------------------------//
 #pragma mark -- Object --
 //--------------------------------------------------------------//
 
-+ (instancetype)testObject
++ (instancetype)object
 {
-	return [[[RETestObject alloc] init] autorelease];
+	return [[[self alloc] init] autorelease];
 }
+
+@end
+
+
+@implementation RETestObject
+
+//--------------------------------------------------------------//
+#pragma mark -- Object --
+//--------------------------------------------------------------//
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
@@ -35,9 +44,18 @@
 #pragma mark -- Methods --
 //--------------------------------------------------------------//
 
+- (void)overrideMe
+{
+}
+
 - (NSString*)log
 {
 	return @"log";
+}
+
+- (NSString*)overrideLog
+{
+	return @"RETestObject";
 }
 
 - (NSString*)say
@@ -55,8 +73,9 @@
 	return self.age + years;
 }
 
-- (void)overrideMe
++ (NSString*)classLog
 {
+	return @"classLog";
 }
 
 + (NSInteger)integerWithInteger:(NSInteger)integer
@@ -79,6 +98,20 @@
 
 @implementation RESubTestObject
 
+- (void)overrideMe
+{
+}
+
+- (NSString*)subLog
+{
+	return @"subLog";
+}
+
+- (NSString*)overrideLog
+{
+	return @"RESubTestObject";
+}
+
 + (CGRect)theRect
 {
 	return CGRectMake(100.0, 200.0, 300.0, 400.0);
@@ -87,10 +120,6 @@
 + (CGRect)subRect
 {
 	return CGRectMake(10.0, 20.0, 30.0, 40.0);
-}
-
-- (void)overrideMe
-{
 }
 
 @end

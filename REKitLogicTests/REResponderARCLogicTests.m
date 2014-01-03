@@ -30,8 +30,8 @@
 			RETestObject *context;
 			SEL dealloc;
 			dealloc = NSSelectorFromString(@"dealloc");
-			context = [RETestObject testObject];
-			[context setBlockForSelector:dealloc key:nil block:^(id receiver) {
+			context = [RETestObject object];
+			[context setBlockForInstanceMethod:dealloc key:nil block:^(id receiver) {
 				// Raise deallocated flag
 				deallocated = YES;
 			}];
@@ -40,7 +40,7 @@
 			[obj setAssociatedValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
 			
 			// Add log block
-			[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
+			[obj setBlockForInstanceMethod:@selector(log) key:nil block:^(id receiver) {
 				RETestObject *ctx;
 				ctx = [receiver associatedValueForKey:@"context"];
 				string = [ctx log];

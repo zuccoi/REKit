@@ -48,16 +48,28 @@
          location = "group:REResponderARCLogicTests.m">
       </FileRef>
       <FileRef
-         location = "group:REResponderClassLogicTests.h">
+         location = "group:REResponderClassMethodOfClassLogicTests.h">
       </FileRef>
       <FileRef
-         location = "group:REResponderClassLogicTests.m">
+         location = "group:REResponderClassMethodOfClassLogicTests.m">
       </FileRef>
       <FileRef
-         location = "group:REResponderLogicTests.h">
+         location = "group:REResponderClassMethodOfObjectTests.h">
       </FileRef>
       <FileRef
-         location = "group:REResponderLogicTests.m">
+         location = "group:REResponderClassMethodOfObjectTests.m">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderInstanceMethodOfClassLogicTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderInstanceMethodOfClassLogicTests.m">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderInstanceMethodOfObjectTests.h">
+      </FileRef>
+      <FileRef
+         location = "group:REResponderInstanceMethodOfObjectTests.m">
       </FileRef>
       <FileRef
          location = "group:RETestObject.h">

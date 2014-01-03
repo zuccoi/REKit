@@ -8,6 +8,11 @@
 #import <CoreGraphics/CoreGraphics.h>
 
 
+@interface NSObject (RETest)
++ (instancetype)object;
+@end
+
+
 @interface RETestObject : NSObject
 
 // Property
@@ -15,15 +20,14 @@
 @property (assign, nonatomic) NSUInteger age;
 @property (assign, nonatomic) CGRect rect;
 
-// Object
-+ (instancetype)testObject;
-
 // Methods
+- (void)overrideMe;
 - (NSString*)log;
+- (NSString*)overrideLog;
 - (NSString*)say;
 - (void)sayHello;
 - (NSUInteger)ageAfterYears:(NSUInteger)years;
-- (void)overrideMe;
++ (NSString*)classLog;
 + (NSInteger)integerWithInteger:(NSInteger)integer;
 + (CGRect)theRect;
 + (void)sayHello;
@@ -32,6 +36,8 @@
 
 @interface RESubTestObject : RETestObject
 - (void)overrideMe;
+- (NSString*)subLog;
+- (NSString*)overrideLog;
 + (CGRect)theRect;
 + (CGRect)subRect;
 @end

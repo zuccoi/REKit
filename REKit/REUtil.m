@@ -4,6 +4,8 @@
  Copyright ©2013 Kazki Miura. All rights reserved.
 */
 
+#import <dlfcn.h>
+#import "execinfo.h"
 #import "REUtil.h"
 
 #if __has_feature(objc_arc)
@@ -44,6 +46,37 @@ const char* REBlockGetObjCTypes(id _block)
 void* REBlockGetImplementation(id block)
 {
 	return ((struct Block*)block)->invoke;
+}
+
+
+//--------------------------------------------------------------//
+#pragma mark - IMP
+//--------------------------------------------------------------//
+
+IMP REImplementationWithBacktraceDepth(int depth)
+{
+	// Get trace
+	int num;
+	void *trace[depth + 1];
+	num = backtrace(trace, (depth + 1));
+	if (num < (depth + 1)) {
+		return NULL;
+	}
+	
+	// Get imp
+	IMP imp;
+	Dl_info callerInfo;
+	if (!dladdr(trace[depth], &callerInfo)) {
+		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
+		return NULL;
+	}
+	imp = callerInfo.dli_saddr;
+	if (!imp) {
+		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
+		return NULL;
+	}
+	
+	return imp;
 }
 
 
@@ -154,7 +187,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 + (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
 {
-	objc_setAssociatedObject(object_getClass(self), key, value, policy);
+	objc_setAssociatedObject(self, key, value, policy);
 }
 
 - (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy
@@ -164,7 +197,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 + (id)associatedValueForKey:(void*)key
 {
-	return objc_getAssociatedObject(object_getClass(self), key);
+	return objc_getAssociatedObject(self, key);
 }
 
 - (id)associatedValueForKey:(void*)key

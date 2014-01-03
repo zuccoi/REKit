@@ -7,7 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EB8535F318689B920043D9A1 /* REResponderClassLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB8535F218689B920043D9A1 /* REResponderClassLogicTests.m */; };
+		EB1D74C618753F5700759BEC /* REResponderClassMethodOfClassLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EB1D74C418753F5700759BEC /* REResponderClassMethodOfClassLogicTests.h */; };
+		EB1D74C718753F5700759BEC /* REResponderClassMethodOfClassLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EB1D74C518753F5700759BEC /* REResponderClassMethodOfClassLogicTests.m */; };
+		EB1D74CE18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EB1D74CC18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.h */; };
+		EB1D74CF18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EB1D74CD18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.m */; };
+		EB1D74D618753FE400759BEC /* REResponderInstanceMethodOfObjectTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EB1D74D418753FE400759BEC /* REResponderInstanceMethodOfObjectTests.h */; };
+		EB1D74D718753FE400759BEC /* REResponderInstanceMethodOfObjectTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EB1D74D518753FE400759BEC /* REResponderInstanceMethodOfObjectTests.m */; };
+		EB1D74DB1875408E00759BEC /* REResponderClassMethodOfClassLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1D74C518753F5700759BEC /* REResponderClassMethodOfClassLogicTests.m */; };
+		EB1D74DC1875408E00759BEC /* REResponderInstanceMethodOfClassLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1D74CD18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.m */; };
+		EB1D74DD1875408E00759BEC /* REResponderInstanceMethodOfObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1D74D518753FE400759BEC /* REResponderInstanceMethodOfObjectTests.m */; };
+		EB1D74EB1875F83000759BEC /* REResponderClassMethodOfObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1D74EA1875F83000759BEC /* REResponderClassMethodOfObjectTests.m */; };
 		EBA420E0167DE1BE0052D11E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBA420DF167DE1BE0052D11E /* Cocoa.framework */; };
 		EBA420EA167DE1BE0052D11E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EBA420E8167DE1BE0052D11E /* InfoPlist.strings */; };
 		EBA420EC167DE1BE0052D11E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA420EB167DE1BE0052D11E /* main.m */; };
@@ -25,14 +34,11 @@
 		EBA42144167DE21F0052D11E /* REUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4213E167DE21F0052D11E /* REUtil.m */; };
 		EBA4215D167DE2B80052D11E /* REObserverLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBA42155167DE2B80052D11E /* REObserverLogicTests.h */; };
 		EBA4215E167DE2B80052D11E /* REObserverLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBA42156167DE2B80052D11E /* REObserverLogicTests.m */; };
-		EBA4215F167DE2B80052D11E /* REResponderLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBA42157167DE2B80052D11E /* REResponderLogicTests.h */; };
-		EBA42160167DE2B80052D11E /* REResponderLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBA42158167DE2B80052D11E /* REResponderLogicTests.m */; };
 		EBA42161167DE2B80052D11E /* RETestObject.h in Resources */ = {isa = PBXBuildFile; fileRef = EBA42159167DE2B80052D11E /* RETestObject.h */; };
 		EBA42162167DE2B80052D11E /* RETestObject.m in Resources */ = {isa = PBXBuildFile; fileRef = EBA4215A167DE2B80052D11E /* RETestObject.m */; };
 		EBA42163167DE2B80052D11E /* REUtilLogicTests.h in Resources */ = {isa = PBXBuildFile; fileRef = EBA4215B167DE2B80052D11E /* REUtilLogicTests.h */; };
 		EBA42164167DE2B80052D11E /* REUtilLogicTests.m in Resources */ = {isa = PBXBuildFile; fileRef = EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */; };
 		EBA4217D167DFFFA0052D11E /* REObserverLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42156167DE2B80052D11E /* REObserverLogicTests.m */; };
-		EBA4217E167DFFFA0052D11E /* REResponderLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA42158167DE2B80052D11E /* REResponderLogicTests.m */; };
 		EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215A167DE2B80052D11E /* RETestObject.m */; };
 		EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBA4215C167DE2B80052D11E /* REUtilLogicTests.m */; };
 		EBE6AD1016EC3C1A00B3A1B1 /* REResponderARCLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
@@ -42,8 +48,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		EB8535F118689B920043D9A1 /* REResponderClassLogicTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REResponderClassLogicTests.h; path = ../../REKitLogicTests/REResponderClassLogicTests.h; sourceTree = "<group>"; };
-		EB8535F218689B920043D9A1 /* REResponderClassLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassLogicTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		EB1D74C418753F5700759BEC /* REResponderClassMethodOfClassLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REResponderClassMethodOfClassLogicTests.h; path = ../../REKitLogicTests/REResponderClassMethodOfClassLogicTests.h; sourceTree = "<group>"; };
+		EB1D74C518753F5700759BEC /* REResponderClassMethodOfClassLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderClassMethodOfClassLogicTests.m; path = ../../REKitLogicTests/REResponderClassMethodOfClassLogicTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		EB1D74CC18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REResponderInstanceMethodOfClassLogicTests.h; path = ../../REKitLogicTests/REResponderInstanceMethodOfClassLogicTests.h; sourceTree = "<group>"; };
+		EB1D74CD18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderInstanceMethodOfClassLogicTests.m; path = ../../REKitLogicTests/REResponderInstanceMethodOfClassLogicTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		EB1D74D418753FE400759BEC /* REResponderInstanceMethodOfObjectTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REResponderInstanceMethodOfObjectTests.h; path = ../../REKitLogicTests/REResponderInstanceMethodOfObjectTests.h; sourceTree = "<group>"; };
+		EB1D74D518753FE400759BEC /* REResponderInstanceMethodOfObjectTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = REResponderInstanceMethodOfObjectTests.m; path = ../../REKitLogicTests/REResponderInstanceMethodOfObjectTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		EB1D74E91875F83000759BEC /* REResponderClassMethodOfObjectTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = REResponderClassMethodOfObjectTests.h; path = ../../REKitLogicTests/REResponderClassMethodOfObjectTests.h; sourceTree = "<group>"; };
+		EB1D74EA1875F83000759BEC /* REResponderClassMethodOfObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = REResponderClassMethodOfObjectTests.m; path = ../../REKitLogicTests/REResponderClassMethodOfObjectTests.m; sourceTree = "<group>"; };
 		EBA420DB167DE1BE0052D11E /* Mac_REKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mac_REKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EBA420DF167DE1BE0052D11E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		EBA420E2167DE1BE0052D11E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -71,8 +83,6 @@
 		EBA4213E167DE21F0052D11E /* REUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REUtil.m; sourceTree = "<group>"; };
 		EBA42155167DE2B80052D11E /* REObserverLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REObserverLogicTests.h; path = ../../REKitLogicTests/REObserverLogicTests.h; sourceTree = "<group>"; };
 		EBA42156167DE2B80052D11E /* REObserverLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REObserverLogicTests.m; path = ../../REKitLogicTests/REObserverLogicTests.m; sourceTree = "<group>"; };
-		EBA42157167DE2B80052D11E /* REResponderLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REResponderLogicTests.h; path = ../../REKitLogicTests/REResponderLogicTests.h; sourceTree = "<group>"; };
-		EBA42158167DE2B80052D11E /* REResponderLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = REResponderLogicTests.m; path = ../../REKitLogicTests/REResponderLogicTests.m; sourceTree = "<group>"; };
 		EBA42159167DE2B80052D11E /* RETestObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RETestObject.h; path = ../../REKitLogicTests/RETestObject.h; sourceTree = "<group>"; };
 		EBA4215A167DE2B80052D11E /* RETestObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RETestObject.m; path = ../../REKitLogicTests/RETestObject.m; sourceTree = "<group>"; };
 		EBA4215B167DE2B80052D11E /* REUtilLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = REUtilLogicTests.h; path = ../../REKitLogicTests/REUtilLogicTests.h; sourceTree = "<group>"; };
@@ -182,10 +192,14 @@
 				EBA42156167DE2B80052D11E /* REObserverLogicTests.m */,
 				EBBF6618169040FB00B66BCE /* REResponderARCLogicTests.h */,
 				EBBF6619169040FB00B66BCE /* REResponderARCLogicTests.m */,
-				EB8535F118689B920043D9A1 /* REResponderClassLogicTests.h */,
-				EB8535F218689B920043D9A1 /* REResponderClassLogicTests.m */,
-				EBA42157167DE2B80052D11E /* REResponderLogicTests.h */,
-				EBA42158167DE2B80052D11E /* REResponderLogicTests.m */,
+				EB1D74C418753F5700759BEC /* REResponderClassMethodOfClassLogicTests.h */,
+				EB1D74C518753F5700759BEC /* REResponderClassMethodOfClassLogicTests.m */,
+				EB1D74E91875F83000759BEC /* REResponderClassMethodOfObjectTests.h */,
+				EB1D74EA1875F83000759BEC /* REResponderClassMethodOfObjectTests.m */,
+				EB1D74CC18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.h */,
+				EB1D74CD18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.m */,
+				EB1D74D418753FE400759BEC /* REResponderInstanceMethodOfObjectTests.h */,
+				EB1D74D518753FE400759BEC /* REResponderInstanceMethodOfObjectTests.m */,
 				EBA42159167DE2B80052D11E /* RETestObject.h */,
 				EBA4215A167DE2B80052D11E /* RETestObject.m */,
 				EBA4215B167DE2B80052D11E /* REUtilLogicTests.h */,
@@ -303,13 +317,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				EBA42121167DE1F20052D11E /* InfoPlist.strings in Resources */,
+				EB1D74C618753F5700759BEC /* REResponderClassMethodOfClassLogicTests.h in Resources */,
+				EB1D74C718753F5700759BEC /* REResponderClassMethodOfClassLogicTests.m in Resources */,
 				EBA4215D167DE2B80052D11E /* REObserverLogicTests.h in Resources */,
 				EBA4215E167DE2B80052D11E /* REObserverLogicTests.m in Resources */,
-				EBA4215F167DE2B80052D11E /* REResponderLogicTests.h in Resources */,
-				EBA42160167DE2B80052D11E /* REResponderLogicTests.m in Resources */,
+				EB1D74CF18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.m in Resources */,
+				EB1D74D718753FE400759BEC /* REResponderInstanceMethodOfObjectTests.m in Resources */,
+				EB1D74CE18753F9400759BEC /* REResponderInstanceMethodOfClassLogicTests.h in Resources */,
 				EBA42161167DE2B80052D11E /* RETestObject.h in Resources */,
 				EBA42162167DE2B80052D11E /* RETestObject.m in Resources */,
 				EBA42163167DE2B80052D11E /* REUtilLogicTests.h in Resources */,
+				EB1D74D618753FE400759BEC /* REResponderInstanceMethodOfObjectTests.h in Resources */,
 				EBA42164167DE2B80052D11E /* REUtilLogicTests.m in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -350,16 +368,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB1D74DB1875408E00759BEC /* REResponderClassMethodOfClassLogicTests.m in Sources */,
+				EB1D74DC1875408E00759BEC /* REResponderInstanceMethodOfClassLogicTests.m in Sources */,
+				EB1D74DD1875408E00759BEC /* REResponderInstanceMethodOfObjectTests.m in Sources */,
 				EBA4217D167DFFFA0052D11E /* REObserverLogicTests.m in Sources */,
-				EBA4217E167DFFFA0052D11E /* REResponderLogicTests.m in Sources */,
 				EBA4217F167DFFFA0052D11E /* RETestObject.m in Sources */,
-				EB8535F318689B920043D9A1 /* REResponderClassLogicTests.m in Sources */,
 				EBA42180167DFFFA0052D11E /* REUtilLogicTests.m in Sources */,
 				EBFA6ED1186C6F1B0026B98D /* RENormalBehaviorTests.m in Sources */,
 				EBA42140167DE21F0052D11E /* NSObject+REObserver.m in Sources */,
 				EBA42142167DE21F0052D11E /* NSObject+REResponder.m in Sources */,
 				EBA42144167DE21F0052D11E /* REUtil.m in Sources */,
 				EBE6AD1016EC3C1A00B3A1B1 /* REResponderARCLogicTests.m in Sources */,
+				EB1D74EB1875F83000759BEC /* REResponderClassMethodOfObjectTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,6 +510,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				INFOPLIST_FILE = "Mac_REKitLogicTests/Mac_REKitLogicTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -505,6 +526,7 @@
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Mac_REKitLogicTests/Mac_REKitLogicTests-Prefix.pch";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				INFOPLIST_FILE = "Mac_REKitLogicTests/Mac_REKitLogicTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";

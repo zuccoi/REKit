@@ -212,7 +212,7 @@
 	STAssertFalse([array respondsToSelector:sel], @"");
 }
 
-- (void)test_valueAssociatedToMetaClassIsObtainableUsingClassInstance
+- (void)test_valueAssociatedToMetaClassIsNotObtainableUsingClassInstance
 {
 	// Associate
 	objc_setAssociatedObject(object_getClass([NSObject class]), "key", @"value", OBJC_ASSOCIATION_RETAIN);
@@ -221,7 +221,12 @@
 	STAssertEqualObjects(objc_getAssociatedObject(object_getClass([NSObject class]), "key"), @"value", @"");
 	
 	// Check class instance's one
-	STAssertEqualObjects(objc_getAssociatedObject([NSObject class], "key"), @"value", @"");
+	id value;
+	value = objc_getAssociatedObject([NSObject class], "key");
+	STAssertNil(value, @"");
+	
+	// Tear down
+	objc_setAssociatedObject(object_getClass([NSObject class]), "key", nil, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (void)test_valueAssociatedToClassInstanceIsNotObtainableUsingMetaClass
@@ -234,6 +239,9 @@
 	
 	// Check value of meta class
 	STAssertNil(objc_getAssociatedObject(object_getClass([NSObject class]), "key"), @"");
+	
+	// Tear down
+	objc_setAssociatedObject([NSObject class], "key", nil, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (void)test_NSStringConcreateClass
@@ -277,6 +285,184 @@
 	string = @"original";
 	[self _reconnectString:string];
 	STAssertEqualObjects(string, @"original", @"");
+}
+
+- (void)test_classInstanceIsChangedAfterKVO
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Make observers
+	id observer1, observer2;
+	observer1 = [NSObject object];
+	observer2 = [NSObject object];
+	
+	// Start observing
+	Class class1;
+	[obj addObserver:observer1 forKeyPath:@"version" options:0 context:nil];
+	class1 = object_getClass(obj);
+	STAssertEqualObjects(NSStringFromClass(class1), @"NSKVONotifying_NSObject", @"");
+	
+	// Stop observing
+	Class class2;
+	[obj removeObserver:observer1 forKeyPath:@"version"];
+	class2 = object_getClass(obj);
+	STAssertEqualObjects(NSStringFromClass(class2), @"NSObject", @"");
+	STAssertTrue(class2 != class1, @"");
+	
+	// Start observing
+	Class class3;
+	[obj addObserver:obj forKeyPath:@"version" options:0 context:nil];
+	class3 = object_getClass(obj);
+	STAssertEqualObjects(NSStringFromClass(class3), @"NSKVONotifying_NSObject", @"");
+	STAssertTrue(class3 != class2, @"");
+	
+	// Start observing more
+	Class class4;
+	[obj addObserver:observer2 forKeyPath:@"version" options:0 context:nil];
+	class4 = object_getClass(obj);
+	STAssertEqualObjects(NSStringFromClass(class4), @"NSKVONotifying_NSObject", @"");
+	STAssertTrue(class4 == class3, @"");
+	
+	// Stop observing
+	Class class5;
+	[obj removeObserver:observer2 forKeyPath:@"version"];
+	class5 = object_getClass(obj);
+	STAssertEqualObjects(NSStringFromClass(class5), @"NSKVONotifying_NSObject", @"");
+	STAssertTrue(class5 == class4, @"");
+	
+	// Stop observing
+	Class class6;
+	[obj removeObserver:obj forKeyPath:@"version"];
+	class6 = object_getClass(obj);
+	STAssertTrue(class6 != class5, @"");
+	STAssertTrue(class6 == [NSObject class], @"");
+}
+
+- (void)test_metaClassIsChangedAfterKVO
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Make observers
+	id observer1, observer2;
+	observer1 = [NSObject object];
+	observer2 = [NSObject object];
+	
+	// Start observing
+	Class class1;
+	[obj addObserver:observer1 forKeyPath:@"version" options:0 context:nil];
+	class1 = object_getClass(object_getClass(obj));
+	STAssertEqualObjects(NSStringFromClass(class1), @"NSKVONotifying_NSObject", @"");
+	
+	// Stop observing
+	Class class2;
+	[obj removeObserver:observer1 forKeyPath:@"version"];
+	class2 = object_getClass(object_getClass(obj));
+	STAssertEqualObjects(NSStringFromClass(class2), @"NSObject", @"");
+	STAssertTrue(class2 != class1, @"");
+	
+	// Start observing
+	Class class3;
+	[obj addObserver:obj forKeyPath:@"version" options:0 context:nil];
+	class3 = object_getClass(object_getClass(obj));
+	STAssertEqualObjects(NSStringFromClass(class3), @"NSKVONotifying_NSObject", @"");
+	STAssertTrue(class3 != class2, @"");
+	
+	// Start observing more
+	Class class4;
+	[obj addObserver:observer2 forKeyPath:@"version" options:0 context:nil];
+	class4 = object_getClass(object_getClass(obj));
+	STAssertEqualObjects(NSStringFromClass(class4), @"NSKVONotifying_NSObject", @"");
+	STAssertTrue(class4 == class3, @"");
+	
+	// Stop observing
+	Class class5;
+	[obj removeObserver:observer2 forKeyPath:@"version"];
+	class5 = object_getClass(object_getClass(obj));
+	STAssertEqualObjects(NSStringFromClass(class5), @"NSKVONotifying_NSObject", @"");
+	STAssertTrue(class5 == class4, @"");
+	
+	// Stop observing
+	Class class6;
+	[obj removeObserver:obj forKeyPath:@"version"];
+	class6 = object_getClass(object_getClass(obj));
+	STAssertTrue(class6 != class5, @"");
+	STAssertTrue(class6 == object_getClass([NSObject class]), @"");
+}
+
+- (void)test_valueAssociatedToClassInstanceIsNotSameAfterKVO
+{
+	// Make obj and associate value
+	id obj;
+	obj = [NSObject object];
+	objc_setAssociatedObject([obj class], "key", @(1), OBJC_ASSOCIATION_RETAIN);
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Get associatedValue
+	id associatedValue;
+	associatedValue = objc_getAssociatedObject(object_getClass(obj), "key");
+	STAssertNil(associatedValue, @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"version"];
+	
+	// Tear down
+	objc_setAssociatedObject([obj class], "key", nil, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (void)test_valueAssociatedClassInstanceIsSameAfterKVOIfYouUseClassMethod
+{
+	// Make obj and associate value
+	id obj;
+	obj = [NSObject object];
+	objc_setAssociatedObject([obj class], "key", @(1), OBJC_ASSOCIATION_RETAIN);
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Get associatedValue
+	id associatedValue;
+	associatedValue = objc_getAssociatedObject([obj class], "key");
+	STAssertEqualObjects(associatedValue, @(1), @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"version"];
+	
+	// Tear down
+	objc_setAssociatedObject([obj class], "key", nil, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (void)test_valueAssociatedToMetaClassIsNotSameAfterKVO
+{
+	// Make obj and associate value
+	id obj;
+	obj = [NSObject object];
+	objc_setAssociatedObject(object_getClass(object_getClass(obj)), "key", @(1), OBJC_ASSOCIATION_RETAIN);
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Get associated value
+	id associatedValue;
+	associatedValue = objc_getAssociatedObject(object_getClass(object_getClass(obj)), "key");
+	STAssertNil(associatedValue, @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"version"];
+	
+	// Tear down
+	objc_setAssociatedObject(object_getClass(object_getClass(obj)), "key", nil, OBJC_ASSOCIATION_RETAIN);
 }
 
 @end

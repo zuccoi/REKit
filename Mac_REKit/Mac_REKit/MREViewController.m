@@ -47,7 +47,7 @@
 		self_.observer = nil;
 		
 		// supermethod
-		RESupermethod(void, self_, @selector(setView:), view);
+		RESupermethod(nil, self_, @selector(setView:), view);
 		
 		// Start observing
 		if (!view) {

@@ -7,17 +7,7 @@
 #import <Foundation/Foundation.h>
 
 #define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
-#define RESupermethod(ReturnType, receiver, selector, ...) \
-	^{\
-		IMP supermethod = REResponderGetSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
-		if (supermethod) {\
-			return (REIMP(ReturnType)supermethod)(receiver, selector, ##__VA_ARGS__);\
-		}\
-		else {\
-			return (ReturnType)nil;\
-		}\
-	}()
-#define RESupermethodStret(defaultValue, receiver, selector, ...) \
+#define RESupermethod(defaultValue, receiver, selector, ...) \
 	^{\
 		IMP supermethod = REResponderGetSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
 		if (supermethod) {\

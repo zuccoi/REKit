@@ -1654,13 +1654,13 @@
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(void, receiver, sel, string);
+		RESupermethod(nil, receiver, sel, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(void, receiver, sel, @"block");
+		RESupermethod(nil, receiver, sel, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
 	
@@ -1674,12 +1674,12 @@
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"Wow"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, sel, @"Wow"), string];
 	}];
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(id, receiver, sel, @"block1"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, sel, @"block1"), string];
 	}];
 	
 	// Call
@@ -1695,7 +1695,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(NSInteger, receiver, sel, integer);
+		value = RESupermethod(0, receiver, sel, integer);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)1, @"");
@@ -1707,7 +1707,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(NSInteger, receiver, sel, 1);
+		value = RESupermethod(0, receiver, sel, 1);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)2, @"");
@@ -1729,7 +1729,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
-		rect = RESupermethodStret((CGRect){}, receiver, sel, origin, size);
+		rect = RESupermethod((CGRect){}, receiver, sel, origin, size);
 		STAssertEquals(rect, CGRectZero, @"");
 		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
@@ -1738,7 +1738,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
-		rect = RESupermethodStret(CGRectZero, receiver, sel, origin, size);
+		rect = RESupermethod(CGRectZero, receiver, sel, origin, size);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

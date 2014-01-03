@@ -551,24 +551,6 @@
 		return @"Dynamic";
 	}];
 	
-// ?????
-//	STAssertTrue([obj methodForSelector:@selector(read)] != [[obj class] methodForSelector:@selector(read)], @"");
-//	{
-//		IMP imp;
-//		imp = [obj methodForSelector:@selector(read)];
-//		STAssertTrue(imp != [NSObject methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
-//		STAssertTrue(imp == method_getImplementation(class_getInstanceMethod(object_getClass(obj), @selector(read))), @"");
-//		STAssertEquals([NSObject instanceMethodForSelector:@selector(methodForSelector:)], [obj methodForSelector:@selector(methodForSelector:)], @"");
-//		
-//		IMP classImp;
-//		classImp = [[obj class] methodForSelector:@selector(read)];
-//		STAssertTrue(classImp != imp, @"");
-//		
-//		IMP classImp2;
-//		classImp2 = method_getImplementation(class_getInstanceMethod(object_getClass(obj), @selector(read)));
-//		STAssertEquals(classImp, classImp2, @"");
-//	}
-	
 	// Change name
 	obj.name = @"name";
 	//

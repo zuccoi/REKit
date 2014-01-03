@@ -1423,7 +1423,7 @@
 	STAssertNil((id)supermethod, @"");
 }
 
-- (void)test_removeBlockForInstanceMethod_key
+- (void)test_removeBlockForClassMethod_key
 {
 	SEL sel = @selector(log);
 	

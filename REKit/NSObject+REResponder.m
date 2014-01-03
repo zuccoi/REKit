@@ -329,22 +329,22 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 			}];
 		};
 		
-		// Search blockInfo of object
+		// Search blockInfo
 		if (receiver != [receiver class]) {
 			blockInfoBlock(REResponderGetBlocks(receiver, REInstanceMethodOfObject, NO));
-			if (!blockInfo) {
-				blockInfoBlock(REResponderGetBlocks(receiver, REClassMethodOfObject, NO));
-			}
 		}
 		if (blockInfo) {
 			return blockInfo;
 		}
-		
-		// Search blockInfo of class
-		blockInfoBlock(REResponderGetBlocks([receiver class], REInstanceMethodOfClass, NO));
-		if (!blockInfo) {
-			blockInfoBlock(REResponderGetBlocks([receiver class], REClassMethodOfClass, NO));
+		blockInfoBlock(REResponderGetBlocks(receiver, REClassMethodOfObject, NO));
+		if (blockInfo) {
+			return blockInfo;
 		}
+		blockInfoBlock(REResponderGetBlocks([receiver class], REInstanceMethodOfClass, NO));
+		if (blockInfo) {
+			return blockInfo;
+		}
+		blockInfoBlock(REResponderGetBlocks([receiver class], REClassMethodOfClass, NO));
 		
 		return blockInfo;
 	}
@@ -809,12 +809,7 @@ void REResponderRemoveCurrentBlock(id receiver)
 	if (!(op & REObjectTargetMask)) {
 		receiver = [receiver class];
 	}
-	if (op & REInstanceMethodMask) {
-		[receiver removeBlockForInstanceMethod:selector key:blockInfo[kBlockInfoKeyKey]];
-	}
-	else {
-		[receiver removeBlockForClassMethod:selector key:blockInfo[kBlockInfoKeyKey]];
-	}
+	REResponderRemoveBlockForSelector(receiver, selector, blockInfo[kBlockInfoKeyKey], op);
 }
 
 + (void)removeCurrentBlock

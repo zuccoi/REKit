@@ -908,16 +908,8 @@
 	
 	// Override log method
 	[RETestObject setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
-		// supermethod
-		NSString *res = nil;
-		typedef id (*id_IMP)(id, SEL, ...);
-		id_IMP supermethod;
-		if ((supermethod = (id_IMP)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			res = supermethod(receiver, sel);
-		}
-		
 		// Check supermethod
-		STAssertEquals(supermethod, originalMethod, @"");
+		STAssertEquals((IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)), originalMethod, @"");
 		
 		called = YES;
 	}];
@@ -934,16 +926,8 @@
 	
 	// Add log block to RESubTestObject
 	[RESubTestObject setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
-		// supermethod
-		id res = nil;
-		typedef id (*id_IMP)(id, SEL, ...);
-		id_IMP supermethod;
-		if ((supermethod = (id_IMP)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			res = supermethod(receiver, sel);
-		}
-		
 		// Check supermethod
-		STAssertEquals(supermethod, [RETestObject instanceMethodForSelector:sel], @"");
+		STAssertEquals((IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)), [RETestObject instanceMethodForSelector:sel], @"");
 		
 		called = YES;
 	}];
@@ -1013,19 +997,7 @@
 	
 	// Add block1
 	[NSObject setBlockForInstanceMethod:sel key:@"block1" block:^(id receiver) {
-		NSMutableString *log;
-		log = [NSMutableString string];
-		
-		// Append supermethod's log
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[log appendString:supermethod(receiver, sel)];
-		}
-		
-		// Append my log
-		[log appendString:@"-block1"];
-		
-		return log;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block1"];
 	}];
 	
 	// Call log method
@@ -1034,20 +1006,7 @@
 	
 	// Add block2
 	[NSObject setBlockForInstanceMethod:sel key:@"block2" block:^(id receiver) {
-		// Make log…
-		NSMutableString *log;
-		log = [NSMutableString string];
-		
-		// Append supermethod's log
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[log appendString:supermethod(receiver, sel)];
-		}
-		
-		// Append my log
-		[log appendString:@"-block2"];
-		
-		return log;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block2"];
 	}];
 	
 	// Call log method
@@ -1056,20 +1015,7 @@
 	
 	// Add block3
 	[NSObject setBlockForInstanceMethod:sel key:@"block3" block:^NSString*(id receiver) {
-		// Make log…
-		NSMutableString *log;
-		log = [NSMutableString string];
-		
-		// Append super's log
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[log appendString:supermethod(receiver, sel)];
-		}
-		
-		// Append my log
-		[log appendString:@"-block3"];
-		
-		return log;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block3"];
 	}];
 	
 	// Call log method
@@ -1102,19 +1048,7 @@
 	
 	// Add block1
 	[NSString setBlockForInstanceMethod:sel key:@"block1" block:^(id receiver, NSString *string) {
-		NSMutableString *str;
-		str = [NSMutableString string];
-		
-		// Append supermethod's string
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[str appendString:supermethod(receiver, sel, string)];
-		}
-		
-		// Append my string
-		[str appendString:@"-block1"];
-		
-		return str;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, sel, string), @"-block1"];
 	}];
 	
 	// Call
@@ -1123,19 +1057,7 @@
 	
 	// Add block2
 	[NSString setBlockForInstanceMethod:sel key:@"block2" block:^(id receiver, NSString *string) {
-		NSMutableString *str;
-		str = [NSMutableString string];
-		
-		// Append supermethod's string
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[str appendString:supermethod(receiver, sel, string)];
-		}
-		
-		// Append my string
-		[str appendString:@"-block2"];
-		
-		return str;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, sel, string), @"-block2"];
 	}];
 	
 	// Call
@@ -1144,19 +1066,7 @@
 	
 	// Add block3
 	[NSString setBlockForInstanceMethod:sel key:@"block3" block:^(id receiver, NSString *string) {
-		NSMutableString *str;
-		str = [NSMutableString string];
-		
-		// Append supermethod's string
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[str appendString:supermethod(receiver, sel, string)];
-		}
-		
-		// Append my string
-		[str appendString:@"-block3"];
-		
-		return str;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, sel, string), @"-block3"];
 	}];
 	
 	// Call
@@ -1196,17 +1106,7 @@
 	
 	// Override age method
 	[RETestObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		NSUInteger age = 0;
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			age = supermethod(receiver, sel);
-		}
-		
-		// Increase age
-		age++;
-		
-		return age;
+		return (RESupermethod(0, receiver, sel) + 1);
 	}];
 	
 	// Check age
@@ -1224,17 +1124,7 @@
 	
 	// Override ageAfterYears: method
 	[RETestObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSUInteger years) {
-		// supermethod
-		NSUInteger age = 0;
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			age = supermethod(receiver, sel, years);
-		}
-		
-		// Increase age
-		age++;
-		
-		return age;
+		return (RESupermethod(years, receiver, sel, years) + 1);
 	}];
 	
 	// Check age
@@ -1254,16 +1144,7 @@
 	
 	// Override rect method
 	[RETestObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		// supermethod
-		CGRect res = CGRectZero;
-		typedef CGRect (*CGRectIMP)(id, SEL, ...);
-		CGRectIMP supermethod;
-		if ((supermethod = (CGRectIMP)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			res = supermethod(receiver, sel);
-		}
-		
-		// Inset
-		return CGRectInset(res, 3.0, 6.0);
+		return CGRectInset(RESupermethod(CGRectZero, receiver, sel), 3.0, 6.0);
 	}];
 	
 	// Get rect
@@ -1512,18 +1393,7 @@
 	
 	// Add block2
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		NSMutableString *str;
-		str = [NSMutableString string];
-		
-		// supermethod
-		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-			[str appendString:supermethod(receiver, sel)];
-		}
-		
-		[str appendString:@"block2"];
-		
-		return str;
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"block2"];
 	}];
 	
 	// Call
@@ -1633,20 +1503,12 @@
 	SEL sel = _cmd;
 	
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
-		// supermethod
-		CGRect res;
-		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
-		if (supermethod) {
-			res = (REIMP(CGRect)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
-		}
-		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		CGRect rect;
-		rect = (REIMP(CGRect)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		rect = RESupermethod(CGRectZero, receiver, sel);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

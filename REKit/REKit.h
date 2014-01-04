@@ -1,7 +1,7 @@
 /*
  REKit.h
  
- Copyright ©2013 Kazki Miura. All rights reserved.
+ Copyright ©2014 Kazki Miura. All rights reserved.
 */
 
 #import "NSObject+REResponder.h"

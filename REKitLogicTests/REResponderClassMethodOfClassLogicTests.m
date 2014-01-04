@@ -364,9 +364,16 @@
 	
 	// Add block
 	for (Class aClass in RESubclassesOfClass([NSObject class], YES)) {
-		[aClass setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
-			return @"block";
-		}];
+		NSString *className;
+		className = NSStringFromClass(aClass);
+		if ([className isEqualToString:@"NSObject"]
+			|| [className isEqualToString:@"RETestObject"]
+			|| [className isEqualToString:@"RESubTestObject"]
+		){
+			[aClass setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
+				return @"block";
+			}];
+		}
 	}
 	
 	// Check returned string

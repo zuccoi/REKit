@@ -204,7 +204,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				[[self class] setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 			
-			// Dispose classes // Should I delay ?????
+			// Dispose classes
 			NSString *className;
 			className = [NSString stringWithUTF8String:class_getName([self class])];
 			if ([className hasPrefix:kClassNamePrefix]) {
@@ -497,14 +497,18 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		NSDictionary *oldBlockInfo;
 		IMP oldBlockMethod;
 		IMP currentMethod;
+		Class class;
+		Class metaClass;
+		class = [receiver class];
+		metaClass = REGetMetaClass(class);
 		blocks = REResponderGetBlocks(receiver, op, YES);
 		oldBlockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
 		oldBlockMethod = [oldBlockInfo[kBlockInfoImpKey] pointerValue];
 		if (op & REResponderOperationInstanceMethodMask) {
-			currentMethod = [[receiver class] instanceMethodForSelector:selector];
+			currentMethod = [class instanceMethodForSelector:selector];
 		}
 		else {
-			currentMethod = [[receiver class] methodForSelector:selector];
+			currentMethod = [class methodForSelector:selector];
 		}
 		
 		// Make blockInfos
@@ -514,7 +518,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			if (op & REResponderOperationInstanceMethodMask) {
 				if (currentMethod
 					&& currentMethod != REResponderForwardingMethod()
-					&& currentMethod != [[[receiver class] superclass] instanceMethodForSelector:selector]
+					&& currentMethod != [[class superclass] instanceMethodForSelector:selector]
 				){
 					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				}
@@ -522,7 +526,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			else {
 				if (currentMethod
 					&& currentMethod != REResponderForwardingMethod()
-					&& currentMethod != [[[receiver class] superclass] methodForSelector:selector]
+					&& currentMethod != [[class superclass] methodForSelector:selector]
 				){
 					[blockInfos setAssociatedValue:[NSValue valueWithPointer:currentMethod] forKey:kBlockInfosOriginalMethodAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				}
@@ -532,22 +536,22 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		
 		// Get originalClassMethod
 		IMP originalClassMethod;
-		originalClassMethod = [[receiver class] methodForSelector:selector];
-		if (originalClassMethod == [[[receiver class] superclass] methodForSelector:selector]) {
+		originalClassMethod = [class methodForSelector:selector];
+		if (originalClassMethod == [[class superclass] methodForSelector:selector]) {
 			originalClassMethod = NULL;
 		}
 		
 		// Replace method
 		IMP imp;
 		imp = imp_implementationWithBlock(block);
-		class_replaceMethod((op & REResponderOperationInstanceMethodMask ? [receiver class] : object_getClass([receiver class])), selector, imp, [objCTypes UTF8String]);
+		class_replaceMethod((op & REResponderOperationInstanceMethodMask ? class : metaClass), selector, imp, [objCTypes UTF8String]);
 		if (op & REResponderOperationInstanceMethodMask && originalClassMethod) {
-			class_replaceMethod(object_getClass([receiver class]), selector, originalClassMethod, [objCTypes UTF8String]);
+			class_replaceMethod(metaClass, selector, originalClassMethod, [objCTypes UTF8String]);
 		}
 		
 		// Replace method of subclasses
 		if (op & REResponderOperationInstanceMethodMask) {
-			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
+			for (Class subclass in RESubclassesOfClass(class, NO)) {
 				// Replace
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
@@ -557,12 +561,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			}
 		}
 		else {
-			for (Class subclass in RESubclassesOfClass([receiver class], NO)) {
+			for (Class subclass in RESubclassesOfClass(class, NO)) {
 				// Replace method
 				IMP subImp;
 				subImp = [subclass methodForSelector:selector];
 				if (subImp == currentMethod || subImp == REResponderForwardingMethod()) {
-					class_replaceMethod(object_getClass(subclass), selector, imp, [objCTypes UTF8String]);
+					class_replaceMethod(REGetMetaClass(subclass), selector, imp, [objCTypes UTF8String]);
 				}
 			}
 		}

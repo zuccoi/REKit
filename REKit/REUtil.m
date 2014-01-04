@@ -114,6 +114,38 @@ IMP REImplementationWithBacktraceDepth(int depth)
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
+Class REGetClass(id receiver)
+{
+	if (!receiver) {
+		return NULL;
+	}
+	else if (receiver != [receiver class]) {
+		return object_getClass(receiver);
+	}
+	else if (class_isMetaClass(receiver)) {
+		return NSClassFromString([NSString stringWithFormat:@"%s", class_getName(receiver)]);
+	}
+	else {
+		return receiver;
+	}
+}
+
+Class REGetMetaClass(id receiver)
+{
+	if (!receiver) {
+		return NULL;
+	}
+	else if (receiver != [receiver class]) {
+		return object_getClass(object_getClass(receiver));
+	}
+	else if (class_isMetaClass(receiver)) {
+		return receiver;
+	}
+	else {
+		return object_getClass(receiver);
+	}
+}
+
 NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 {
 	// Filter

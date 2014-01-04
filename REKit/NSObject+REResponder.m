@@ -587,15 +587,13 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	}
 	
 	@synchronized (receiver) {
-		// Get block
-		IMP blockImp;
-		
-		// Get blockInfo
+		// Check imp
+		IMP imp;
 		NSDictionary *blockInfo;
 		blockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, nil, op);
-		blockImp = [blockInfo[kBlockInfoImpKey] pointerValue];
+		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
 		
-		return (blockImp != NULL);
+		return (imp != NULL);
 	}
 }
 

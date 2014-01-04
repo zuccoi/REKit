@@ -340,6 +340,24 @@
 	STAssertTrue(class6 == [NSObject class], @"");
 }
 
+- (void)test_KVONotifyingClassIsSubclassOfOriginalClass
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Make observers
+	id observer;
+	observer = [NSObject object];
+	
+	// Start observing
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Check
+	STAssertEquals(class_getSuperclass(object_getClass(obj)), [NSObject class], @"");
+	STAssertEquals(class_getSuperclass(object_getClass(object_getClass(obj))), object_getClass([NSObject class]), @"");
+}
+
 - (void)test_metaClassIsChangedWhenStartingAndStoppingKVO
 {
 	// Make obj

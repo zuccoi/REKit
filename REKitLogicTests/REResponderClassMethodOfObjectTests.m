@@ -1821,7 +1821,7 @@
 	// Call
 	NSInteger value;
 	value = objc_msgSend(object_getClass(obj), sel, 10);
-	STAssertEquals(value, 11, @"");
+	STAssertEquals((NSInteger)value, (NSInteger)11, @"");
 }
 
 - (void)test_supermethodReturningStructure

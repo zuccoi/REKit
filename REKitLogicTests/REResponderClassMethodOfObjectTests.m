@@ -2208,7 +2208,7 @@
 	}];
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		CGRect rect;
-		rect = (REIMP(CGRect)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		rect = RESupermethod(CGRectZero, receiver, sel);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

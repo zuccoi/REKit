@@ -344,7 +344,7 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 		if (blockInfo) {
 			return blockInfo;
 		}
-		blockInfoBlock(REResponderGetBlocks([receiver class], REResponderOperationClassMethodOfClass, NO)); // Not needed 'cos blocks is associated with class instance >>>
+//		blockInfoBlock(REResponderGetBlocks([receiver class], REResponderOperationClassMethodOfClass, NO)); // Not needed 'cos blocks is associated with class instance
 		
 		return blockInfo;
 	}
@@ -604,24 +604,17 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	}
 }
 
-void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResponderOperation op)
+void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, NSMutableArray *blockInfos, SEL selector, REResponderOperation op)
 {
 	// Filter
-	if (!selector || !key) {
+	if (!receiver || !blockInfo || !blockInfos || !selector) {
 		return;
 	}
 	
 	// Remove
 	@synchronized (receiver) {
-		// Get elements
 		IMP imp;
 		IMP supermethod;
-		NSDictionary *blockInfo;
-		NSMutableArray *blockInfos;
-		blockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
-		if (!blockInfo || !blockInfos) {
-			return;
-		}
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
 		supermethod = REResponderGetSupermethodWithImp(receiver, imp);
 		if (!supermethod) {
@@ -666,6 +659,23 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 			blocks = REResponderGetBlocks(receiver, op, NO);
 			[blocks removeObjectForKey:NSStringFromSelector(selector)];
 		}
+	}
+}
+
+void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResponderOperation op)
+{
+	// Filter
+	if (!selector || !key) {
+		return;
+	}
+	
+	// Remove
+	@synchronized (receiver) {
+		// Get elements
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		blockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
+		REResponderRemoveBlockWithBlockInfo(receiver, blockInfo, blockInfos, selector, op);
 	}
 }
 
@@ -797,8 +807,9 @@ void REResponderRemoveCurrentBlock(id receiver)
 	
 	// Get elements
 	NSDictionary *blockInfo;
+	NSMutableArray *blockInfos;
 	SEL selector;
-	blockInfo = REResponderGetBlockInfoWithImp(receiver, imp, nil, &selector);
+	blockInfo = REResponderGetBlockInfoWithImp(receiver, imp, &blockInfos, &selector);
 	if (!blockInfo || !selector) {
 		return;
 	}
@@ -809,7 +820,7 @@ void REResponderRemoveCurrentBlock(id receiver)
 	if (!(op & REResponderOperationObjectTargetMask)) {
 		receiver = [receiver class];
 	}
-	REResponderRemoveBlockForSelector(receiver, selector, blockInfo[kBlockInfoKeyKey], op); // Call REResponderRemoveBlockWithBlockInfo for performance >>>
+	REResponderRemoveBlockWithBlockInfo(receiver, blockInfo, blockInfos, selector, op);
 }
 
 + (void)removeCurrentBlock

@@ -338,7 +338,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 
 //--------------------------------------------------------------//
-#pragma mark - NSObject REUtil_Deprecated
+#pragma mark - NSObject (REUtil_Deprecated)
 //--------------------------------------------------------------//
 
 @implementation NSObject (REUtil_Deprecated)

@@ -54,7 +54,7 @@
 extern IMP REResponderGetSupermethodWithImp(id receiver, IMP imp);
 
 // Deprecated Methods
-@interface NSObject (REResponderDeprecated)
+@interface NSObject (REResponder_Depricated)
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));

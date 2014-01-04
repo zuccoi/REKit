@@ -22,16 +22,14 @@ extern NSString* const REObjectNewClassNameKey;
 //--------------------------------------------------------------//
 
 // BlockDescriptor
-struct BlockDescriptor
-{
+struct BlockDescriptor {
 	unsigned long reserved;
 	unsigned long size;
 	void *rest[1];
 };
 
 // Block
-struct Block
-{
+struct Block {
 	void *isa;
 	int flags;
 	int reserved;
@@ -53,7 +51,7 @@ extern void* REBlockGetImplementation(id block);
 
 
 //--------------------------------------------------------------//
-#pragma mark -- IMP --
+#pragma mark - IMP
 //--------------------------------------------------------------//
 
 extern IMP REImplementationWithBacktraceDepth(int depth);
@@ -108,7 +106,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 
 
 //--------------------------------------------------------------//
-#pragma mark - NSObject (REUtil_Deprecated) -
+#pragma mark - NSObject (REUtil_Deprecated)
 //--------------------------------------------------------------//
 
 @interface NSObject (REUtil_Deprecated)

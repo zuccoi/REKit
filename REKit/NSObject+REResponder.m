@@ -976,7 +976,7 @@ IMP REResponderSupermethodOfCurrentBlock(id receiver)
 #pragma mark -
 
 
-@implementation NSObject (REResponderDeprecated)
+@implementation NSObject (REResponder_Depricated)
 
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated))
 {

@@ -72,7 +72,7 @@
 	obj = [NSObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"block";
 	}];
 	
@@ -93,7 +93,7 @@
 	obj = [RETestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"Overridden log";
 	}];
 	
@@ -113,7 +113,7 @@
 	obj = [NSObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"block";
 	}];
 	
@@ -131,7 +131,7 @@
 	obj = [RETestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"Overridden log";
 	}];
 	
@@ -152,7 +152,7 @@
 	obj = [NSObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"block";
 	}];
 	
@@ -170,7 +170,7 @@
 	obj = [RETestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"Overridden log";
 	}];
 	
@@ -191,7 +191,7 @@
 	obj = [NSObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"block";
 	}];
 	
@@ -209,7 +209,7 @@
 	obj = [RETestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"Overridden log";
 	}];
 	
@@ -230,7 +230,7 @@
 	obj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"block";
 	}];
 	
@@ -248,7 +248,7 @@
 	obj = [RESubTestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^NSString*(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^NSString*(Class receiver) {
 		return @"Overridden log";
 	}];
 	
@@ -274,7 +274,7 @@
 	obj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return CGRectMake(4.0, 3.0, 2.0, 1.0);
 	}];
 	
@@ -291,7 +291,7 @@
 	obj = [RETestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return CGRectMake(4.0, 3.0, 2.0, 1.0);
 	}];
 	
@@ -1506,7 +1506,7 @@
 	}];
 	
 	// Add class block
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
 		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
 		STAssertNil((id)supermethod, @"");
@@ -1865,7 +1865,7 @@
 	obj = [RETestObject object];
 	
 	// Override
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
 		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
@@ -2352,7 +2352,7 @@
 	obj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -2382,7 +2382,7 @@
 	obj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -2417,7 +2417,7 @@
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -2447,7 +2447,7 @@
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:nil block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -2476,7 +2476,7 @@
 	originalObj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -2514,7 +2514,7 @@
 	originalObj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		return @"block";
 	}];
 	
@@ -2548,7 +2548,7 @@
 	obj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:@"block1" block:^(Class receiver) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
 	}];
 	
@@ -2558,7 +2558,7 @@
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:@"block2" block:^(Class receiver) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
 	}];
 	
@@ -2583,7 +2583,7 @@
 	obj = [RETestObject object];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:@"block1" block:^(Class receiver) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
 	}];
 	
@@ -2593,7 +2593,7 @@
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
 	// Add block
-	[obj setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
+	[obj setBlockForClassMethod:sel key:@"block2" block:^(Class receiver) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
 	}];
 	

@@ -1454,10 +1454,10 @@
 	SEL sel = _cmd;
 	__block BOOL called = NO;
 	
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		called = YES;
 	}];
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		(REIMP(void)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
 	}];
 	
@@ -1470,10 +1470,10 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		return @"hello";
 	}];
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		NSString *res;
 		res = (REIMP(id)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
 		return res;
@@ -1486,10 +1486,10 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		return 1;
 	}];
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		NSInteger i;
 		i = (REIMP(NSInteger)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
 		return i + 1;
@@ -1502,10 +1502,10 @@
 {
 	SEL sel = _cmd;
 	
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
-	[NSObject setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		// supermethod
 		CGRect rect;
 		rect = RESupermethod(CGRectZero, receiver, sel);

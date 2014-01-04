@@ -1894,7 +1894,7 @@
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 	
 	// Responds to log method dynamically
-	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		// Check receiver
 		STAssertTrue(receiver == [NSObject class], @"");
 		
@@ -1926,7 +1926,7 @@
 	STAssertFalse([[NSObject class] respondsToSelector:sel], @"");
 	
 	// Responds to log method dynamically
-	[NSObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
+	[NSObject setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		// Check receiver
 		STAssertTrue(receiver == [NSObject class], @"");
 		
@@ -1949,10 +1949,10 @@
 	id obj;
 	obj = [NSObject object];
 	
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		called = YES;
 	}];
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		(REIMP(void)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
 	}];
 	
@@ -1969,10 +1969,10 @@
 	id obj;
 	obj = [NSObject object];
 	
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		return @"hello";
 	}];
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		NSString *res;
 		res = (REIMP(id)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
 		return res;
@@ -1989,10 +1989,10 @@
 	id obj;
 	obj = [NSObject object];
 	
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		return 1;
 	}];
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		NSInteger i;
 		i = (REIMP(NSInteger)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
 		return i + 1;
@@ -2009,10 +2009,10 @@
 	id obj;
 	obj = [NSObject object];
 	
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
 	}];
-	[obj setBlockForInstanceMethod:sel key:nil block:^(Class receiver) {
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		CGRect rect;
 		rect = RESupermethod(CGRectZero, receiver, sel);
 		rect.origin.x *= 10.0;

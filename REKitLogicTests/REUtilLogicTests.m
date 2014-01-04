@@ -15,6 +15,32 @@
 
 @implementation REUtilLogicTests
 
+- (void)test_REGetClass
+{
+	id obj;
+	obj = [NSObject object];
+	
+	Class class;
+	class = [NSObject class];
+	
+	STAssertEquals(REGetClass(obj), class, @"");
+	STAssertEquals(REGetClass([NSObject class]), class, @"");
+	STAssertEquals(REGetClass(object_getClass([NSObject class])), class, @"");
+}
+
+- (void)test_REGetMetaClass
+{
+	id obj;
+	obj = [NSObject object];
+	
+	Class metaClass;
+	metaClass = object_getClass([NSObject class]);
+	
+	STAssertEquals(REGetMetaClass(obj), metaClass, @"");
+	STAssertEquals(REGetMetaClass([NSObject class]), metaClass, @"");
+	STAssertEquals(REGetMetaClass(object_getClass([NSObject class])), metaClass, @"");
+}
+
 - (void)test_RESubclassesOfClass
 {
 	NSSet *subclasses;

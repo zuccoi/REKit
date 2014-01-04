@@ -396,32 +396,36 @@ NSString* const REObserverContainerKey = @"container";
 	[self REObserver_X_didChangeClass:fromClass];
 }
 
-- (void)REObserver_X_dealloc
+- (void)REObserver_X_release
 {
-	// Stop observing
-	[self stopObserving];
-	
-	// Stop being observed
-	NSMutableArray *observedInfos;
-	observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
-	while ([observedInfos count]) {
-		// Get observedInfo
-		NSDictionary *observedInfo;
-		observedInfo = [observedInfos lastObject];
+	@synchronized (self) {
+		if ([self retainCount] == 1) {
+			// Stop observing
+			[self stopObserving];
+			
+			// Stop being observed
+			NSMutableArray *observedInfos;
+			observedInfos = [self associatedValueForKey:kObservedInfosAssociationKey];
+			while ([observedInfos count]) {
+				// Get observedInfo
+				NSDictionary *observedInfo;
+				observedInfo = [observedInfos lastObject];
+				
+				// Remove observer
+				NSValue *contextPointerValue;
+				contextPointerValue = observedInfo[REObserverContextPointerValueKey];
+				if (contextPointerValue) {
+					[self removeObserver:[observedInfo[REObserverObservingObjectPointerValueKey] pointerValue] forKeyPath:observedInfo[REObserverKeyPathKey] context:[contextPointerValue pointerValue]];
+				}
+				else {
+					[self removeObserver:[observedInfo[REObserverObservingObjectPointerValueKey] pointerValue] forKeyPath:observedInfo[REObserverKeyPathKey]];
+				}
+			}
+		}
 		
-		// Remove observer
-		NSValue *contextPointerValue;
-		contextPointerValue = observedInfo[REObserverContextPointerValueKey];
-		if (contextPointerValue) {
-			[self removeObserver:[observedInfo[REObserverObservingObjectPointerValueKey] pointerValue] forKeyPath:observedInfo[REObserverKeyPathKey] context:[contextPointerValue pointerValue]];
-		}
-		else {
-			[self removeObserver:[observedInfo[REObserverObservingObjectPointerValueKey] pointerValue] forKeyPath:observedInfo[REObserverKeyPathKey]];
-		}
+		// original
+		[self REObserver_X_release];
 	}
-	
-	// original
-	[self REObserver_X_dealloc];
 }
 
 + (void)load
@@ -435,7 +439,7 @@ NSString* const REObserverContainerKey = @"container";
 			@selector(removeObserver:forKeyPath:context:),
 			@selector(willChangeClass:),
 			@selector(didChangeClass:),
-			@selector(dealloc),
+			@selector(release),
 			nil
 		];
 	}
@@ -511,24 +515,16 @@ NSString* const REObserverContainerKey = @"container";
 
 - (NSArray*)observingInfos
 {
-	// Get observingInfo
-	NSArray *observingInfos;
 	@synchronized (self) {
-		observingInfos = [NSArray arrayWithArray:[self associatedValueForKey:kObservingInfosAssociationKey]];
+		return [NSArray arrayWithArray:[self associatedValueForKey:kObservingInfosAssociationKey]];
 	}
-	
-	return observingInfos;
 }
 
 - (NSArray*)observedInfos
 {
-	// Get observedInfos
-	NSArray *observedInfos;
 	@synchronized (self) {
-		observedInfos = [NSArray arrayWithArray:[self associatedValueForKey:kObservedInfosAssociationKey]];
+		return [NSArray arrayWithArray:[self associatedValueForKey:kObservedInfosAssociationKey]];
 	}
-	
-	return observedInfos;
 }
 
 - (void)stopObserving

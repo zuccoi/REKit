@@ -206,22 +206,16 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			
 			// Dispose classes
 			NSString *className;
-			className = [NSString stringWithUTF8String:class_getName([self class])];
+			className = NSStringFromClass([self class]);
 			if ([className hasPrefix:kClassNamePrefix]) {
-				// Dispose NSKVONotifying subclass
-				Class kvoClass;
-				kvoClass = NSClassFromString([NSString stringWithFormat:@"NSKVONotifying_%@", className]);
-				if (kvoClass) {
-					objc_disposeClassPair(kvoClass);
-				}
-				
-				// Dispose class
-				Class class;
-				class = [self class];
-				[self willChangeClass:[self superclass]];
-				object_setClass(self, [self superclass]);
-				[self didChangeClass:class];
-				objc_disposeClassPair(class);
+				dispatch_async(dispatch_get_main_queue(), ^{
+					Class class;
+					class = NSClassFromString(className);
+					for (Class aClass in RESubclassesOfClass(class, NO)) {
+						objc_disposeClassPair(aClass);
+					}
+					objc_disposeClassPair(class);
+				});
 			}
 		}
 	}
@@ -434,49 +428,48 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		return;
 	}
 	
-	// Don't set block to private class
-	if (!(op & REResponderOperationObjectTargetMask)) {
-		NSString *className;
-		className = NSStringFromClass([receiver class]);
-//		if ([className hasPrefix:kClassNamePrefix] || [className hasPrefix:@"__"]) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
-		if ([className hasPrefix:kClassNamePrefix]) {
-			// Search valid superclass
-			Class superclass;
-			superclass = [[receiver class] superclass];
-			while (superclass) {
-				if (![NSStringFromClass(superclass) hasPrefix:kClassNamePrefix]) {
-					REResponderSetBlockForSelector(superclass, selector, key, block, op);
-					return;
-				}
-			}
-			return;
-		}
-	}
-	
-	// Get key
-	key = (key ? key : REUUIDString());
-	
-	// Get selectorName
-	NSString *selectorName;
-	selectorName = NSStringFromSelector(selector);
-	
-	// Make signatures
-	NSMethodSignature *blockSignature;
-	NSMethodSignature *methodSignature;
-	NSMutableString *objCTypes;
-	blockSignature = [NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)];
-	objCTypes = [NSMutableString stringWithFormat:@"%@@:", [NSString stringWithCString:[blockSignature methodReturnType] encoding:NSUTF8StringEncoding]];
-	for (NSInteger i = 2; i < [blockSignature numberOfArguments]; i++) {
-		[objCTypes appendString:[NSString stringWithCString:[blockSignature getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
-	}
-	methodSignature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
-	if (!methodSignature) {
-		NSLog(@"Failed to get signature for key %@", key);
-		return;
-	}
-	
 	// Update blocks
 	@synchronized (receiver) {
+		// Don't set block to private class
+		if (!(op & REResponderOperationObjectTargetMask)) {
+			NSString *className;
+			className = NSStringFromClass([receiver class]);
+			if ([className hasPrefix:kClassNamePrefix]) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
+				// Search valid superclass
+				Class superclass;
+				superclass = [[receiver class] superclass];
+				while (superclass) {
+					if (![NSStringFromClass(superclass) hasPrefix:kClassNamePrefix]) {
+						REResponderSetBlockForSelector(superclass, selector, key, block, op);
+						return;
+					}
+				}
+				return;
+			}
+		}
+		
+		// Get key
+		key = (key ? key : REUUIDString());
+		
+		// Get selectorName
+		NSString *selectorName;
+		selectorName = NSStringFromSelector(selector);
+		
+		// Make signatures
+		NSMethodSignature *blockSignature;
+		NSMethodSignature *methodSignature;
+		NSMutableString *objCTypes;
+		blockSignature = [NSMethodSignature signatureWithObjCTypes:REBlockGetObjCTypes(block)];
+		objCTypes = [NSMutableString stringWithFormat:@"%@@:", [NSString stringWithCString:[blockSignature methodReturnType] encoding:NSUTF8StringEncoding]];
+		for (NSInteger i = 2; i < [blockSignature numberOfArguments]; i++) {
+			[objCTypes appendString:[NSString stringWithCString:[blockSignature getArgumentTypeAtIndex:i] encoding:NSUTF8StringEncoding]];
+		}
+		methodSignature = [NSMethodSignature signatureWithObjCTypes:[objCTypes cStringUsingEncoding:NSUTF8StringEncoding]];
+		if (!methodSignature) {
+			NSLog(@"Failed to get signature for key %@", key);
+			return;
+		}
+		
 		// Become subclass
 		if (op & REResponderOperationObjectTargetMask && ![NSStringFromClass([receiver class]) hasPrefix:kClassNamePrefix]) {
 			Class originalClass;

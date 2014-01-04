@@ -1873,257 +1873,256 @@
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
-// ?????
-//- (void)test_dynamicBlockBeforeKVO
-//{
-//	SEL sel = _cmd;
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//}
-//
-//- (void)test_overrideBlockBeforeKVO
-//{
-//	SEL sel = @selector(classLog);
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//}
-//
-//- (void)test_dynamicBlockAfterKVO
-//{
-//	SEL sel = _cmd;
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//}
-//
-//- (void)test_overrideBlockAfterKVO
-//{
-//	SEL sel = @selector(classLog);
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
-//}
-//
-//- (void)test_hasDynamicBlockForInstanceMethod__KVO
-//{
-//	SEL sel = _cmd;
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Check
-//	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Check
-//	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
-//}
-//
-//- (void)test_hasOverrideBlockForInstanceMethod__KVO
-//{
-//	SEL sel = @selector(classLog);
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
-//		return @"block";
-//	}];
-//	
-//	// Check
-//	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Check
-//	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
-//}
-//
-//- (void)test_supermethodOfDynamicBlockAddedBeforeKVO
-//{
-//	SEL sel = _cmd;
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
-//		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
-//	}];
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
-//		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
-//	}];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"12", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"12", @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"12", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"12", @"");
-//}
-//
-//- (void)test_supermethodOfOverrideBlockAddedBeforeKVO
-//{
-//	SEL sel = @selector(classLog);
-//	
-//	// Make obj
-//	id obj;
-//	obj = [RETestObject object];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
-//		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
-//	}];
-//	
-//	// Start observing
-//	id observer;
-//	observer = [NSObject object];
-//	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
-//	
-//	// Add block
-//	[RETestObject setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
-//		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
-//	}];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog12", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
-//	
-//	// Stop observing
-//	[obj removeObserver:observer forKeyPath:@"name"];
-//	
-//	// Check
-//	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog12", @"");
-//	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
-//}
+- (void)test_dynamicBlockBeforeKVO
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+}
+
+- (void)test_overrideBlockBeforeKVO
+{
+	SEL sel = @selector(classLog);
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+}
+
+- (void)test_dynamicBlockAfterKVO
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+}
+
+- (void)test_overrideBlockAfterKVO
+{
+	SEL sel = @selector(classLog);
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:nil block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
+}
+
+- (void)test_hasDynamicBlockForInstanceMethod__KVO
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+}
+
+- (void)test_hasOverrideBlockForInstanceMethod__KVO
+{
+	SEL sel = @selector(classLog);
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:@"key" block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+}
+
+- (void)test_supermethodOfDynamicBlockAddedBeforeKVO
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
+	}];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
+	}];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"12", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"12", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"12", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"12", @"");
+}
+
+- (void)test_supermethodOfOverrideBlockAddedBeforeKVO
+{
+	SEL sel = @selector(classLog);
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:@"block1" block:^(id receiver) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
+	}];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Add block
+	[RETestObject setBlockForClassMethod:sel key:@"block2" block:^(id receiver) {
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
+	}];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog12", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog12", @"");
+	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
+}
 
 @end

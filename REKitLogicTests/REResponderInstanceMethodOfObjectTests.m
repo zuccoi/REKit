@@ -246,11 +246,8 @@
 			// Raise deallocated flag
 			deallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 	}
 	
@@ -273,11 +270,8 @@
 			// Raise deallocated flag
 			deallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 	}
 	
@@ -297,11 +291,8 @@
 			// Raise deallocated flag
 			deallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Make obj
@@ -453,11 +444,8 @@
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Make obj
@@ -472,11 +460,8 @@
 			// Raise isObjDeallocated
 			isObjDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 	}
 	
@@ -498,11 +483,8 @@
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Make obj
@@ -522,11 +504,8 @@
 			// Raise isObjDeallocated
 			isObjDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Perform log method
@@ -551,11 +530,8 @@
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Make obj
@@ -565,11 +541,8 @@
 			// Raise isObjDeallocated
 			isObjDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Add log method
@@ -607,11 +580,8 @@
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Make obj
@@ -2032,11 +2002,8 @@
 			// Raise deallocated flag
 			deallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Make obj

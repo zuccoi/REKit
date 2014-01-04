@@ -465,11 +465,8 @@
 			// Raise deallocated flag
 			isContextDeallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Add log method
@@ -1790,11 +1787,8 @@
 			// Raise deallocated flag
 			deallocated = YES;
 			
-			// super
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, @selector(dealloc));
-			}
+			// supermethod
+			RESupermethod(nil, receiver, @selector(dealloc));
 		}];
 		
 		// Set NSObject conformable to NSCopying

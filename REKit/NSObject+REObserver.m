@@ -340,9 +340,6 @@ NSString* const REObserverContainerKey = @"container";
 
 - (void)REObserver_X_willChangeClass:(Class)toClass
 {
-	// original
-	[self REObserver_X_willChangeClass:toClass];
-	
 	// Remove observers
 	NSArray *observedInfos;
 	observedInfos = [self observedInfos];
@@ -363,6 +360,9 @@ NSString* const REObserverContainerKey = @"container";
 			[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath];
 		}
 	}];
+	
+	// original
+	[self REObserver_X_willChangeClass:toClass];
 }
 
 - (void)REObserver_X_didChangeClass:(Class)fromClass

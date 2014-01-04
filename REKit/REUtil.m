@@ -4,6 +4,7 @@
  Copyright ©2014 Kazki Miura. All rights reserved.
 */
 
+#import <objc/message.h>
 #import <dlfcn.h>
 #import "execinfo.h"
 #import "REUtil.h"
@@ -113,6 +114,31 @@ IMP REImplementationWithBacktraceDepth(int depth)
 //--------------------------------------------------------------//
 #pragma mark - NSObject
 //--------------------------------------------------------------//
+
+Class object_setClass(id object, Class cls)
+{
+	// Gete original function
+	static Class (*RE_X_object_setClass)(id, Class) = nil;
+	if (!RE_X_object_setClass) {
+		RE_X_object_setClass = (Class (*)(id, Class))dlsym(RTLD_NEXT, "object_setClass");
+		if (!RE_X_object_setClass) {
+			NSLog(@"Original object_setClass function was not found");
+			return NULL;
+		}
+	}
+	
+	// Call willChangeClass:
+	objc_msgSend(object, @selector(willChangeClass:), cls);
+	
+	// original
+	Class oldClass;
+	oldClass = RE_X_object_setClass(object, cls);
+	
+	// Call didChangeClass:
+	objc_msgSend(object, @selector(didChangeClass:), oldClass);
+	
+	return oldClass;
+}
 
 Class REGetClass(id receiver)
 {

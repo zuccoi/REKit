@@ -156,6 +156,14 @@ Class REGetClass(id receiver)
 	}
 }
 
+Class REGetSuperclass(id receiver) // Test >>>
+{
+	Class class;
+	class = REGetClass(receiver);
+	
+	return class_getSuperclass(class);
+}
+
 Class REGetMetaClass(id receiver)
 {
 	if (!receiver) {
@@ -229,7 +237,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 {
 	// Post notification
 	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectWillChangeClassNotification object:self userInfo:@{
-		REObjectOldClassNameKey : NSStringFromClass([self class]),
+		REObjectOldClassNameKey : NSStringFromClass(REGetClass(self)),
 		REObjectNewClassNameKey : NSStringFromClass(toClass)
 	}];
 }
@@ -239,7 +247,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 	// Post notification
 	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectDidChangeClassNotification object:self userInfo:@{
 		REObjectOldClassNameKey : NSStringFromClass(fromClass),
-		REObjectNewClassNameKey : NSStringFromClass([self class])
+		REObjectNewClassNameKey : NSStringFromClass(REGetClass(self))
 	}];
 }
 

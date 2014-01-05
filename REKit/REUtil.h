@@ -72,6 +72,7 @@ extern IMP REImplementationWithBacktraceDepth(int depth);
 //--------------------------------------------------------------//
 
 extern Class REGetClass(id receiver);
+extern Class REGetSuperclass(id receiver);
 extern Class REGetMetaClass(id receiver);
 NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 

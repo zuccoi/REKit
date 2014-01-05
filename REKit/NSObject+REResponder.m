@@ -184,7 +184,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			
 			// Remove blocks
 			NSDictionary *blocks;
-			if ([NSStringFromClass(REGetClass(self)) hasPrefix:kClassNamePrefix]) {
+			if ([NSStringFromClass(REGetClass(self)) rangeOfString:kClassNamePrefix].location != NSNotFound) {
 				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationClassMethodOfObject, NO)];
 				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
 					while ([blockInfos count]) {
@@ -208,7 +208,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			// Dispose classes
 			NSString *className;
 			className = NSStringFromClass(REGetClass(self));
-			if ([className hasPrefix:kClassNamePrefix]) {
+			if ([className rangeOfString:kClassNamePrefix].location != NSNotFound) {
 				dispatch_async(dispatch_get_main_queue(), ^{
 					Class class;
 					class = NSClassFromString(className);
@@ -335,15 +335,6 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 			return blockInfo;
 		}
 		
-		// Search blockInfo of class
-		blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationInstanceMethodOfClass, NO));
-		if (!blockInfo) {
-			blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationClassMethodOfClass, NO));
-		}
-		if (blockInfo) {
-			return blockInfo;
-		}
-		
 		// Search blockInfo of instance associated with private class
 		Class class;
 		class = REGetClass(receiver);
@@ -360,6 +351,15 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 				}
 			}
 			class = REGetSuperclass(class);
+		}
+		
+		// Search blockInfo of class
+		blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationInstanceMethodOfClass, NO));
+		if (!blockInfo) {
+			blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationClassMethodOfClass, NO));
+		}
+		if (blockInfo) {
+			return blockInfo;
 		}
 		
 		return nil;
@@ -452,19 +452,20 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 	
 	// Update blocks
 	@synchronized (receiver) {
-		// Don't set block to private class
+		// Don't set class-target block to private class
 		if (!(op & REResponderOperationObjectTargetMask)) {
 			NSString *className;
 			className = NSStringFromClass(REGetClass(receiver));
-			if ([className hasPrefix:kClassNamePrefix]) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
+			if ([className rangeOfString:kClassNamePrefix].location != NSNotFound) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ????? // Should I filter NSKVONotifying_ class ?????
 				// Search valid superclass
 				Class superclass;
 				superclass = REGetSuperclass(receiver);
 				while (superclass) {
-					if (![NSStringFromClass(superclass) hasPrefix:kClassNamePrefix]) {
+					if ([NSStringFromClass(superclass) rangeOfString:kClassNamePrefix].location == NSNotFound) {
 						REResponderSetBlockForSelector(superclass, selector, key, block, op);
 						return;
 					}
+					superclass = REGetSuperclass(superclass);
 				}
 				return;
 			}

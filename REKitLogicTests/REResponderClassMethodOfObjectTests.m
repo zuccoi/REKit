@@ -2563,12 +2563,12 @@
 	// Start observing
 	id observer;
 	observer = [NSObject object];
-	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil]; // blocks moves to NSKVONotifying_ class!!!
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:@"block2" block:^(Class receiver) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
-	}];
+	}]; // oldBlockInfo is nil!!!
 	
 	// Check
 	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"12", @"");

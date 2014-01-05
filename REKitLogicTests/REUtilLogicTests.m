@@ -59,7 +59,7 @@
 	expected = [NSSet setWithArray:@[[RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
 	
-	// Get subclasses of REREstObject
+	// Get subclasses of RERestObject
 	subclasses = [RESubclassesOfClass([RETestObject class], YES) filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Class aClass, NSDictionary *bindings) {
 		NSString *className;
 		className = NSStringFromClass(aClass);

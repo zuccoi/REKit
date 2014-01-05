@@ -17,7 +17,7 @@ static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kClassMethodBlocksAssociationKey = @"REResponder_classMethodBlocks";
 static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_instanceMethodBlocks";
-static NSString* const kInstanceOfPrivateClassAssociationKey = @"REREsponder_instance";
+static NSString* const kInstanceOfPrivateClassAssociationKey = @"REResponder_instance";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger, REResponderOperation) {
 #pragma mark -- Setup --
 //--------------------------------------------------------------//
 
-BOOL REREsponderConformsToProtocol(id receiver, Protocol *protocol)
+BOOL REResponderConformsToProtocol(id receiver, Protocol *protocol)
 {
 	// Filter
 	if (!protocol) {
@@ -101,7 +101,7 @@ BOOL REREsponderConformsToProtocol(id receiver, Protocol *protocol)
 	Class class;
 	class = self;
 	while (!conforms && class) {
-		conforms = REREsponderConformsToProtocol(class, protocol);
+		conforms = REResponderConformsToProtocol(class, protocol);
 		class = REGetSuperclass(class);
 	}
 	
@@ -115,7 +115,7 @@ BOOL REREsponderConformsToProtocol(id receiver, Protocol *protocol)
 		return NO;
 	}
 	
-	return (REREsponderConformsToProtocol(self, protocol) || [REGetClass(self) conformsToProtocol:protocol]);
+	return (REResponderConformsToProtocol(self, protocol) || [REGetClass(self) conformsToProtocol:protocol]);
 }
 
 BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperation op)
@@ -494,16 +494,44 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		}
 		
 		// Become subclass
-		Class originalClass = NULL;
 		if (op & REResponderOperationObjectTargetMask && [NSStringFromClass(REGetClass(receiver)) rangeOfString:kClassNamePrefix].location == NSNotFound) {
 			Class subclass;
 			NSString *className;
+			Class originalClass;
 			originalClass = [receiver class]; // Use class method to avoid getting NSKVONotifying_ class
 			className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass(originalClass)];
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
-			object_setClass(receiver, subclass); // blocks is updated ?????
+			object_setClass(receiver, subclass);
 			[REGetClass(receiver) setAssociatedValue:receiver forKey:kInstanceOfPrivateClassAssociationKey policy:OBJC_ASSOCIATION_ASSIGN];
+			
+			// Get originalClassName
+			NSString *originalClassName;
+			originalClassName = NSStringFromClass(originalClass);
+			
+			// Override class
+			[receiver setBlockForInstanceMethod:@selector(class) key:nil block:^(id receiver) {
+				return NSClassFromString(originalClassName);
+			}];
+			
+			// Override superclass
+			[receiver setBlockForInstanceMethod:@selector(superclass) key:nil block:^(id receiver) {
+				return [[receiver class] superclass];
+			}];
+			
+			// Override classForCoder
+			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
+				IMP superImp;
+				Class realSuperclass;
+				realSuperclass = REGetSuperclass(receiver);
+				superImp = (IMP)class_getInstanceMethod(realSuperclass, @selector(classForCoder));
+				if (superImp) {
+					return (REIMP(Class)superImp)(receiver, @selector(classForCoder));
+				}
+				else {
+					return RESupermethod(NSClassFromString(originalClassName), receiver, @selector(classForCoder));
+				}
+			}];
 		}
 		
 		// Get elements
@@ -555,19 +583,19 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
-		// Get originalClassMethod // Rename >>>
-		IMP originalClassMethod;
-		originalClassMethod = [class methodForSelector:selector];
-		if (originalClassMethod == [superclass methodForSelector:selector]) {
-			originalClassMethod = NULL;
+		// Get originalClassImp
+		IMP originalClassImp;
+		originalClassImp = [class methodForSelector:selector];
+		if (originalClassImp == [superclass methodForSelector:selector]) {
+			originalClassImp = NULL;
 		}
 		
 		// Replace method
 		IMP imp;
 		imp = imp_implementationWithBlock(block);
 		class_replaceMethod((op & REResponderOperationInstanceMethodMask ? class : metaClass), selector, imp, [objCTypes UTF8String]);
-		if (op & REResponderOperationInstanceMethodMask && originalClassMethod) {
-			class_replaceMethod(metaClass, selector, originalClassMethod, [objCTypes UTF8String]);
+		if (op & REResponderOperationInstanceMethodMask && originalClassImp) {
+			class_replaceMethod(metaClass, selector, originalClassImp, [objCTypes UTF8String]);
 		}
 		
 		// Replace method of subclasses
@@ -606,42 +634,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			kBlockInfoOperationKey : @(op),
 		};
 		[blockInfos addObject:blockInfo];
-		
-		// Override methods // Should I override using InstanceMethodOfClass ?????
-		if (originalClass) {
-			// Get originalClassName
-			NSString *originalClassName;
-			originalClassName = NSStringFromClass(originalClass);
-			
-			// Override class
-			[receiver setBlockForInstanceMethod:@selector(class) key:nil block:^(id receiver) {
-				return NSClassFromString(originalClassName);
-			}];
-			
-			// Override superclass
-			[receiver setBlockForInstanceMethod:@selector(superclass) key:nil block:^(id receiver) {
-				return [[receiver class] superclass];
-			}];
-			
-			// Override classForCoder
-			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
-				IMP superImp;
-				Class realSuperclass;
-				realSuperclass = REGetSuperclass(receiver);
-				superImp = (IMP)class_getInstanceMethod(realSuperclass, @selector(classForCoder));
-				if (superImp) {
-					return (REIMP(Class)superImp)(receiver, @selector(classForCoder));
-				}
-				else {
-					return RESupermethod(NSClassFromString(originalClassName), receiver, @selector(classForCoder));
-				}
-			}];
-//			
-//			// Override didChangeClass: // >>>
-//			[receiver setBlockForInstanceMethod:@selector(didChangeClass:) key:nil block:^(id receiver, Class fromClass) {
-//				
-//			}];
-		}
 	}
 }
 

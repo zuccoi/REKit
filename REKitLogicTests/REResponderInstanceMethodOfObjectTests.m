@@ -2314,6 +2314,10 @@
 	observer = [NSObject object];
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
+	// ?????
+//	NSLog(@"blocks = %@", [obj associatedValueForKey:@"REResponder_instanceMethodBlocks"]); // Has
+//	STAssertEquals([obj methodForSelector:sel], imp, @""); // True
+	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
 	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");

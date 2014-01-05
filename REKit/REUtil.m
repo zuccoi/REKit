@@ -227,7 +227,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 	
 	// Free classes
 	free(classes);
-	 
+	
 	return subclasses;
 }
 

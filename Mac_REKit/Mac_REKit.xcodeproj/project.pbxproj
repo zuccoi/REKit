@@ -75,9 +75,9 @@
 		EBA42120167DE1F20052D11E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		EBA42125167DE1F20052D11E /* Mac_REKitLogicTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Mac_REKitLogicTests-Prefix.pch"; sourceTree = "<group>"; };
 		EBA42138167DE21F0052D11E /* NSObject+REObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+REObserver.h"; sourceTree = "<group>"; };
-		EBA42139167DE21F0052D11E /* NSObject+REObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+REObserver.m"; sourceTree = "<group>"; };
+		EBA42139167DE21F0052D11E /* NSObject+REObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSObject+REObserver.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBA4213A167DE21F0052D11E /* NSObject+REResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+REResponder.h"; sourceTree = "<group>"; };
-		EBA4213B167DE21F0052D11E /* NSObject+REResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+REResponder.m"; sourceTree = "<group>"; };
+		EBA4213B167DE21F0052D11E /* NSObject+REResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSObject+REResponder.m"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		EBA4213C167DE21F0052D11E /* REKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REKit.h; sourceTree = "<group>"; };
 		EBA4213D167DE21F0052D11E /* REUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = REUtil.h; sourceTree = "<group>"; };
 		EBA4213E167DE21F0052D11E /* REUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REUtil.m; sourceTree = "<group>"; };

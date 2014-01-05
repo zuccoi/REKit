@@ -20,6 +20,8 @@ static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_insta
 static NSString* const kInstanceOfPrivateClassAssociationKey = @"REResponder_instance";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
+static NSString* const kIsChangingClassByItselfAssociationKey = @"REResponder_isChangingClassByItself"; // Tests >>>
+static NSString* const kIsChangingClassAssociationKey = @"REResponder_isChangingClass"; // Tests >>>
 
 // Keys for protocolInfo
 static NSString* const kProtocolInfoKeysKey = @"keys";
@@ -175,6 +177,33 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 	return REResponderRespondsToSelector(self, aSelector, REResponderOperationInstanceMethodOfObject);
 }
 
+- (void)REResponder_X_willChangeClass:(NSString*)toClassName
+{
+	if (![self REResponder_isChangingClassByItself]
+		&& ![[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue]
+	){
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		
+		// Not Implemented >>>
+	}
+	
+	// original
+	[self REResponder_X_willChangeClass:toClassName];
+}
+
+- (void)REResponder_X_didChangeClass:(NSString*)fromClassName
+{
+	if (![self REResponder_isChangingClassByItself]) {
+		// Not Implemented >>>
+	}
+	
+	// original
+	[self REResponder_X_didChangeClass:fromClassName];
+	
+	// Down isChangingClass flag
+	[self setAssociatedValue:nil forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+}
+
 - (void)REResponder_X_dealloc
 {
 	@autoreleasepool {
@@ -240,10 +269,28 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REResponder_X_" selectors:
 			@selector(conformsToProtocol:),
 			@selector(respondsToSelector:),
+			@selector(willChangeClass:),
+			@selector(didChangeClass:),
 			@selector(dealloc),
 			nil
 		];
 	}
+}
+
+//--------------------------------------------------------------//
+#pragma mark -- Util --
+//--------------------------------------------------------------//
+
+- (BOOL)REResponder_isChangingClassByItself
+{
+	return [[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue];
+}
+
+- (void)REResponder_setChangingClassByItself:(BOOL)flag
+{
+	id value;
+	value = (flag ? @(YES) : nil);
+	[self setAssociatedValue:value forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 }
 
 //--------------------------------------------------------------//
@@ -502,7 +549,9 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass(originalClass)];
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
+			[receiver REResponder_setChangingClassByItself:YES];
 			object_setClass(receiver, subclass);
+			[receiver REResponder_setChangingClassByItself:NO];
 			[REGetClass(receiver) setAssociatedValue:receiver forKey:kInstanceOfPrivateClassAssociationKey policy:OBJC_ASSOCIATION_ASSIGN];
 			
 			// Get originalClassName

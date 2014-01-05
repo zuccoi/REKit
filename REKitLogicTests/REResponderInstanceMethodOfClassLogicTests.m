@@ -886,6 +886,27 @@
 	STAssertFalse([[RETestObject object] respondsToSelector:sel], @"");
 }
 
+- (void)test_receiverIsObject
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForInstanceMethod:sel key:Nil block:^(id receiver) {
+		STAssertEqualObjects(receiver, obj, @"");
+		[receiver removeCurrentBlock];
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(called, @"");
+}
+
 - (void)test_supermethodPointsToNil
 {
 	SEL sel = @selector(log);
@@ -1634,7 +1655,7 @@
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
-- (void)test_dynamicBlockBeforeKVO
+- (void)test_dynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
 	
@@ -1662,7 +1683,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 }
 
-- (void)test_overrideBlockBeforeKVO
+- (void)test_overrideBlockAddedBeforeKVO
 {
 	SEL sel = @selector(log);
 	
@@ -1690,7 +1711,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 }
 
-- (void)test_dynamicBlockAfterKVO
+- (void)test_dynamicBlockAddedAfterKVO
 {
 	SEL sel = _cmd;
 	
@@ -1718,7 +1739,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 }
 
-- (void)test_overrideBlockAfterKVO
+- (void)test_overrideBlockAddedAfterKVO
 {
 	SEL sel = @selector(log);
 	
@@ -1746,7 +1767,7 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
 }
 
-- (void)test_hasDynamicBlockForInstanceMethod__KVO
+- (void)test_hasDynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
 	
@@ -1777,7 +1798,7 @@
 	STAssertTrue([RETestObject hasBlockForInstanceMethod:sel key:@"key"], @"");
 }
 
-- (void)test_hasOverrideBlockForInstanceMethod__KVO
+- (void)test_hasOverrideBlockAddedBeforeKVO
 {
 	SEL sel = @selector(log);
 	
@@ -1806,6 +1827,16 @@
 	
 	// Check
 	STAssertTrue([RETestObject hasBlockForInstanceMethod:sel key:@"key"], @"");
+}
+
+- (void)test_hasDynamicBlockAddedAfterKVO
+{
+	// Not Implemented >>>
+}
+
+- (void)test_hasOverrideBlockAddedAfterKVO
+{
+	// Not Implemented >>>
 }
 
 - (void)test_supermethodOfDynamicBlockAddedBeforeKVO

@@ -77,10 +77,10 @@
 	}];
 	
 	// Responds?
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Check log
-	log = [[obj class] performSelector:sel];
+	log = [REGetClass(obj) performSelector:sel];
 	STAssertEqualObjects(log, @"block", @"");
 }
 
@@ -98,10 +98,10 @@
 	}];
 	
 	// Responds?
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	STAssertEqualObjects([[obj class] classLog], @"Overridden log", @"");
+	STAssertEqualObjects([REGetClass(obj) classLog], @"Overridden log", @"");
 }
 
 - (void)test_dynamicBlockDoesNotAffectInstanceMethod
@@ -119,7 +119,7 @@
 	
 	// Don't affect instance
 	STAssertTrue(![obj respondsToSelector:sel], @"");
-	STAssertTrue(![[obj class] instancesRespondToSelector:sel], @"");
+	STAssertTrue(![REGetClass(obj) instancesRespondToSelector:sel], @"");
 }
 
 - (void)test_overrideBlockDoesNotAffectInstanceMethod
@@ -137,7 +137,7 @@
 	
 	// Don't affect instance
 	STAssertTrue(![obj respondsToSelector:sel], @"");
-	STAssertTrue(![[obj class] instancesRespondToSelector:sel], @"");
+	STAssertTrue(![REGetClass(obj) instancesRespondToSelector:sel], @"");
 	
 	// Call original
 	STAssertEqualObjects([RETestObject classLog], @"classLog", @"");
@@ -325,12 +325,12 @@
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
-		STAssertEquals(receiver, [obj class], @"");
+		STAssertEquals(receiver, REGetClass(obj), @"");
 		called = YES;
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -352,12 +352,12 @@
 	}];
 	
 	// Add block
-	[obj setBlockForClassMethod:@selector(otherMethod) key:[obj class] block:^(Class receiver) {
+	[obj setBlockForClassMethod:@selector(otherMethod) key:REGetClass(obj) block:^(Class receiver) {
 		return @"block";
 	}];
 	
 	// Call
-	STAssertEqualObjects(objc_msgSend([obj class], @selector(otherMethod)), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), @selector(otherMethod)), @"block", @"");
 }
 
 - (void)test_usingObjectInDynamicBlockCausesRetainCycle
@@ -615,7 +615,7 @@
 //		}];
 //		
 //		// Call
-//		objc_msgSend([obj class], @selector(log));
+//		objc_msgSend(REGetClass(obj), @selector(log));
 //		
 //		// Check retain count of block
 //		STAssertEquals(CFGetRetainCount(block), (signed long)1, @"");
@@ -746,7 +746,7 @@
 		}];
 		
 		// Call
-		objc_msgSend([obj class], @selector(log));
+		objc_msgSend(REGetClass(obj), @selector(log));
 	}
 	
 	// Check
@@ -831,7 +831,7 @@
 		}];
 		
 		// Perform block
-		objc_msgSend([obj class], @selector(log));
+		objc_msgSend(REGetClass(obj), @selector(log));
 		
 		// Remove block
 		[obj removeBlockForClassMethod:@selector(log) key:@"key"];
@@ -886,7 +886,7 @@
 		STAssertTrue(!isContextDeallocated, @"");
 		
 		// Call
-		objc_msgSend([obj class], @selector(log));
+		objc_msgSend(REGetClass(obj), @selector(log));
 	}
 	
 	// Check
@@ -924,18 +924,18 @@
 			}];
 			
 			// Associate context
-			[[obj class] setAssociatedValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
+			[REGetClass(obj) setAssociatedValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
 			
 			// Deallocated?
 			STAssertTrue(!deallocated, @"");
-			STAssertNotNil([[obj class] associatedValueForKey:@"context"], @"");
+			STAssertNotNil([REGetClass(obj) associatedValueForKey:@"context"], @"");
 			
 			// Call
-			objc_msgSend([obj class], @selector(log));
+			objc_msgSend(REGetClass(obj), @selector(log));
 		}
 		
 		// Call
-		objc_msgSend([obj class], @selector(log));
+		objc_msgSend(REGetClass(obj), @selector(log));
 	}
 	
 	// Check
@@ -956,7 +956,7 @@
 	}];
 	
 	// Call logWithSuffix: method
-	log = objc_msgSend([obj class], @selector(logWithSuffix:), @"suffix");
+	log = objc_msgSend(REGetClass(obj), @selector(logWithSuffix:), @"suffix");
 	STAssertEqualObjects(log, @"block1-suffix", @"");
 }
 
@@ -975,7 +975,7 @@
 	}];
 	
 	// Check rect
-	rect = (REIMP(CGRect)objc_msgSend_stret)([obj class], sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
+	rect = (REIMP(CGRect)objc_msgSend_stret)(REGetClass(obj), sel, CGPointMake(10.0, 20.0), CGSizeMake(30.0, 40.0));
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
@@ -994,8 +994,8 @@
 	
 	// Call imp
 	IMP imp;
-	imp = [[obj class] methodForSelector:@selector(doSomething)];
-	(REIMP(void)imp)([obj class], @selector(doSomething));
+	imp = [REGetClass(obj) methodForSelector:@selector(doSomething)];
+	(REIMP(void)imp)(REGetClass(obj), @selector(doSomething));
 	STAssertTrue(called, @"");
 }
 
@@ -1014,6 +1014,8 @@
 	STAssertTrue(![obj hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
 	STAssertTrue(![[obj class] hasBlockForClassMethod:@selector(log) key:@"key"], @"");
 	STAssertTrue(![[obj class] hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
+	STAssertTrue(![REGetClass(obj) hasBlockForClassMethod:@selector(log) key:@"key"], @"");
+	STAssertTrue(![REGetClass(obj) hasBlockForInstanceMethod:@selector(log) key:@"key"], @"");
 	
 	// Remove log block
 	[obj removeBlockForClassMethod:@selector(log) key:@"key"];
@@ -1039,22 +1041,22 @@
 	}];
 	
 	// Call log
-	string = objc_msgSend([obj class], @selector(log));
+	string = objc_msgSend(REGetClass(obj), @selector(log));
 	STAssertEqualObjects(string, @"log", @"");
 	
 	// Call say
-	string = objc_msgSend([obj class], @selector(say));
+	string = objc_msgSend(REGetClass(obj), @selector(say));
 	STAssertEqualObjects(string, @"say", @"");
 	
 	// Remove log block
 	[obj removeBlockForClassMethod:@selector(log) key:@"key"];
-	STAssertTrue(![[obj class] respondsToSelector:@selector(log)], @"");
-	string = objc_msgSend([obj class], @selector(say));
+	STAssertTrue(![REGetClass(obj) respondsToSelector:@selector(log)], @"");
+	string = objc_msgSend(REGetClass(obj), @selector(say));
 	STAssertEqualObjects(string, @"say", @"");
 	
 	// Remove say block
 	[obj removeBlockForClassMethod:@selector(say) key:@"key"];
-	STAssertTrue(![[obj class] respondsToSelector:@selector(say)], @"");
+	STAssertTrue(![REGetClass(obj) respondsToSelector:@selector(say)], @"");
 }
 
 - (void)test_stackOfDynamicBlocks
@@ -1070,52 +1072,52 @@
 	[obj setBlockForClassMethod:sel key:@"block1" block:^(Class receiver) {
 		return @"block1";
 	}];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Add block2
 	[obj setBlockForClassMethod:sel key:@"block2" block:^(Class receiver) {
 		return @"block2";
 	}];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Add block3
 	[obj setBlockForClassMethod:sel key:@"block3" block:^(Class receiver) {
 		return @"block3";
 	}];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block3", @"");
 	
 	// Remove block3
 	[obj removeBlockForClassMethod:sel key:@"block3"];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block1
 	[obj removeBlockForClassMethod:sel key:@"block1"];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block2
 	[obj removeBlockForClassMethod:sel key:@"block2"];
-	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
-	STAssertEquals([[obj class] methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertTrue(![REGetClass(obj) respondsToSelector:sel], @"");
+	STAssertEquals([REGetClass(obj) methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_connectToForwardingMethod
@@ -1131,13 +1133,13 @@
 	[obj setBlockForClassMethod:(sel = @selector(readThis:)) key:@"block1" block:^(Class receiver, NSString *string) {
 		return string;
 	}];
-	string = objc_msgSend([obj class], sel, @"Read");
+	string = objc_msgSend(REGetClass(obj), sel, @"Read");
 	STAssertEqualObjects(string, @"Read", @"");
 	
 	// Remove block1
 	[obj removeBlockForClassMethod:sel key:@"block1"];
-	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
-	STAssertEquals([[obj class] methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
+	STAssertTrue(![REGetClass(obj) respondsToSelector:sel], @"");
+	STAssertEquals([REGetClass(obj) methodForSelector:sel], [obj methodForSelector:NSSelectorFromString(@"_objc_msgForward")], @"");
 }
 
 - (void)test_stackOfOverrideBlocks
@@ -1153,54 +1155,54 @@
 	[obj setBlockForClassMethod:sel key:@"block1" block:^(Class receiver) {
 		return @"block1";
 	}];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Add block2
 	[obj setBlockForClassMethod:sel key:@"block2" block:^(Class receiver) {
 		return @"block2";
 	}];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Add block3
 	[obj setBlockForClassMethod:sel key:@"block3" block:^(Class receiver) {
 		return @"block3";
 	}];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block3", @"");
 	
 	// Remove block3
 	[obj removeBlockForClassMethod:sel key:@"block3"];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block1
 	[obj removeBlockForClassMethod:sel key:@"block1"];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block2
 	[obj removeBlockForClassMethod:sel key:@"block2"];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"classLog", @"");
 }
 
@@ -1219,7 +1221,7 @@
 	}];
 	
 	// Call log method
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Override the block
@@ -1228,12 +1230,12 @@
 	}];
 	
 	// Call log method
-	log = objc_msgSend([obj class], sel);
+	log = objc_msgSend(REGetClass(obj), sel);
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block
 	[obj removeBlockForClassMethod:sel key:@"key"];
-	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
+	STAssertTrue(![REGetClass(obj) respondsToSelector:sel], @"");
 }
 
 - (void)test_allowsOverrideOfOverrideBlock
@@ -1251,7 +1253,7 @@
 	}];
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block1", @"");
 	
 	// Override the block
@@ -1260,14 +1262,14 @@
 	}];
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"block2", @"");
 	
 	// Remove block
 	[obj removeBlockForClassMethod:sel key:@"key"];
 	
 	// Call log method
-	log = [[obj class] classLog];
+	log = [REGetClass(obj) classLog];
 	STAssertEqualObjects(log, @"classLog", @"");
 }
 
@@ -1284,12 +1286,12 @@
 	}
 	
 	// Call log
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	
 	// Remove block
 	[obj removeBlockForClassMethod:sel key:@"key"];
-	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
+	STAssertTrue(![REGetClass(obj) respondsToSelector:sel], @"");
 }
 
 - (void)test_overrideBySameBlock
@@ -1305,13 +1307,13 @@
 	}
 	
 	// Call
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	
 	// Remove block
 	[obj removeBlockForClassMethod:sel key:@"key"];
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog", @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"classLog", @"");
 }
 
 - (void)test_canShareBlock
@@ -1332,27 +1334,27 @@
 	}
 	
 	// Call log method
-	STAssertEqualObjects(objc_msgSend([obj1 class], sel), @"block", @"");
-	STAssertEqualObjects(objc_msgSend([obj2 class], sel), @"block", @"");
-	STAssertEqualObjects(objc_msgSend([obj3 class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj1), sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj2), sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj3), sel), @"block", @"");
 	
 	// Remove block from obj2
 	[obj2 removeBlockForClassMethod:sel key:@"key"];
-	STAssertEqualObjects(objc_msgSend([obj1 class], sel), @"block", @"");
-	STAssertFalse([[obj2 class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj3 class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj1), sel), @"block", @"");
+	STAssertFalse([REGetClass(obj2) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj3), sel), @"block", @"");
 	
 	// Remove block from obj3
 	[obj3 removeBlockForClassMethod:sel key:@"key"];
-	STAssertEqualObjects(objc_msgSend([obj1 class], sel), @"block", @"");
-	STAssertFalse([[obj2 class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj3 class], sel), @"classLog", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj1), sel), @"block", @"");
+	STAssertFalse([REGetClass(obj2) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj3), sel), @"classLog", @"");
 	
 	// Remove block from obj1
 	[obj1 removeBlockForClassMethod:sel key:@"key"];
-	STAssertFalse([[obj1 class] respondsToSelector:sel], @"");
-	STAssertFalse([[obj2 class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj3 class], sel), @"classLog", @"");
+	STAssertFalse([REGetClass(obj1) respondsToSelector:sel], @"");
+	STAssertFalse([REGetClass(obj2) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj3), sel), @"classLog", @"");
 }
 
 - (void)test_canPassAlreadyExistBlock
@@ -1373,12 +1375,12 @@
 	[obj setBlockForClassMethod:sel key:@"key" block:block];
 	
 	// Call
-	STAssertTrue([[obj class] respondsToSelector:sel], @"");
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertTrue([REGetClass(obj) respondsToSelector:sel], @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	
 	// Remove block
 	[obj removeBlockForClassMethod:sel key:@"key"];
-	STAssertFalse([[obj class] respondsToSelector:sel], @"");
+	STAssertFalse([REGetClass(obj) respondsToSelector:sel], @"");
 }
 
 - (void)test_supermethodPointsToNil
@@ -1400,7 +1402,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1414,7 +1416,7 @@
 	obj = [RETestObject object];
 	
 	IMP originalMethod;
-	originalMethod = [[obj class] methodForSelector:sel];
+	originalMethod = [REGetClass(obj) methodForSelector:sel];
 	STAssertNotNil((id)originalMethod, @"");
 	
 	// Override
@@ -1430,7 +1432,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1448,7 +1450,7 @@
 	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 	}];
 	imp = [obj methodForSelector:sel];
-	STAssertTrue([[obj class] methodForSelector:sel] != imp, @"");
+	STAssertTrue([REGetClass(obj) methodForSelector:sel] != imp, @"");
 	
 	// Add class block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
@@ -1461,7 +1463,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1488,7 +1490,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1515,7 +1517,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1544,7 +1546,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1573,7 +1575,7 @@
 	imp = [RETestObject methodForSelector:sel];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1602,7 +1604,7 @@
 	}];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1631,7 +1633,7 @@
 	imp = [NSObject methodForSelector:sel];
 	
 	// Call
-	objc_msgSend([obj class], sel);
+	objc_msgSend(REGetClass(obj), sel);
 	STAssertTrue(called, @"");
 }
 
@@ -1721,7 +1723,7 @@
 	
 	// Remove block2
 	[obj removeBlockForClassMethod:sel key:@"block2"];
-	STAssertTrue(![[obj class] respondsToSelector:sel], @"");
+	STAssertTrue(![REGetClass(obj) respondsToSelector:sel], @"");
 }
 
 - (void)test_supermethodOfOverrideBlock
@@ -2025,22 +2027,25 @@
 	[obj setBlockForClassMethod:@selector(log) key:@"logBlock" block:^(Class receiver) {
 		return @"Dynamic log";
 	}];
-	STAssertTrue([obj class] != [RETestObject class], @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertTrue(REGetClass(obj) != [RETestObject class], @"");
 	
 	// Record new class
 	Class newClass;
-	newClass = [obj class];
+	newClass = REGetClass(obj);
 	
 	// Add say method
 	[obj setBlockForClassMethod:@selector(say) key:@"sayBlock" block:^(Class receiver) {
 		return @"Dynamic say";
 	}];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertEquals([obj class], [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 	
 	// Remove blocks
 	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
 	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 }
 
 - (void)test_doNotChangeClassFrequentlyWithOverrideBlockManagement
@@ -2053,22 +2058,25 @@
 	[obj setBlockForClassMethod:@selector(classLog) key:@"logBlock" block:^(Class receiver) {
 		return @"Overridden log";
 	}];
-	STAssertTrue([obj class] != [RETestObject class], @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertTrue(REGetClass(obj) != [RETestObject class], @"");
 	
 	// Record new class
 	Class newClass;
-	newClass = [obj class];
+	newClass = REGetClass(obj);
 	
 	// Override
 	[obj setBlockForClassMethod:@selector(sayHello) key:@"sayBlock" block:^(Class receiver) {
 		return @"Overridden say";
 	}];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertEquals([obj class], [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 	
 	// Remove blocks
 	[obj removeBlockForInstanceMethod:@selector(classLog) key:@"logBlock"];
 	[obj removeBlockForInstanceMethod:@selector(sayHello) key:@"sayBlock"];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 }
 
 - (void)test_replacedClassIsKindOfOriginalClass
@@ -2343,7 +2351,7 @@
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
-- (void)test_dynamicBlockBeforeKVO
+- (void)test_dynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
 	
@@ -2362,18 +2370,18 @@
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_overrideBlockBeforeKVO
+- (void)test_overrideBlockAddedBeforeKVO
 {
 	SEL sel = @selector(classLog);
 	
@@ -2392,18 +2400,18 @@
 	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_dynamicBlockAfterKVO
+- (void)test_dynamicBlockAddedAfterKVO
 {
 	SEL sel = _cmd;
 	
@@ -2422,18 +2430,18 @@
 	}];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_overrideBlockAfterKVO
+- (void)test_overrideBlockAddedAfterKVO
 {
 	SEL sel = @selector(classLog);
 	
@@ -2452,18 +2460,18 @@
 	}];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"block", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"block", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_hasDynamicBlockForInstanceMethodsetBlockForClassMethodKVO
+- (void)test_hasDynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
 	
@@ -2501,7 +2509,7 @@
 	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 }
 
-- (void)test_hasOverrideBlockForInstanceMethod__KVO
+- (void)test_hasOverrideBlockAddedBeforeKVO
 {
 	SEL sel = @selector(classLog);
 	
@@ -2537,6 +2545,16 @@
 	// Check
 	STAssertTrue([obj hasBlockForClassMethod:sel key:@"key"], @"");
 	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
+}
+
+- (void)test_hasDynamicBlockAddedAfterKVO
+{
+	// Not Implemented >>>
+}
+
+- (void)test_hasOverrideBlockAddedAfterKVO
+{
+	// Not Implemented >>>
 }
 
 - (void)test_supermethodOfDynamicBlockAddedBeforeKVO
@@ -2555,22 +2573,22 @@
 	// Start observing
 	id observer;
 	observer = [NSObject object];
-	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil]; // blocks moves to NSKVONotifying_ class!!!
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:@"block2" block:^(Class receiver) {
 		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
-	}];
+	}]; // oldBlockInfo is nil!!!
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"12", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"12", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"12", @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"12", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"12", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"12", @"");
 }
 
@@ -2598,14 +2616,14 @@
 	}];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog12", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"classLog12", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"classLog12", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"classLog12", @"");
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
 }
 

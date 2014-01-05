@@ -15,6 +15,8 @@
 // Constants
 static NSString* const kObservingInfosAssociationKey = @"REObserver_observingInfos";
 static NSString* const kObservedInfosAssociationKey = @"REObserver_observedInfos";
+static NSString* const kIsChangingClassByItselfAssociationKey = @"REObserver_isChangingClassByItself"; // Tests >>>
+static NSString* const kIsChangingClassAssociationKey = @"REObserver_isChangingClass"; // Tests >>>
 
 // Keys for observing/observedInfo
 NSString* const REObserverObservedObjectPointerValueKey = @"observedObjectPointerValue";
@@ -26,133 +28,9 @@ NSString* const REObserverBlockKey = @"block";
 NSString* const REObserverContainerKey = @"container";
 
 
-//--------------------------------------------------------------//
-#pragma mark NSArray
-//--------------------------------------------------------------//
-
-@implementation NSArray (REObserver)
-
-//--------------------------------------------------------------//
-#pragma mark -- Setup --
-//--------------------------------------------------------------//
-
-- (void)REObserver_X_addObserver:(NSObject *)observer toObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context
-{
-	// Filter
-	if (!observer || ![keyPath length]) {
-		return;
-	}
-	
-	// Get copiedKeyPath
-	NSString *copiedKeyPath;
-	copiedKeyPath = [[keyPath copy] autorelease];
-	
-	// Enumerate objects
-	@synchronized (self) {
-		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-			// Make observingInfo
-			NSMutableDictionary *observingInfo;
-			observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-				REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
-				REObserverContainerKey : self,
-				REObserverKeyPathKey : copiedKeyPath,
-				REObserverOptionsKey : @(options),
-			}];
-			if (context) {
-				observingInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
-			}
-			
-			// Add observingInfo
-			NSMutableArray *observingInfos;
-			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
-			if (!observingInfos) {
-				observingInfos = [NSMutableArray array];
-				[observer setAssociatedValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			[observingInfos addObject:observingInfo];
-			
-			// Make observedInfo
-			NSMutableDictionary *observedInfo;
-			observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-				REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
-				REObserverContainerKey : self,
-				REObserverKeyPathKey : copiedKeyPath,
-				REObserverOptionsKey : @(options),
-			}];
-			if (context) {
-				observedInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
-			}
-			
-			// Add observedInfo
-			NSMutableArray *observedInfos;
-			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
-			if (!observedInfos) {
-				observedInfos = [NSMutableArray array];
-				[obj setAssociatedValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			[observedInfos addObject:observedInfo];
-		}];	
-	}
-	
-	// original
-	[self REObserver_X_addObserver:observer toObjectsAtIndexes:indexes forKeyPath:keyPath options:options context:context];
-}
-
-- (void)REObserver_X_removeObserver:(NSObject *)observer fromObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath
-{
-	// Filter
-	if (!observer || ![indexes count] || ![keyPath length]) {
-		return;
-	}
-	
-	@synchronized (self) {
-		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-			// Get observingInfos
-			NSMutableArray *observingInfos;
-			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
-			
-			// Get observedInfos
-			NSMutableArray *observedInfos;
-			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
-			
-			// Remove observingInfo
-			[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
-				if ([observingInfo[REObserverObservedObjectPointerValueKey] pointerValue] == obj
-					&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
-				){
-					// Remove observingInfo
-					[observingInfos removeObject:observingInfo];
-				}
-			}];
-			
-			// Remove observedInfo
-			[observedInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
-				if ([observedInfo[REObserverObservingObjectPointerValueKey] pointerValue] == observer
-					&& [observedInfo[REObserverKeyPathKey] isEqualToString:keyPath]
-				){
-					// Remove observedInfo
-					[observedInfos removeObject:observedInfo];
-				}
-			}];
-		}];
-	}
-	
-	// original
-	[self REObserver_X_removeObserver:observer fromObjectsAtIndexes:indexes forKeyPath:keyPath];
-}
-
-+ (void)load
-{
-	@autoreleasepool {
-		// Exchange methods…
-		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REObserver_X_" selectors:
-			@selector(addObserver:toObjectsAtIndexes:forKeyPath:options:context:),
-			@selector(removeObserver:fromObjectsAtIndexes:forKeyPath:),
-			nil
-		];
-	}
-}
-
+@interface NSArray (REObserver)
+- (void)REObserver_X_addObserver:(NSObject *)observer toObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context;
+- (void)REObserver_X_removeObserver:(NSObject *)observer fromObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath;
 @end
 
 
@@ -219,8 +97,27 @@ NSString* const REObserverContainerKey = @"container";
 		[observedInfos addObject:observedInfo];
 	}
 	
+	
+	// Will change class?
+	NSString *originalClassName;
+	BOOL willChange; // Tests >>>
+	originalClassName = NSStringFromClass(REGetClass(self));
+	willChange = ![originalClassName hasPrefix:@"NSKVONotifying_"];
+	
+	// Call willChangeClass:
+	if (willChange) {
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+	}
+	
 	// original
 	[self REObserver_X_addObserver:observer forKeyPath:keyPath options:options context:context];
+	
+	// Call didChangeClass:
+	if (willChange) {
+		[self didChangeClass:originalClassName];
+		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	}
 }
 
 - (void)REObserver_X_observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context
@@ -289,8 +186,26 @@ NSString* const REObserverContainerKey = @"container";
 		}];
 	}
 	
+	// Will change class?
+	BOOL willChangeClass;
+	NSString *originalClassName = nil;
+	willChangeClass = ([[self observedInfos] count] == 0); // Tests >>>
+	
+	// Call willChangeClass:
+	if (willChangeClass) {
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		originalClassName = NSStringFromClass(REGetClass(self));
+		[self willChangeClass:NSStringFromClass(REGetSuperclass(self))];
+	}
+	
 	// original
 	[self REObserver_X_removeObserver:observer forKeyPath:keyPath];
+	
+	// Call didChangeClass:
+	if (willChangeClass) {
+		[self didChangeClass:originalClassName];
+		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	}
 }
 
 - (void)REObserver_X_removeObserver:(NSObject*)observer forKeyPath:(NSString*)keyPath context:(void*)context
@@ -331,69 +246,102 @@ NSString* const REObserverContainerKey = @"container";
 					[observedInfos removeObject:observedInfo];
 				}
 			}];
+			
+			// Will change class?
+			BOOL willChangeClass; // Tests >>>
+			NSString *originalClassName;
+			willChangeClass = ([[self observedInfos] count] == 0);
+			
+			// Call willChangeClass:
+			if (willChangeClass) {
+				[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				originalClassName = NSStringFromClass(REGetClass(self));
+				[self willChangeClass:NSStringFromClass(REGetSuperclass(self))];
+			}
+			
+			// original
+			[self REObserver_X_removeObserver:observer forKeyPath:keyPath context:context];
+			
+			// Call didChangeClass:
+			if (willChangeClass) {
+				[self didChangeClass:originalClassName];
+				[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
 		}
+	}
+	else {
+		// original
+		[self REObserver_X_removeObserver:observer forKeyPath:keyPath context:context];
+	}
+}
+
+- (void)REObserver_X_willChangeClass:(NSString*)toClassName
+{
+	// Remove observers
+	if (![[self associatedValueForKey:kIsChangingClassByItselfAssociationKey] boolValue]
+		&& ![[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue]
+	){
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		
+		NSArray *observedInfos;
+		observedInfos = [self observedInfos];
+		[observedInfos enumerateObjectsUsingBlock:^(NSMutableDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
+			// Get elements
+			id observingObject;
+			NSString *keyPath;
+			void *context;
+			observingObject = [observedInfo[REObserverObservingObjectPointerValueKey] pointerValue];
+			keyPath = observedInfo[REObserverKeyPathKey];
+			context = [observedInfo[REObserverContextPointerValueKey] pointerValue];
+			
+			// Remove observer
+			if (context) {
+				[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath context:context];
+			}
+			else {
+				[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath];
+			}
+		}];
 	}
 	
 	// original
-	[self REObserver_X_removeObserver:observer forKeyPath:keyPath context:context];
+	[self REObserver_X_willChangeClass:toClassName];
 }
 
-- (void)REObserver_X_willChangeClass:(Class)toClass
+- (void)REObserver_X_didChangeClass:(NSString*)fromClassName
 {
-	// Remove observers
-	NSArray *observedInfos;
-	observedInfos = [self observedInfos];
-	[observedInfos enumerateObjectsUsingBlock:^(NSMutableDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
-		// Get elements
-		id observingObject;
-		NSString *keyPath;
-		void *context;
-		observingObject = [observedInfo[REObserverObservingObjectPointerValueKey] pointerValue];
-		keyPath = observedInfo[REObserverKeyPathKey];
-		context = [observedInfo[REObserverContextPointerValueKey] pointerValue];
-		
-		// Remove observer
-		if (context) {
-			[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath context:context];
-		}
-		else {
-			[self REObserver_X_removeObserver:observingObject forKeyPath:keyPath];
-		}
-	}];
+	if (![[self associatedValueForKey:kIsChangingClassByItselfAssociationKey] boolValue]) {
+		// Add observers removed in willChangeClass: method
+		[[self observedInfos] enumerateObjectsUsingBlock:^(NSMutableDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
+			// Get elements
+			id observingObject;
+			NSString *keyPath;
+			void *context;
+			NSKeyValueObservingOptions options;
+			observingObject = [observedInfo[REObserverObservingObjectPointerValueKey] pointerValue];
+			keyPath = observedInfo[REObserverKeyPathKey];
+			options = [observedInfo[REObserverOptionsKey] integerValue];
+			context = [observedInfo[REObserverContextPointerValueKey] pointerValue];
+			
+			// Add observer
+			id container;
+			container = observedInfo[REObserverContainerKey];
+			if ([container containsObject:self]) {
+				NSUInteger index;
+				index = [container indexOfObject:self];
+				[container REObserver_X_addObserver:observingObject toObjectsAtIndexes:[NSIndexSet indexSetWithIndex:index] forKeyPath:keyPath options:options context:context];
+			}
+			else {
+				[self REObserver_X_addObserver:observingObject forKeyPath:keyPath options:options context:context];
+			}
+		}];
+	}
 	
 	// original
-	[self REObserver_X_willChangeClass:toClass];
-}
-
-- (void)REObserver_X_didChangeClass:(Class)fromClass
-{
-	// Add observers removed in willChangeClass: method
-	[[self observedInfos] enumerateObjectsUsingBlock:^(NSMutableDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
-		// Get elements
-		id observingObject;
-		NSString *keyPath;
-		void *context;
-		NSKeyValueObservingOptions options;
-		observingObject = [observedInfo[REObserverObservingObjectPointerValueKey] pointerValue];
-		keyPath = observedInfo[REObserverKeyPathKey];
-		options = [observedInfo[REObserverOptionsKey] integerValue];
-		context = [observedInfo[REObserverContextPointerValueKey] pointerValue];
-		
-		// Add observer
-		id container;
-		container = observedInfo[REObserverContainerKey];
-		if ([container containsObject:self]) {
-			NSUInteger index;
-			index = [container indexOfObject:self];
-			[container REObserver_X_addObserver:observingObject toObjectsAtIndexes:[NSIndexSet indexSetWithIndex:index] forKeyPath:keyPath options:options context:context];
-		}
-		else {
-			[self REObserver_X_addObserver:observingObject forKeyPath:keyPath options:options context:context];
-		}
-	}];
+	[self REObserver_X_didChangeClass:fromClassName];
 	
-	// original
-	[self REObserver_X_didChangeClass:fromClass];
+	// Down isChangingClass flag
+	[self setAssociatedValue:nil forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 }
 
 - (void)REObserver_X_release
@@ -552,6 +500,172 @@ NSString* const REObserverContainerKey = @"container";
 				[observedObject removeObserver:self forKeyPath:keyPath];
 			}
 		}
+	}
+}
+
+@end
+
+
+//--------------------------------------------------------------//
+#pragma mark - NSArray
+//--------------------------------------------------------------//
+
+@implementation NSArray (REObserver)
+
+//--------------------------------------------------------------//
+#pragma mark -- Setup --
+//--------------------------------------------------------------//
+
+- (void)REObserver_X_addObserver:(NSObject *)observer toObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context
+{
+	// Filter
+	if (!observer || ![keyPath length]) {
+		return;
+	}
+	
+	// Get copiedKeyPath
+	NSString *copiedKeyPath;
+	copiedKeyPath = [[keyPath copy] autorelease];
+	
+	// Enumerate objects
+	@synchronized (self) {
+		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+			// Make observingInfo
+			NSMutableDictionary *observingInfo;
+			observingInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+				REObserverObservedObjectPointerValueKey : [NSValue valueWithPointer:obj],
+				REObserverContainerKey : self,
+				REObserverKeyPathKey : copiedKeyPath,
+				REObserverOptionsKey : @(options),
+			}];
+			if (context) {
+				observingInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
+			}
+			
+			// Add observingInfo
+			NSMutableArray *observingInfos;
+			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
+			if (!observingInfos) {
+				observingInfos = [NSMutableArray array];
+				[observer setAssociatedValue:observingInfos forKey:kObservingInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
+			[observingInfos addObject:observingInfo];
+			
+			// Make observedInfo
+			NSMutableDictionary *observedInfo;
+			observedInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+				REObserverObservingObjectPointerValueKey : [NSValue valueWithPointer:observer],
+				REObserverContainerKey : self,
+				REObserverKeyPathKey : copiedKeyPath,
+				REObserverOptionsKey : @(options),
+			}];
+			if (context) {
+				observedInfo[REObserverContextPointerValueKey] = [NSValue valueWithPointer:context];
+			}
+			
+			// Add observedInfo
+			NSMutableArray *observedInfos;
+			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
+			if (!observedInfos) {
+				observedInfos = [NSMutableArray array];
+				[obj setAssociatedValue:observedInfos forKey:kObservedInfosAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
+			[observedInfos addObject:observedInfo];
+		}];	
+	}
+	
+	// Will change class?
+	NSString *originalClassName;
+	BOOL willChange;
+	originalClassName = NSStringFromClass(REGetClass(self));
+	willChange = ![originalClassName hasPrefix:@"NSKVONotifying_"]; // Tests >>>
+	
+	// Call willChangeClass:
+	if (willChange) {
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+	}
+	
+	// original
+	[self REObserver_X_addObserver:observer toObjectsAtIndexes:indexes forKeyPath:keyPath options:options context:context];
+	
+	// Call didChangeClass:
+	if (willChange) {
+		[self didChangeClass:originalClassName];
+		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	}
+}
+
+- (void)REObserver_X_removeObserver:(NSObject *)observer fromObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath
+{
+	// Filter
+	if (!observer || ![indexes count] || ![keyPath length]) {
+		return;
+	}
+	
+	@synchronized (self) {
+		[self enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+			// Get observingInfos
+			NSMutableArray *observingInfos;
+			observingInfos = [observer associatedValueForKey:kObservingInfosAssociationKey];
+			
+			// Get observedInfos
+			NSMutableArray *observedInfos;
+			observedInfos = [obj associatedValueForKey:kObservedInfosAssociationKey];
+			
+			// Remove observingInfo
+			[observingInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observingInfo, NSUInteger idx, BOOL *stop) {
+				if ([observingInfo[REObserverObservedObjectPointerValueKey] pointerValue] == obj
+					&& [observingInfo[REObserverKeyPathKey] isEqualToString:keyPath]
+				){
+					// Remove observingInfo
+					[observingInfos removeObject:observingInfo];
+				}
+			}];
+			
+			// Remove observedInfo
+			[observedInfos enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(NSDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
+				if ([observedInfo[REObserverObservingObjectPointerValueKey] pointerValue] == observer
+					&& [observedInfo[REObserverKeyPathKey] isEqualToString:keyPath]
+				){
+					// Remove observedInfo
+					[observedInfos removeObject:observedInfo];
+				}
+			}];
+		}];
+	}
+	
+	// Will change class?
+	BOOL willChangeClass;
+	willChangeClass = ([[self observedInfos] count] == 0); // Tests >>>
+	
+	// Call willChangeClass:
+	NSString *originalClassName;
+	if (willChangeClass) {
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		originalClassName = NSStringFromClass(REGetClass(self));
+		[self willChangeClass:NSStringFromClass(REGetSuperclass(self))];
+	}
+	
+	// original
+	[self REObserver_X_removeObserver:observer fromObjectsAtIndexes:indexes forKeyPath:keyPath];
+	
+	// Call didChangeClass:
+	if (willChangeClass) {
+		[self didChangeClass:originalClassName];
+		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	}
+}
+
++ (void)load
+{
+	@autoreleasepool {
+		// Exchange methods…
+		[self exchangeInstanceMethodsWithAdditiveSelectorPrefix:@"REObserver_X_" selectors:
+			@selector(addObserver:toObjectsAtIndexes:forKeyPath:options:context:),
+			@selector(removeObserver:fromObjectsAtIndexes:forKeyPath:),
+			nil
+		];
 	}
 }
 

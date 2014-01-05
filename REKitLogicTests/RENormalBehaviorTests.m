@@ -340,6 +340,73 @@
 	STAssertTrue(class6 == [NSObject class], @"");
 }
 
+- (void)test_KVONotifyingClassIsSubclassOfOriginalClass
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Make observers
+	id observer;
+	observer = [NSObject object];
+	
+	// Start observing
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Check class instance
+	STAssertEquals(class_getSuperclass(object_getClass(obj)), [NSObject class], @"");
+	STAssertEquals([object_getClass(obj) superclass], [NSObject class], @"");
+	
+	// Check meta class
+	STAssertEquals(class_getSuperclass(object_getClass(object_getClass(obj))), object_getClass([NSObject class]), @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"version"];
+}
+
+- (void)test_classOfKVONotifyingClassIsKVONotifyingClass
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Check
+	Class realClass;
+	realClass = object_getClass(obj);
+	STAssertEquals([realClass class], realClass, @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"version"];
+}
+
+- (void)test_superclassOfKVONotifyingObjectIsSuperclassOfOriginalClass
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Get originalClass and its superclass
+	Class originalClass, originalSuperclass;
+	originalClass = [obj class];
+	originalSuperclass = [obj superclass];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:nil];
+	
+	// Check
+	STAssertEquals([obj superclass], originalSuperclass, @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"version"];
+}
+
 - (void)test_metaClassIsChangedWhenStartingAndStoppingKVO
 {
 	// Make obj

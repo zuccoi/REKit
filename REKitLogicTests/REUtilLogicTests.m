@@ -59,7 +59,7 @@
 	expected = [NSSet setWithArray:@[[RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
 	
-	// Get subclasses of REREstObject
+	// Get subclasses of RETestObject
 	subclasses = [RESubclassesOfClass([RETestObject class], YES) filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Class aClass, NSDictionary *bindings) {
 		NSString *className;
 		className = NSStringFromClass(aClass);
@@ -83,7 +83,7 @@
 	obj = [RETestObject object];
 	
 	// Call willChangeClass
-	[obj willChangeClass:[NSArray class]];
+	[obj willChangeClass:NSStringFromClass([NSArray class])];
 	STAssertEquals(newClass, [NSArray class], @"");
 }
 
@@ -101,7 +101,7 @@
 	obj = [RETestObject object];
 	
 	// Call didChangeClass
-	[obj didChangeClass:[RETestObject class]];
+	[obj didChangeClass:NSStringFromClass([RETestObject class])];
 	STAssertEquals(oldClass, [RETestObject class], @"");
 }
 

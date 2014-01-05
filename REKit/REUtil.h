@@ -72,14 +72,15 @@ extern IMP REImplementationWithBacktraceDepth(int depth);
 //--------------------------------------------------------------//
 
 extern Class REGetClass(id receiver);
+extern Class REGetSuperclass(id receiver);
 extern Class REGetMetaClass(id receiver);
 NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 
 @interface NSObject (REUtil)
 
 // Class Exchange
-- (void)willChangeClass:(Class)toClass;
-- (void)didChangeClass:(Class)fromClass;
+- (void)willChangeClass:(NSString*)fromClassName;
+- (void)didChangeClass:(NSString*)toClassName;
 
 // Association
 + (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy;

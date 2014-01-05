@@ -128,14 +128,14 @@ Class object_setClass(id object, Class cls)
 	}
 	
 	// Call willChangeClass:
-	objc_msgSend(object, @selector(willChangeClass:), cls);
+	objc_msgSend(object, @selector(willChangeClass:), NSStringFromClass(cls));
 	
 	// original
 	Class oldClass;
 	oldClass = RE_X_object_setClass(object, cls);
 	
 	// Call didChangeClass:
-	objc_msgSend(object, @selector(didChangeClass:), oldClass);
+	objc_msgSend(object, @selector(didChangeClass:), NSStringFromClass(oldClass));
 	
 	return oldClass;
 }
@@ -154,6 +154,14 @@ Class REGetClass(id receiver)
 	else {
 		return receiver;
 	}
+}
+
+Class REGetSuperclass(id receiver) // Test >>>
+{
+	Class class;
+	class = REGetClass(receiver);
+	
+	return class_getSuperclass(class);
 }
 
 Class REGetMetaClass(id receiver)
@@ -219,27 +227,27 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 	
 	// Free classes
 	free(classes);
-	 
+	
 	return subclasses;
 }
 
 @implementation NSObject (REUtil)
 
-- (void)willChangeClass:(Class)toClass
+- (void)willChangeClass:(NSString*)toClassName
 {
 	// Post notification
 	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectWillChangeClassNotification object:self userInfo:@{
-		REObjectOldClassNameKey : NSStringFromClass([self class]),
-		REObjectNewClassNameKey : NSStringFromClass(toClass)
+		REObjectOldClassNameKey : NSStringFromClass(REGetClass(self)),
+		REObjectNewClassNameKey : (toClassName ? toClassName : @"")
 	}];
 }
 
-- (void)didChangeClass:(Class)fromClass
+- (void)didChangeClass:(NSString*)fromClassName
 {
 	// Post notification
 	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectDidChangeClassNotification object:self userInfo:@{
-		REObjectOldClassNameKey : NSStringFromClass(fromClass),
-		REObjectNewClassNameKey : NSStringFromClass([self class])
+		REObjectOldClassNameKey : (fromClassName ? fromClassName : @""),
+		REObjectNewClassNameKey : NSStringFromClass(REGetClass(self))
 	}];
 }
 

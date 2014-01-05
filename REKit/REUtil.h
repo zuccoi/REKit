@@ -8,6 +8,10 @@
 #import <objc/runtime.h>
 
 
+// Notifications
+extern NSString* const REObjectWillChangeClassNotification;
+extern NSString* const REObjectDidChangeClassNotification;
+
 // Keys for userInfo of notifications above
 extern NSString* const REObjectOldClassNameKey;
 extern NSString* const REObjectNewClassNameKey;

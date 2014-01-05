@@ -886,6 +886,27 @@
 	STAssertFalse([[RETestObject object] respondsToSelector:sel], @"");
 }
 
+- (void)test_receiverIsObject
+{
+	SEL sel = _cmd;
+	__block BOOL called = NO;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[RETestObject setBlockForInstanceMethod:sel key:Nil block:^(id receiver) {
+		STAssertEqualObjects(receiver, obj, @"");
+		[receiver removeCurrentBlock];
+		called = YES;
+	}];
+	
+	// Call
+	objc_msgSend(obj, sel);
+	STAssertTrue(called, @"");
+}
+
 - (void)test_supermethodPointsToNil
 {
 	SEL sel = @selector(log);

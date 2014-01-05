@@ -1590,22 +1590,25 @@
 	[obj setBlockForInstanceMethod:@selector(log) key:@"logBlock" block:^(id receiver) {
 		return @"Dynamic log";
 	}];
-	STAssertTrue([obj class] != [RETestObject class], @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertTrue(REGetClass(obj) != [RETestObject class], @"");
 	
 	// Record new class
 	Class newClass;
-	newClass = [obj class];
+	newClass = REGetClass(obj);
 	
 	// Add say method
 	[obj setBlockForInstanceMethod:@selector(say) key:@"sayBlock" block:^(id receiver) {
 		return @"Dynamic say";
 	}];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertEquals([obj class], [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 	
 	// Remove blocks
 	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
 	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 }
 
 - (void)test_doNotChangeClassFrequentlyWithOverrideBlockManagement
@@ -1618,22 +1621,25 @@
 	[obj setBlockForInstanceMethod:@selector(log) key:@"logBlock" block:^(id receiver) {
 		return @"Overridden log";
 	}];
-	STAssertTrue([obj class] != [RETestObject class], @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertTrue(REGetClass(obj) != [RETestObject class], @"");
 	
 	// Record new class
 	Class newClass;
-	newClass = [obj class];
+	newClass = REGetClass(obj);
 	
 	// Override say method
 	[obj setBlockForInstanceMethod:@selector(say) key:@"sayBlock" block:^(id receiver) {
 		return @"Overridden say";
 	}];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertEquals([obj class], [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 	
 	// Remove blocks
 	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
 	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
-	STAssertEquals([obj class], newClass, @"");
+	STAssertTrue([obj class] == [RETestObject class], @"");
+	STAssertEquals(REGetClass(obj), newClass, @"");
 }
 
 - (void)test_replacedClassIsKindOfOriginalClass

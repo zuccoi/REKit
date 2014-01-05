@@ -59,7 +59,7 @@
 	expected = [NSSet setWithArray:@[[RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
 	
-	// Get subclasses of RERestObject
+	// Get subclasses of RETestObject
 	subclasses = [RESubclassesOfClass([RETestObject class], YES) filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Class aClass, NSDictionary *bindings) {
 		NSString *className;
 		className = NSStringFromClass(aClass);
@@ -67,42 +67,6 @@
 	}]];
 	expected = [NSSet setWithArray:@[[RETestObject class], [RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
-}
-
-- (void)test_willChangeClass
-{
-	__block Class newClass = nil;
-	
-	// Register to notification center
-	[[NSNotificationCenter defaultCenter] addObserverForName:REObjectWillChangeClassNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-		newClass = NSClassFromString([note userInfo][REObjectNewClassNameKey]);
-	}];
-	
-	// Make obj
-	RETestObject *obj;
-	obj = [RETestObject object];
-	
-	// Call willChangeClass
-	[obj willChangeClass:NSStringFromClass([NSArray class])];
-	STAssertEquals(newClass, [NSArray class], @"");
-}
-
-- (void)test_didChangeClass
-{
-	__block Class oldClass = nil;
-	
-	// Register to notification center
-	[[NSNotificationCenter defaultCenter] addObserverForName:REObjectDidChangeClassNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-		oldClass = NSClassFromString([note userInfo][REObjectOldClassNameKey]);
-	}];
-	
-	// Make obj
-	RETestObject *obj;
-	obj = [RETestObject object];
-	
-	// Call didChangeClass
-	[obj didChangeClass:NSStringFromClass([RETestObject class])];
-	STAssertEquals(oldClass, [RETestObject class], @"");
 }
 
 @end

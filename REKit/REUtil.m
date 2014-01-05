@@ -235,20 +235,10 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 - (void)willChangeClass:(NSString*)toClassName
 {
-	// Post notification
-	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectWillChangeClassNotification object:self userInfo:@{
-		REObjectOldClassNameKey : NSStringFromClass(REGetClass(self)),
-		REObjectNewClassNameKey : (toClassName ? toClassName : @"")
-	}];
 }
 
 - (void)didChangeClass:(NSString*)fromClassName
 {
-	// Post notification
-	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectDidChangeClassNotification object:self userInfo:@{
-		REObjectOldClassNameKey : (fromClassName ? fromClassName : @""),
-		REObjectNewClassNameKey : NSStringFromClass(REGetClass(self))
-	}];
 }
 
 + (void)setAssociatedValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy

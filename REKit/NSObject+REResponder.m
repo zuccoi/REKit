@@ -479,7 +479,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass(originalClass)];
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
-			object_setClass(receiver, subclass);
+			object_setClass(receiver, subclass); // blocks is updated ?????
 		}
 		
 		// Get elements
@@ -612,6 +612,11 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 					return RESupermethod(NSClassFromString(originalClassName), receiver, @selector(classForCoder));
 				}
 			}];
+//			
+//			// Override didChangeClass: // >>>
+//			[receiver setBlockForInstanceMethod:@selector(didChangeClass:) key:nil block:^(id receiver, Class fromClass) {
+//				
+//			}];
 		}
 	}
 }

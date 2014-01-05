@@ -128,14 +128,14 @@ Class object_setClass(id object, Class cls)
 	}
 	
 	// Call willChangeClass:
-	objc_msgSend(object, @selector(willChangeClass:), cls);
+	objc_msgSend(object, @selector(willChangeClass:), NSStringFromClass(cls));
 	
 	// original
 	Class oldClass;
 	oldClass = RE_X_object_setClass(object, cls);
 	
 	// Call didChangeClass:
-	objc_msgSend(object, @selector(didChangeClass:), oldClass);
+	objc_msgSend(object, @selector(didChangeClass:), NSStringFromClass(oldClass));
 	
 	return oldClass;
 }
@@ -233,20 +233,20 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls)
 
 @implementation NSObject (REUtil)
 
-- (void)willChangeClass:(Class)toClass
+- (void)willChangeClass:(NSString*)toClassName
 {
 	// Post notification
 	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectWillChangeClassNotification object:self userInfo:@{
 		REObjectOldClassNameKey : NSStringFromClass(REGetClass(self)),
-		REObjectNewClassNameKey : NSStringFromClass(toClass)
+		REObjectNewClassNameKey : (toClassName ? toClassName : @"")
 	}];
 }
 
-- (void)didChangeClass:(Class)fromClass
+- (void)didChangeClass:(NSString*)fromClassName
 {
 	// Post notification
 	[[NSNotificationCenter defaultCenter] postNotificationName:REObjectDidChangeClassNotification object:self userInfo:@{
-		REObjectOldClassNameKey : NSStringFromClass(fromClass),
+		REObjectOldClassNameKey : (fromClassName ? fromClassName : @""),
 		REObjectNewClassNameKey : NSStringFromClass(REGetClass(self))
 	}];
 }

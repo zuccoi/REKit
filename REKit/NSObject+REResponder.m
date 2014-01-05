@@ -653,7 +653,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				// Replace
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
-				if (subImp == currentImp || subImp == REResponderForwardingMethod()) { // When subclass is NSKVONotifying_, subImp of test_dynamicBlockAfterKVO method is not currentImp (forward). So it is not replaced!!! Check class method of NSKVONotifying_REResponder_ class >>>
+				if (subImp == currentImp || subImp == REResponderForwardingMethod()) { // When subclass is NSKVONotifying_, subImp of test_dynamicBlockAddedAfterKVO method is not currentImp (forward). So it is not replaced!!! Check class method of NSKVONotifying_REResponder_ class >>>
 					class_replaceMethod(subclass, selector, imp, [objCTypes UTF8String]);
 				}
 			}

@@ -1880,7 +1880,7 @@
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
-- (void)test_dynamicBlockBeforeKVO
+- (void)test_dynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
 	
@@ -1910,7 +1910,7 @@
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_overrideBlockBeforeKVO
+- (void)test_overrideBlockAddedBeforeKVO
 {
 	SEL sel = @selector(classLog);
 	
@@ -1940,7 +1940,7 @@
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_dynamicBlockAfterKVO
+- (void)test_dynamicBlockAddedAfterKVO
 {
 	SEL sel = _cmd;
 	
@@ -1970,7 +1970,7 @@
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_overrideBlockAfterKVO
+- (void)test_overrideBlockAddedAfterKVO
 {
 	SEL sel = @selector(classLog);
 	
@@ -2000,7 +2000,7 @@
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_hasDynamicBlock__KVO
+- (void)test_hasDynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
 	
@@ -2031,7 +2031,7 @@
 	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
 }
 
-- (void)test_hasOverrideBlock__KVO
+- (void)test_hasOverrideBlockAddedBeforeKVO
 {
 	SEL sel = @selector(classLog);
 	
@@ -2060,6 +2060,16 @@
 	
 	// Check
 	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
+}
+
+- (void)test_hasDynamicBlockAddedAfterKVO
+{
+	// Not Implemented >>>
+}
+
+- (void)test_hasOverrideBlockAddedAfterKVO
+{
+	// Not Implemented >>>
 }
 
 - (void)test_supermethodOfDynamicBlockAddedBeforeKVO

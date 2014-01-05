@@ -17,6 +17,7 @@ static NSString* const kClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kClassMethodBlocksAssociationKey = @"REResponder_classMethodBlocks";
 static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_instanceMethodBlocks";
+static NSString* const kInstanceOfPrivateClassAssociationKey = @"REREsponder_instance";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 
@@ -259,10 +260,10 @@ NSMutableDictionary* REResponderGetBlocks(id receiver, REResponderOperation op, 
 	NSMutableDictionary *blocks;
 	NSString *key;
 	key = (op & REResponderOperationInstanceMethodMask ? kInstanceMethodBlocksAssociationKey : kClassMethodBlocksAssociationKey);
-	blocks = [REGetClass(receiver) associatedValueForKey:key];
+	blocks = [receiver associatedValueForKey:key];
 	if (!blocks && create) {
 		blocks = [NSMutableDictionary dictionary];
-		[REGetClass(receiver) setAssociatedValue:blocks forKey:key policy:OBJC_ASSOCIATION_RETAIN];
+		[receiver setAssociatedValue:blocks forKey:key policy:OBJC_ASSOCIATION_RETAIN];
 	}
 	
 	return blocks;
@@ -323,24 +324,45 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 			}];
 		};
 		
-		// Search blockInfo
+		// Search blockInfo of object
 		if (receiver != REGetClass(receiver)) {
 			blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationInstanceMethodOfObject, NO));
+			if (!blockInfo) {
+				blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationClassMethodOfObject, NO));
+			}
 		}
 		if (blockInfo) {
 			return blockInfo;
 		}
-		blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationClassMethodOfObject, NO));
-		if (blockInfo) {
-			return blockInfo;
-		}
-		blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationInstanceMethodOfClass, NO));
-		if (blockInfo) {
-			return blockInfo;
-		}
-//		blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationClassMethodOfClass, NO)); // Not needed 'cos blocks is associated with class instance
 		
-		return blockInfo;
+		// Search blockInfo of class
+		blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationInstanceMethodOfClass, NO));
+		if (!blockInfo) {
+			blockInfoBlock(REResponderGetBlocks(REGetClass(receiver), REResponderOperationClassMethodOfClass, NO));
+		}
+		if (blockInfo) {
+			return blockInfo;
+		}
+		
+		// Search blockInfo of instance associated with private class
+		Class class;
+		class = REGetClass(receiver);
+		while (class) {
+			id instance;
+			instance = [class associatedValueForKey:kInstanceOfPrivateClassAssociationKey];
+			if (instance) {
+				blockInfoBlock(REResponderGetBlocks(instance, REResponderOperationClassMethodOfObject, NO));
+				if (!blockInfo) {
+					blockInfoBlock(REResponderGetBlocks(instance, REResponderOperationInstanceMethodOfObject, NO));
+				}
+				if (blockInfo) {
+					return blockInfo;
+				}
+			}
+			class = REGetSuperclass(class);
+		}
+		
+		return nil;
 	}
 }
 
@@ -480,6 +502,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
 			object_setClass(receiver, subclass); // blocks is updated ?????
+			[REGetClass(receiver) setAssociatedValue:receiver forKey:kInstanceOfPrivateClassAssociationKey policy:OBJC_ASSOCIATION_ASSIGN];
 		}
 		
 		// Get elements
@@ -583,7 +606,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		};
 		[blockInfos addObject:blockInfo];
 		
-		// Override methods
+		// Override methods // Should I override using InstanceMethodOfClass ?????
 		if (originalClass) {
 			// Get originalClassName
 			NSString *originalClassName;

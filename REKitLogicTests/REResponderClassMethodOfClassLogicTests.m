@@ -417,12 +417,12 @@
 		return @"private";
 	}];
 	
-	[[obj class] setBlockForClassMethod:@selector(otherMethod) key:nil block:^(Class receiver) {
+	[REGetClass(obj) setBlockForClassMethod:@selector(otherMethod) key:nil block:^(Class receiver) {
 		return @"public";
 	}];
 	STAssertTrue([RETestObject respondsToSelector:@selector(otherMethod)], @"");
 	
-	STAssertEqualObjects(objc_msgSend([obj class], sel), @"private", @"");
+	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"private", @"");
 	STAssertEqualObjects(objc_msgSend([RETestObject class], @selector(otherMethod)), @"public", @"");
 }
 
@@ -2000,7 +2000,7 @@
 	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"block", @"");
 }
 
-- (void)test_hasDynamicBlockForInstanceMethod__KVO
+- (void)test_hasDynamicBlock__KVO
 {
 	SEL sel = _cmd;
 	
@@ -2031,7 +2031,7 @@
 	STAssertTrue([RETestObject hasBlockForClassMethod:sel key:@"key"], @"");
 }
 
-- (void)test_hasOverrideBlockForInstanceMethod__KVO
+- (void)test_hasOverrideBlock__KVO
 {
 	SEL sel = @selector(classLog);
 	

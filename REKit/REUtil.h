@@ -71,9 +71,9 @@ extern IMP REImplementationWithBacktraceDepth(int depth);
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
-extern Class REGetClass(id receiver);
-extern Class REGetSuperclass(id receiver);
-extern Class REGetMetaClass(id receiver);
+Class REGetClass(id receiver);
+Class REGetSuperclass(id receiver);
+Class REGetMetaClass(id receiver);
 NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 
 @interface NSObject (REUtil)

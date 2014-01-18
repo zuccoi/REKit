@@ -344,6 +344,7 @@ NSDictionary* REResponderGetBlockInfoForSelector(id receiver, SEL selector, id k
 
 NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger returnAddress, NSMutableArray **outBlockInfos, SEL *outSelector)
 {
+// Use cache >>>
 	@synchronized (receiver) {
 		// Get blockInfo 
 		__block NSDictionary *blockInfo = nil;
@@ -382,8 +383,6 @@ NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger r
 				}];
 			}];
 		};
-		
-		// Should I search all blocks ?????
 		
 		// Get class
 		Class class;

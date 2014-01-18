@@ -9,7 +9,7 @@
 #define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
 #define RESupermethod(defaultValue, receiver, selector, ...) \
 	^{\
-		IMP supermethod = REResponderGetSupermethodWithImp(receiver, REImplementationWithBacktraceDepth(2));\
+		IMP supermethod = [receiver supermethodOfCurrentBlock];\
 		if (supermethod) {\
 			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))supermethod)(receiver, selector, ##__VA_ARGS__);\
 		}\
@@ -38,6 +38,8 @@
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
 
 // Current Block Management (Call from Block)
++ (IMP)supermethodOfCurrentBlock; // Private ?????
+- (IMP)supermethodOfCurrentBlock; // Private ?????
 + (void)removeCurrentBlock;
 - (void)removeCurrentBlock;
 

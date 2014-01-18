@@ -51,37 +51,6 @@ void* REBlockGetImplementation(id block)
 
 
 //--------------------------------------------------------------//
-#pragma mark - IMP
-//--------------------------------------------------------------//
-
-IMP REImplementationWithBacktraceDepth(int depth)
-{
-	// Get trace
-	int num;
-	void *trace[depth + 1];
-	num = backtrace(trace, (depth + 1));
-	if (num < (depth + 1)) {
-		return NULL;
-	}
-	
-	// Get imp
-	IMP imp;
-	Dl_info callerInfo;
-	if (!dladdr(trace[depth], &callerInfo)) {
-		NSLog(@"ERROR: Failed to get callerInfo with error:%s «%s-%d", dlerror(), __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	imp = callerInfo.dli_saddr;
-	if (!imp) {
-		NSLog(@"ERROR: Failed to get imp from callerInfo «%s-%d", __PRETTY_FUNCTION__, __LINE__);
-		return NULL;
-	}
-	
-	return imp;
-}
-
-
-//--------------------------------------------------------------//
 #pragma mark - NSMethodSignature
 //--------------------------------------------------------------//
 

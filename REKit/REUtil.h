@@ -51,13 +51,6 @@ extern void* REBlockGetImplementation(id block);
 
 
 //--------------------------------------------------------------//
-#pragma mark - IMP
-//--------------------------------------------------------------//
-
-extern IMP REImplementationWithBacktraceDepth(int depth);
-
-
-//--------------------------------------------------------------//
 #pragma mark - NSMethodSignature
 //--------------------------------------------------------------//
 

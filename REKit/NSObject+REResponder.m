@@ -701,7 +701,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		NSDictionary *oldBlockInfo;
 		IMP oldImp;
 		IMP currentImp;
-		Class class, metaClass, superclass;
+		Class class, superclass;
 		class = REGetClass(receiver);
 		while (class) {
 			if (![NSStringFromClass(class) hasPrefix:@"NSKVONotifying_"]) {
@@ -709,7 +709,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			}
 			class = REGetSuperclass(class);
 		}
-		metaClass = REGetMetaClass(class);
 		superclass = REGetSuperclass(class);
 		blocks = REResponderGetBlocks(receiver, op, YES);
 		oldBlockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
@@ -827,10 +826,9 @@ void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, N
 		if (blockInfo == [blockInfos lastObject]) {
 			// Get elements
 			const char *objCTypes;
-			Class class, metaClass;
+			Class class;
 			objCTypes = [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes];
 			class = REGetClass(receiver);
-			metaClass = REGetMetaClass(receiver);
 			
 			// Replace method of receiver
 			REResponderReplaceImp(class, selector, supermethod, objCTypes, op);

@@ -565,6 +565,43 @@ IMP REResponderGetSupermethodWithImp(id receiver, IMP imp) // Needed ?????
 	return supermethod;
 }
 
+IMP REResponderReplaceImp(id receiver, SEL selector, IMP imp, const char *objCTypes, REResponderOperation op)
+{
+	// Get class
+	Class class;
+	Class metaClass;
+	class = REGetClass(receiver);
+	metaClass = REGetMetaClass(receiver);
+	
+	// Get oldImp
+	IMP originalImp = NULL;
+	if (op & REResponderOperationInstanceMethodMask) {
+		originalImp = [class instanceMethodForSelector:selector];
+	}
+	else {
+		originalImp = [class methodForSelector:selector];
+	}
+	
+	// Replace method
+	if (op & REResponderOperationInstanceMethodMask) {
+		// Get originalClassImp
+		IMP originalClassImp;
+		originalClassImp = [class methodForSelector:selector];
+		
+		// Replace
+		class_replaceMethod(class, selector, imp, objCTypes);
+		
+		// Revert class method
+		class_replaceMethod(metaClass, selector, originalClassImp, objCTypes);
+	}
+	else {
+		// Replace
+		class_replaceMethod(metaClass, selector, imp, objCTypes);
+	}
+	
+	return originalImp;
+}
+
 void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block, REResponderOperation op)
 {
 	// Filter
@@ -707,20 +744,10 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			[blocks setObject:blockInfos forKey:selectorName];
 		}
 		
-		// Get originalClassImp
-		IMP originalClassImp;
-		originalClassImp = [class methodForSelector:selector];
-		if (originalClassImp == [superclass methodForSelector:selector]) {
-			originalClassImp = NULL;
-		}
-		
 		// Replace method
 		IMP imp;
 		imp = imp_implementationWithBlock(block);
-		class_replaceMethod((op & REResponderOperationInstanceMethodMask ? class : metaClass), selector, imp, [objCTypes UTF8String]);
-		if (op & REResponderOperationInstanceMethodMask && originalClassImp) {
-			class_replaceMethod(metaClass, selector, originalClassImp, [objCTypes UTF8String]);
-		}
+		REResponderReplaceImp(class, selector, imp, [objCTypes UTF8String], op);
 		
 		// Replace method of subclasses
 		if (op & REResponderOperationInstanceMethodMask) {
@@ -729,7 +756,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				IMP subImp;
 				subImp = [subclass instanceMethodForSelector:selector];
 				if (subImp == currentImp || subImp == REResponderForwardingMethod()) { // When subclass is NSKVONotifying_, subImp of test_dynamicBlockAddedAfterKVO method is not currentImp (forward). So it is not replaced!!! Check class method of NSKVONotifying_REResponder_ class >>>
-					class_replaceMethod(subclass, selector, imp, [objCTypes UTF8String]);
+					REResponderReplaceImp(subclass, selector, imp, [objCTypes UTF8String], op);
 				}
 			}
 		}
@@ -739,7 +766,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				IMP subImp;
 				subImp = [subclass methodForSelector:selector];
 				if (subImp == currentImp || subImp == REResponderForwardingMethod()) {
-					class_replaceMethod(REGetMetaClass(subclass), selector, imp, [objCTypes UTF8String]);
+					REResponderReplaceImp(subclass, selector, imp, [objCTypes UTF8String], op);
 				}
 			}
 		}
@@ -806,20 +833,20 @@ void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, N
 			metaClass = REGetMetaClass(receiver);
 			
 			// Replace method of receiver
-			class_replaceMethod((op & REResponderOperationInstanceMethodMask ? class : metaClass), selector, supermethod, objCTypes);
+			REResponderReplaceImp(class, selector, supermethod, objCTypes, op);
 			
 			// Replace method of subclasses
 			if (op & REResponderOperationInstanceMethodMask) {
 				for (Class subclass in RESubclassesOfClass(class, NO)) {
 					if ([subclass instanceMethodForSelector:selector] == imp) {
-						class_replaceMethod(subclass, selector, supermethod, objCTypes);
+						REResponderReplaceImp(subclass, selector, supermethod, objCTypes, op);
 					}
 				}
 			}
 			else {
 				for (Class subclass in RESubclassesOfClass(class, NO)) {
 					if ([subclass methodForSelector:selector] == imp) {
-						class_replaceMethod(object_getClass(subclass), selector, supermethod, objCTypes);
+						REResponderReplaceImp(subclass, selector, supermethod, objCTypes, op);
 					}
 				}
 			}

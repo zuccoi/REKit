@@ -1038,8 +1038,41 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 }
 
 //--------------------------------------------------------------//
-#pragma mark -- Current Block Management --
+#pragma mark -- Current Block --
 //--------------------------------------------------------------//
+
+IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
+{
+	// Optimize >>>
+	
+	// Get elements
+	NSDictionary *blockInfo;
+	IMP imp;
+	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, nil, nil);
+	imp = [blockInfo[kBlockInfoImpKey] pointerValue];
+	
+	return REResponderGetSupermethodWithImp(receiver, imp);
+}
+
++ (IMP)supermethodOfCurrentBlock
+{
+	// Filter
+	if (self != REGetClass(self)) {
+		return NULL;
+	}
+	
+	return REResponderGetSupermethod(self, __builtin_return_address(0));
+}
+
+- (IMP)supermethodOfCurrentBlock
+{
+	// Filter
+	if (self == REGetClass(self)) {
+		return NULL;
+	}
+	
+	return REResponderGetSupermethod(self, __builtin_return_address(0));
+}
 
 void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
 {
@@ -1189,41 +1222,6 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 
 @end
 
-#pragma mark -
-
-
-@interface NSObject (REResponderPrivate)
-+ (IMP)supermethodOfCurrentBlock;
-@end
-
-@implementation NSObject (REResponderPrivate)
-
-IMP REResponderGetSupermethodWithReturnAddress(id receiver, NSUInteger returnAddress)
-{
-	// Optimize >>>
-	
-	// Get elements
-	NSDictionary *blockInfo;
-	IMP imp;
-	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, nil, nil);
-	imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-	
-	return REResponderGetSupermethodWithImp(receiver, imp);
-}
-
-+ (IMP)supermethodOfCurrentBlock
-{
-	// Optimize >>>
-	
-	// Filter
-	if (self != REGetClass(self)) {
-		return NULL;
-	}
-	
-	return REResponderGetSupermethodWithReturnAddress(self, __builtin_return_address(0));
-}
-
-@end
 
 #pragma mark -
 
@@ -1243,18 +1241,6 @@ IMP REResponderGetSupermethodWithReturnAddress(id receiver, NSUInteger returnAdd
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
 	[self removeBlockForInstanceMethod:selector key:key];
-}
-
-- (IMP)supermethodOfCurrentBlock
-{
-	// Optimize >>>
-	
-	// Filter
-	if (self == REGetClass(self)) {
-		return NULL;
-	}
-	
-	return REResponderGetSupermethodWithReturnAddress(self, __builtin_return_address(0));
 }
 
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated))

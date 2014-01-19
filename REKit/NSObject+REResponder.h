@@ -37,9 +37,9 @@
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key; // Needed ?????
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
 
-// Current Block Management (Call from Block)
-+ (IMP)supermethodOfCurrentBlock; // Private ?????
-- (IMP)supermethodOfCurrentBlock; // Private ?????
+// Methods intended to be called in Block
++ (IMP)supermethodOfCurrentBlock;
+- (IMP)supermethodOfCurrentBlock;
 + (void)removeCurrentBlock;
 - (void)removeCurrentBlock;
 
@@ -60,6 +60,5 @@ extern IMP REResponderGetSupermethodWithImp(id receiver, IMP imp);
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
-- (IMP)supermethodOfCurrentBlock __attribute__((deprecated));
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
 @end

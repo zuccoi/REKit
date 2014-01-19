@@ -21,7 +21,7 @@ static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_insta
 static NSString* const kInstanceOfPrivateClassAssociationKey = @"REResponder_instance";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
-static NSString* const kIsChangingClassByItselfAssociationKey = @"REResponder_isChangingClassByItself"; // Tests >>>
+static NSString* const kIsChangingClassBySelfAssociationKey = @"REResponder_isChangingClassBySelf"; // Tests >>>
 static NSString* const kIsChangingClassAssociationKey = @"REResponder_isChangingClass"; // Tests >>>
 
 // Keys for protocolInfo
@@ -180,7 +180,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 
 - (void)REResponder_X_willChangeClass:(NSString*)toClassName
 {
-	if (![self REResponder_isChangingClassByItself]
+	if (![self REResponder_isChangingClassBySelf]
 		&& ![[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue]
 	){
 		[self setAssociatedValue:@(YES) forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -194,7 +194,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 
 - (void)REResponder_X_didChangeClass:(NSString*)fromClassName
 {
-	if (![self REResponder_isChangingClassByItself]) {
+	if (![self REResponder_isChangingClassBySelf]) {
 		// Not Implemented >>>
 	}
 	
@@ -284,16 +284,16 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 #pragma mark -- Util --
 //--------------------------------------------------------------//
 
-- (BOOL)REResponder_isChangingClassByItself
+- (BOOL)REResponder_isChangingClassBySelf
 {
-	return [[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue];
+	return [[self associatedValueForKey:kIsChangingClassBySelfAssociationKey] boolValue];
 }
 
-- (void)REResponder_setChangingClassByItself:(BOOL)flag
+- (void)REResponder_setChangingClassBySelf:(BOOL)flag
 {
 	id value;
 	value = (flag ? @(YES) : nil);
-	[self setAssociatedValue:value forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	[self setAssociatedValue:value forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 }
 
 //--------------------------------------------------------------//
@@ -666,9 +666,9 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			className = [NSString stringWithFormat:@"%@(%@_%@)", NSStringFromClass(originalClass), kPrivateClassNamePrefix, REUUIDString()];
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
-			[receiver REResponder_setChangingClassByItself:YES];
+			[receiver REResponder_setChangingClassBySelf:YES];
 			object_setClass(receiver, subclass);
-			[receiver REResponder_setChangingClassByItself:NO];
+			[receiver REResponder_setChangingClassBySelf:NO];
 			[REGetClass(receiver) setAssociatedValue:receiver forKey:kInstanceOfPrivateClassAssociationKey policy:OBJC_ASSOCIATION_ASSIGN];
 			
 			// Get originalClassName

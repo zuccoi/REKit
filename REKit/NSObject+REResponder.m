@@ -210,7 +210,6 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 	@autoreleasepool {
 		@synchronized (self) {
 			// Reset
-			[self setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			if (REResponderIsPrivateClass(self)) {
 				// Remove blocks
 				NSDictionary *blocks;
@@ -222,7 +221,6 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 						[self removeBlockForClassMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 					}
 				}];
-				[REGetClass(self) setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
 				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
 					while ([blockInfos count]) {
@@ -231,7 +229,6 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 						[self removeBlockForInstanceMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
 					}
 				}];
-				[REGetClass(self) setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				
 				// Dispose classes later
 				NSString *className;
@@ -240,6 +237,8 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					Class class;
 					class = NSClassFromString(className);
 					for (Class aClass in RESubclassesOfClass(class, NO)) {
+						[class setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+						[class setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 						objc_disposeClassPair(aClass);
 					}
 					objc_disposeClassPair(class);

@@ -183,9 +183,36 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 	if (![self REResponder_isChangingClassBySelf]
 		&& ![[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue]
 	){
+		// Raise flag
 		[self setAssociatedValue:@(YES) forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		
-		// Not Implemented >>>
+		// Revert instance blocks // Revert class methods too ?????
+		if (REResponderIsPrivateClass(self)) {
+			BOOL hadObserver;
+			BOOL haveObserver;
+			hadObserver = [NSStringFromClass(REGetClass(self)) hasPrefix:@"NSKVONotifying_"];
+			haveObserver = [toClassName hasPrefix:@"NSKVONotifying_"];
+			if (hadObserver != haveObserver) {
+				NSDictionary *blocks;
+				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
+				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+					// Filter
+					if (![blockInfos count]) {
+						return;
+					}
+					
+					// Get originalImp
+					IMP originalImp;
+					NSDictionary *firstBlockInfo;
+					firstBlockInfo = [blockInfos firstObject];
+					originalImp = REResponderGetSupermethodWithImp(self, [firstBlockInfo[kBlockInfoImpKey] pointerValue]);
+					if (!originalImp) {
+						originalImp = REResponderForwardingMethod();
+					}
+					REResponderReplaceImp(self, NSSelectorFromString(selectorName), originalImp, [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes], REResponderOperationInstanceMethodOfObject);
+				}];
+			}
+		}
 	}
 	
 	// original
@@ -208,9 +235,13 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 - (void)REResponder_X_dealloc
 {
 	@autoreleasepool {
+		// Reset
 		@synchronized (self) {
-			// Reset
 			if (REResponderIsPrivateClass(self)) {
+				// Get className
+				NSString *className;
+				className = NSStringFromClass(REGetClass(self));
+				
 				// Remove protocols
 				[self setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				
@@ -227,17 +258,22 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				[self setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
 				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
-					while ([blockInfos count]) {
-						NSDictionary *blockInfo;
-						blockInfo = [blockInfos lastObject];
-						[self removeBlockForInstanceMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
+					if (![selectorName isEqualToString:@"class"]) {
+						while ([blockInfos count]) {
+							NSDictionary *blockInfo;
+							blockInfo = [blockInfos lastObject];
+							[self removeBlockForInstanceMethod:NSSelectorFromString(selectorName) key:blockInfo[kBlockInfoKeyKey]];
+						}
 					}
 				}];
+				while ([blocks[@"class"] count]) {
+					NSDictionary *blockInfo;
+					blockInfo = [blocks[@"class"] lastObject];
+					[self removeBlockForInstanceMethod:@selector(class) key:blockInfo[kBlockInfoKeyKey]];
+				}
 				[self setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				
 				// Dispose classes later
-				NSString *className;
-				className = NSStringFromClass(REGetClass(self));
 				dispatch_async(dispatch_get_main_queue(), ^{
 					Class class;
 					class = NSClassFromString(className);
@@ -251,10 +287,10 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				});
 			}
 		}
+		
+		// original
+		[self REResponder_X_dealloc];
 	}
-	
-	// original
-	[self REResponder_X_dealloc];
 }
 
 + (void)load
@@ -675,10 +711,14 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			NSString *originalClassName;
 			originalClassName = NSStringFromClass(originalClass);
 			
-			// Override class
-			[receiver setBlockForInstanceMethod:@selector(class) key:nil block:^(id receiver) {
+			// Override _isKVOA method to avoid class change >>>
+			
+			// Override class method
+			Class (^classBlock)(id receiver);
+			classBlock = ^(id receiver) {
 				return NSClassFromString(originalClassName);
-			}];
+			};
+			REResponderSetBlockForSelector(receiver, @selector(class), nil, classBlock, REResponderOperationInstanceMethodOfObject);
 			
 			// Override classForCoder // Test >>>
 			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
@@ -698,12 +738,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		IMP currentImp;
 		Class class, superclass;
 		class = REGetClass(receiver);
-		while (class) {
-			if (![NSStringFromClass(class) hasPrefix:@"NSKVONotifying_"]) {
-				break;
-			}
-			class = REGetSuperclass(class);
-		}
 		superclass = REGetSuperclass(class);
 		blocks = REResponderGetBlocks(receiver, op, YES);
 		oldBlockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);

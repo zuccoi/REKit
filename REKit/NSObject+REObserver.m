@@ -344,10 +344,10 @@ NSString* const REObserverContainerKey = @"container";
 	[self setAssociatedValue:nil forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 }
 
-- (void)REObserver_X_release
+- (void)REObserver_X_dealloc
 {
-	@synchronized (self) {
-		if ([self retainCount] == 1) {
+	@autoreleasepool {
+		@synchronized (self) {
 			// Stop observing
 			[self stopObserving];
 			
@@ -372,7 +372,7 @@ NSString* const REObserverContainerKey = @"container";
 		}
 		
 		// original
-		[self REObserver_X_release];
+		[self REObserver_X_dealloc];
 	}
 }
 
@@ -387,7 +387,7 @@ NSString* const REObserverContainerKey = @"container";
 			@selector(removeObserver:forKeyPath:context:),
 			@selector(willChangeClass:),
 			@selector(didChangeClass:),
-			@selector(release),
+			@selector(dealloc),
 			nil
 		];
 	}

@@ -958,10 +958,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, sel);
-			}
+			RESupermethod(nil, receiver, sel);
 		}];
 	}
 	
@@ -991,10 +988,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			IMP supermethod;
-			if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
-				supermethod(receiver, sel);
-			}
+			RESupermethod(nil, receiver, sel);
 		}];
 	}
 	

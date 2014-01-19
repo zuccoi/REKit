@@ -201,7 +201,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 						return;
 					}
 					
-					// Get originalImp
+					// Revert to originalImp
 					IMP originalImp;
 					NSDictionary *firstBlockInfo;
 					firstBlockInfo = [blockInfos firstObject];
@@ -222,7 +222,20 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 - (void)REResponder_X_didChangeClass:(NSString*)fromClassName
 {
 	if (![self REResponder_isChangingClassBySelf]) {
-		// Not Implemented >>>
+		// Restore instance blocks
+		NSDictionary *blocks;
+		blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
+		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+			// Filter
+			if (![blockInfos count]) {
+				return;
+			}
+			
+			// Apply newestImp
+			IMP newestImp;
+			newestImp = [[blockInfos lastObject][kBlockInfoImpKey] pointerValue];
+			REResponderReplaceImp(self, NSSelectorFromString(selectorName), newestImp, [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes], REResponderOperationInstanceMethodOfObject);
+		}];
 	}
 	
 	// original

@@ -674,17 +674,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				return NSClassFromString(originalClassName);
 			}];
 			
-			// Override classForCoder
+			// Override classForCoder // Test >>>
 			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
-				IMP superImp;
-				Class realSuperclass;
-				realSuperclass = REGetSuperclass(receiver);
-				superImp = (IMP)class_getInstanceMethod(realSuperclass, @selector(classForCoder));
-				if (superImp) {
-					return (REIMP(Class)superImp)(receiver, @selector(classForCoder));
-				}
-				else {
-					return RESupermethod(NSClassFromString(originalClassName), receiver, @selector(classForCoder));
+				IMP imp;
+				imp = method_getImplementation(class_getInstanceMethod(NSClassFromString(originalClassName), @selector(classForCoder)));
+				if (imp) {
+					(REIMP(Class)imp)(receiver, @selector(classForCoder));
 				}
 			}];
 		}

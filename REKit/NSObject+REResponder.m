@@ -245,11 +245,11 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 	[self setAssociatedValue:nil forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 }
 
-- (void)REResponder_X_release
+- (void)REResponder_X_dealloc
 {
-	@synchronized (self) {
-		if ([self retainCount] == 1) {
-			// Reset
+	@autoreleasepool {
+		// Reset
+		@synchronized (self) {
 			if (REResponderIsPrivateClass(self)) {
 				// Get className
 				NSString *className;
@@ -302,7 +302,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		}
 		
 		// original
-		[self REResponder_X_release];
+		[self REResponder_X_dealloc];
 	}
 }
 
@@ -323,7 +323,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			@selector(respondsToSelector:),
 			@selector(willChangeClass:),
 			@selector(didChangeClass:),
-			@selector(release),
+			@selector(dealloc),
 			nil
 		];
 	}

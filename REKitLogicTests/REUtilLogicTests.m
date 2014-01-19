@@ -54,7 +54,7 @@
 	subclasses = [RESubclassesOfClass([RETestObject class], NO) filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Class aClass, NSDictionary *bindings) {
 		NSString *className;
 		className = NSStringFromClass(aClass);
-		return (![className hasPrefix:@"REResponder_"] && ![className hasPrefix:@"NSKVONotifying_"]);
+		return ([className rangeOfString:@"REResponder"].location == NSNotFound && ![className hasPrefix:@"NSKVONotifying_"]);
 	}]];
 	expected = [NSSet setWithArray:@[[RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");
@@ -63,7 +63,7 @@
 	subclasses = [RESubclassesOfClass([RETestObject class], YES) filteredSetUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Class aClass, NSDictionary *bindings) {
 		NSString *className;
 		className = NSStringFromClass(aClass);
-		return (![className hasPrefix:@"REResponder_"] && ![className hasPrefix:@"NSKVONotifying_"]);
+		return ([className rangeOfString:@"REResponder"].location == NSNotFound && ![className hasPrefix:@"NSKVONotifying_"]);
 	}]];
 	expected = [NSSet setWithArray:@[[RETestObject class], [RESubTestObject class]]];
 	STAssertEqualObjects(subclasses, expected, @"");

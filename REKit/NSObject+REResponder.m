@@ -658,7 +658,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			NSString *className;
 			Class originalClass;
 			originalClass = [receiver class]; // Use class method to avoid getting NSKVONotifying_ class
-			className = [NSString stringWithFormat:@"%@_%@(%@)", kPrivateClassNamePrefix, NSStringFromClass(originalClass), REUUIDString()];
+			className = [NSString stringWithFormat:@"%@(%@_%@)", NSStringFromClass(originalClass), kPrivateClassNamePrefix, REUUIDString()];
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
 			[receiver REResponder_setChangingClassByItself:YES];

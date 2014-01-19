@@ -2178,6 +2178,62 @@
 	STAssertEquals(rect, CGRectMake(10.0, 20.0, 30.0, 40.0), @"");
 }
 
+- (void)test_KVODoesNotChangeClassImarginary
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Add block
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Check
+	STAssertEqualObjects(NSStringFromClass([obj class]), @"RETestObject", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
+}
+
+- (void)test_REResponderDoesNotChangeClassImaginary
+{
+	SEL sel = _cmd;
+	
+	// Make obj
+	id obj;
+	obj = [RETestObject object];
+	
+	// Start observing
+	id observer;
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"name" options:0 context:nil];
+	
+	// Add block
+	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
+		return @"block";
+	}];
+	
+	// Check
+	STAssertEqualObjects(NSStringFromClass([obj class]), @"RETestObject", @"");
+	
+	// Stop observing
+	[obj removeObserver:observer forKeyPath:@"name"];
+	
+	// Check
+	STAssertEqualObjects(objc_msgSend(obj, sel), @"block", @"");
+}
+
 - (void)test_dynamicBlockAddedBeforeKVO
 {
 	SEL sel = _cmd;
@@ -2415,7 +2471,7 @@
 //IMP observedImp;
 //observedImp = [obj methodForSelector:sel];
 //NSLog(@"observedImp = %p", observedImp);
-//NSLog(@"obj class = %@", NSStringFromClass([obj class]));
+//NSLog(@"obj class = %@", NSStringFromClass([obj class])); // REResponder_RETestObject(E85BBBA0-1998-4DB6-915D-7DAA56A8B4C6) !!!
 //NSLog(@"obj superclass = %@", NSStringFromClass([obj superclass]));
 //	
 //	// Add block
@@ -2444,7 +2500,7 @@
 //	// Check
 //	STAssertEqualObjects(objc_msgSend(obj, sel), @"12", @"");
 //}
-//
+
 // ?????
 //- (void)test_supermethodOfOverrideBlockAddedBeforeKVO
 //{

@@ -15,7 +15,7 @@
 // Constants
 static NSString* const kObservingInfosAssociationKey = @"REObserver_observingInfos";
 static NSString* const kObservedInfosAssociationKey = @"REObserver_observedInfos";
-static NSString* const kIsChangingClassByItselfAssociationKey = @"REObserver_isChangingClassByItself"; // Tests >>>
+static NSString* const kIsChangingClassBySelfAssociationKey = @"REObserver_isChangingClassBySelf"; // Tests >>>
 static NSString* const kIsChangingClassAssociationKey = @"REObserver_isChangingClass"; // Tests >>>
 
 // Keys for observing/observedInfo
@@ -106,7 +106,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Call willChangeClass:
 	if (willChange) {
-		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
 	}
 	
@@ -116,7 +116,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Call didChangeClass:
 	if (willChange) {
 		[self didChangeClass:originalClassName];
-		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 	}
 }
 
@@ -193,7 +193,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Call willChangeClass:
 	if (willChangeClass) {
-		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		originalClassName = NSStringFromClass(REGetClass(self));
 		[self willChangeClass:NSStringFromClass(REGetSuperclass(self))];
 	}
@@ -204,7 +204,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Call didChangeClass:
 	if (willChangeClass) {
 		[self didChangeClass:originalClassName];
-		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 	}
 }
 
@@ -254,7 +254,7 @@ NSString* const REObserverContainerKey = @"container";
 			
 			// Call willChangeClass:
 			if (willChangeClass) {
-				[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				originalClassName = NSStringFromClass(REGetClass(self));
 				[self willChangeClass:NSStringFromClass(REGetSuperclass(self))];
 			}
@@ -265,7 +265,7 @@ NSString* const REObserverContainerKey = @"container";
 			// Call didChangeClass:
 			if (willChangeClass) {
 				[self didChangeClass:originalClassName];
-				[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+				[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 			}
 		}
 	}
@@ -278,7 +278,7 @@ NSString* const REObserverContainerKey = @"container";
 - (void)REObserver_X_willChangeClass:(NSString*)toClassName
 {
 	// Remove observers
-	if (![[self associatedValueForKey:kIsChangingClassByItselfAssociationKey] boolValue]
+	if (![[self associatedValueForKey:kIsChangingClassBySelfAssociationKey] boolValue]
 		&& ![[self associatedValueForKey:kIsChangingClassAssociationKey] boolValue]
 	){
 		[self setAssociatedValue:@(YES) forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
@@ -310,7 +310,7 @@ NSString* const REObserverContainerKey = @"container";
 
 - (void)REObserver_X_didChangeClass:(NSString*)fromClassName
 {
-	if (![[self associatedValueForKey:kIsChangingClassByItselfAssociationKey] boolValue]) {
+	if (![[self associatedValueForKey:kIsChangingClassBySelfAssociationKey] boolValue]) {
 		// Add observers removed in willChangeClass: method
 		[[self observedInfos] enumerateObjectsUsingBlock:^(NSMutableDictionary *observedInfo, NSUInteger idx, BOOL *stop) {
 			// Get elements
@@ -344,10 +344,10 @@ NSString* const REObserverContainerKey = @"container";
 	[self setAssociatedValue:nil forKey:kIsChangingClassAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 }
 
-- (void)REObserver_X_release
+- (void)REObserver_X_dealloc
 {
-	@synchronized (self) {
-		if ([self retainCount] == 1) {
+	@autoreleasepool {
+		@synchronized (self) {
 			// Stop observing
 			[self stopObserving];
 			
@@ -372,7 +372,7 @@ NSString* const REObserverContainerKey = @"container";
 		}
 		
 		// original
-		[self REObserver_X_release];
+		[self REObserver_X_dealloc];
 	}
 }
 
@@ -387,7 +387,7 @@ NSString* const REObserverContainerKey = @"container";
 			@selector(removeObserver:forKeyPath:context:),
 			@selector(willChangeClass:),
 			@selector(didChangeClass:),
-			@selector(release),
+			@selector(dealloc),
 			nil
 		];
 	}
@@ -582,7 +582,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Call willChangeClass:
 	if (willChange) {
-		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
 	}
 	
@@ -592,7 +592,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Call didChangeClass:
 	if (willChange) {
 		[self didChangeClass:originalClassName];
-		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 	}
 }
 
@@ -642,7 +642,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Call willChangeClass:
 	NSString *originalClassName;
 	if (willChangeClass) {
-		[self setAssociatedValue:@(YES) forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 		originalClassName = NSStringFromClass(REGetClass(self));
 		[self willChangeClass:NSStringFromClass(REGetSuperclass(self))];
 	}
@@ -653,7 +653,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Call didChangeClass:
 	if (willChangeClass) {
 		[self didChangeClass:originalClassName];
-		[self setAssociatedValue:nil forKey:kIsChangingClassByItselfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 	}
 }
 

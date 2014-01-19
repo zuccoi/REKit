@@ -16,6 +16,7 @@
 
 @implementation REResponderClassMethodOfObjectTests
 
+#if 0
 - (void)_resetClasses
 {
 	// Reset all classes
@@ -2630,5 +2631,7 @@
 //	STAssertEqualObjects(objc_msgSend(REGetClass(obj), sel), @"classLog12", @"");
 //	STAssertEqualObjects(objc_msgSend(object_getClass(obj), sel), @"classLog12", @"");
 //}
+
+#endif
 
 @end

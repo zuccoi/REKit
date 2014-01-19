@@ -1615,6 +1615,8 @@
 	}];
 	STAssertTrue([obj class] == [RETestObject class], @"");
 	STAssertTrue(REGetClass(obj) != [RETestObject class], @"");
+	STAssertTrue([obj superclass] == [RETestObject superclass], @"");
+	STAssertTrue(REGetSuperclass(obj) != [RETestObject superclass], @"");
 	
 	// Record new class
 	Class newClass;
@@ -1626,12 +1628,14 @@
 	}];
 	STAssertEquals([obj class], [RETestObject class], @"");
 	STAssertEquals(REGetClass(obj), newClass, @"");
+	STAssertTrue([obj superclass] == [RETestObject superclass], @"");
 	
 	// Remove blocks
 	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
 	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
 	STAssertTrue([obj class] == [RETestObject class], @"");
 	STAssertEquals(REGetClass(obj), newClass, @"");
+	STAssertTrue([obj superclass] == [RETestObject superclass], @"");
 }
 
 - (void)test_doNotChangeClassFrequentlyWithOverrideBlockManagement
@@ -1646,6 +1650,8 @@
 	}];
 	STAssertTrue([obj class] == [RETestObject class], @"");
 	STAssertTrue(REGetClass(obj) != [RETestObject class], @"");
+	STAssertTrue([obj superclass] == [RETestObject superclass], @"");
+	STAssertTrue(REGetSuperclass(obj) != [RETestObject superclass], @"");
 	
 	// Record new class
 	Class newClass;
@@ -1657,12 +1663,14 @@
 	}];
 	STAssertEquals([obj class], [RETestObject class], @"");
 	STAssertEquals(REGetClass(obj), newClass, @"");
+	STAssertTrue([obj superclass] == [RETestObject superclass], @"");
 	
 	// Remove blocks
 	[obj removeBlockForInstanceMethod:@selector(log) key:@"logBlock"];
 	[obj removeBlockForInstanceMethod:@selector(say) key:@"sayBlock"];
 	STAssertTrue([obj class] == [RETestObject class], @"");
 	STAssertEquals(REGetClass(obj), newClass, @"");
+	STAssertTrue([obj superclass] == [RETestObject superclass], @"");
 }
 
 - (void)test_replacedClassIsKindOfOriginalClass

@@ -675,11 +675,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				return NSClassFromString(originalClassName);
 			}];
 			
-			// Override superclass
-			[receiver setBlockForInstanceMethod:@selector(superclass) key:nil block:^(id receiver) {
-				return [[receiver class] superclass];
-			}];
-			
 			// Override classForCoder
 			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
 				IMP superImp;

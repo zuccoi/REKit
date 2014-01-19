@@ -658,7 +658,7 @@ IMP REResponderReplaceImp(id receiver, SEL selector, IMP imp, const char *objCTy
 	return originalImp;
 }
 
-void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block, REResponderOperation op, BOOL forcibly) // forcibly is needed ?????
+void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block, REResponderOperation op)
 {
 	// Filter
 	if (!selector || !block) {
@@ -668,14 +668,14 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 	// Update blocks
 	@synchronized (receiver) {
 		// Don't set class-target block to private class
-		if (!forcibly && !(op & REResponderOperationObjectTargetMask)) {
+		if (!(op & REResponderOperationObjectTargetMask)) {
 			if (REResponderIsPrivateClass(receiver)) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ????? // Should I filter NSKVONotifying_ class ?????
 				// Search valid superclass
 				Class superclass;
 				superclass = REGetSuperclass(receiver);
 				while (superclass) {
 					if (!REResponderIsPrivateClass(superclass)) {
-						REResponderSetBlockForSelector(superclass, selector, key, block, op, NO);
+						REResponderSetBlockForSelector(superclass, selector, key, block, op);
 						return;
 					}
 					superclass = REGetSuperclass(superclass);
@@ -731,18 +731,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			classBlock = ^(id receiver) {
 				return NSClassFromString(originalClassName);
 			};
-			REResponderSetBlockForSelector(receiver, @selector(class), nil, classBlock, REResponderOperationInstanceMethodOfObject, YES);
-			
-			// Override _isKVOA method
-//			BOOL (^isKVOABlock)(id receiver);
-//			isKVOABlock = ^(id receiver) {
-//				// supermethod
-//				BOOL res;
-//				res = RESupermethod(NO, receiver, @selector(_isKVOA));
-//				
-//				return res;
-//			};
-//			REResponderSetBlockForSelector(receiver, @selector(_isKVOA), nil, isKVOABlock, REResponderOperationInstanceMethodOfObject, YES);
+			REResponderSetBlockForSelector(receiver, @selector(class), nil, classBlock, REResponderOperationInstanceMethodOfObject);
 			
 			// Override classForCoder // Test >>>
 			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
@@ -762,14 +751,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		IMP currentImp;
 		Class class, superclass;
 		class = REGetClass(receiver);
-//		if (!forcibly) {
-//			while (class) {
-//				if (![NSStringFromClass(class) hasPrefix:@"NSKVONotifying_"]) {
-//					break;
-//				}
-//				class = REGetSuperclass(class);
-//			}
-//		}
 		superclass = REGetSuperclass(class);
 		blocks = REResponderGetBlocks(receiver, op, YES);
 		oldBlockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
@@ -954,7 +935,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfClass, NO);
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfClass);
 }
 
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
@@ -964,7 +945,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass, NO);
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfClass);
 }
 
 + (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
@@ -1008,7 +989,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject, NO);
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationClassMethodOfObject);
 }
 
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
@@ -1018,7 +999,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return;
 	}
 	
-	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfObject, NO);
+	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfObject);
 }
 
 - (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key

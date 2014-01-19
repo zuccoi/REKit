@@ -14,7 +14,7 @@
 
 
 // Constants
-static NSString* const kClassNamePrefix = @"REResponder";
+static NSString* const kPrivateClassNamePrefix = @"REResponder";
 static NSString* const kProtocolsAssociationKey = @"REResponder_protocols";
 static NSString* const kClassMethodBlocksAssociationKey = @"REResponder_classMethodBlocks";
 static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_instanceMethodBlocks";
@@ -209,12 +209,11 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 {
 	@autoreleasepool {
 		@synchronized (self) {
-			// Remove protocols
+			// Reset
 			[self setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			
-			// Remove blocks
-			NSDictionary *blocks;
-			if ([NSStringFromClass(REGetClass(self)) rangeOfString:kClassNamePrefix].location != NSNotFound) {
+			if (REResponderIsPrivateClass(self)) {
+				// Remove blocks
+				NSDictionary *blocks;
 				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationClassMethodOfObject, NO)];
 				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
 					while ([blockInfos count]) {
@@ -233,12 +232,10 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					}
 				}];
 				[REGetClass(self) setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-			
-			// Dispose classes
-			NSString *className;
-			className = NSStringFromClass(REGetClass(self));
-			if ([className rangeOfString:kClassNamePrefix].location != NSNotFound) {
+				
+				// Dispose classes later
+				NSString *className;
+				className = NSStringFromClass(REGetClass(self));
 				dispatch_async(dispatch_get_main_queue(), ^{
 					Class class;
 					class = NSClassFromString(className);
@@ -301,6 +298,11 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 IMP REResponderForwardingMethod()
 {
 	return [NSObject methodForSelector:@selector(REResponder_UnexistingMethod)];
+}
+
+BOOL REResponderIsPrivateClass(id receiver)
+{
+	return ([NSStringFromClass(REGetClass(receiver)) rangeOfString:kPrivateClassNamePrefix].location != NSNotFound);
 }
 
 NSMutableDictionary* REResponderGetBlocks(id receiver, REResponderOperation op, BOOL create)
@@ -613,14 +615,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 	@synchronized (receiver) {
 		// Don't set class-target block to private class
 		if (!(op & REResponderOperationObjectTargetMask)) {
-			NSString *className;
-			className = NSStringFromClass(REGetClass(receiver));
-			if ([className rangeOfString:kClassNamePrefix].location != NSNotFound) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ????? // Should I filter NSKVONotifying_ class ?????
+			if (REResponderIsPrivateClass(receiver)) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ????? // Should I filter NSKVONotifying_ class ?????
 				// Search valid superclass
 				Class superclass;
 				superclass = REGetSuperclass(receiver);
 				while (superclass) {
-					if ([NSStringFromClass(superclass) rangeOfString:kClassNamePrefix].location == NSNotFound) {
+					if (!REResponderIsPrivateClass(superclass)) {
 						REResponderSetBlockForSelector(superclass, selector, key, block, op);
 						return;
 					}
@@ -653,12 +653,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		}
 		
 		// Become subclass
-		if (op & REResponderOperationObjectTargetMask && [NSStringFromClass(REGetClass(receiver)) rangeOfString:kClassNamePrefix].location == NSNotFound) {
+		if (op & REResponderOperationObjectTargetMask && !REResponderIsPrivateClass(receiver)) {
 			Class subclass;
 			NSString *className;
 			Class originalClass;
 			originalClass = [receiver class]; // Use class method to avoid getting NSKVONotifying_ class
-			className = [NSString stringWithFormat:@"%@_%@_%@", kClassNamePrefix, REUUIDString(), NSStringFromClass(originalClass)];
+			className = [NSString stringWithFormat:@"%@_%@(%@)", kPrivateClassNamePrefix, NSStringFromClass(originalClass), REUUIDString()];
 			subclass = objc_allocateClassPair(originalClass, [className UTF8String], 0);
 			objc_registerClassPair(subclass);
 			[receiver REResponder_setChangingClassByItself:YES];

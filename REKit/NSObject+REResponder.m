@@ -450,9 +450,9 @@ NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger r
 					NSUInteger address, blockAddress;
 					id block;
 					BOOL updated = NO;
-					address = [aBlockInfo[kBlockInfoImpKey] pointerValue];
+					address = (NSUInteger)[aBlockInfo[kBlockInfoImpKey] pointerValue];
 					block = imp_getBlock((IMP)address);
-					blockAddress = block ? REBlockGetImplementation(block) : 0;
+					blockAddress = block ? (NSUInteger)REBlockGetImplementation(block) : 0;
 					if (address < returnAddress && address > closestAddress) {
 						// Update elements
 						closestAddress = address;
@@ -1095,7 +1095,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 		return NULL;
 	}
 	
-	return REResponderGetSupermethod(self, __builtin_return_address(0));
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0));
 }
 
 - (IMP)supermethodOfCurrentBlock
@@ -1105,7 +1105,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 		return NULL;
 	}
 	
-	return REResponderGetSupermethod(self, __builtin_return_address(0));
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0));
 }
 
 void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
@@ -1135,7 +1135,7 @@ void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
 		return;
 	}
 	
-	REResponderRemoveCurrentBlock(self, __builtin_return_address(0));
+	REResponderRemoveCurrentBlock(self, (NSUInteger)__builtin_return_address(0));
 }
 
 - (void)removeCurrentBlock
@@ -1145,7 +1145,7 @@ void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
 		return;
 	}
 	
-	REResponderRemoveCurrentBlock(self, __builtin_return_address(0));
+	REResponderRemoveCurrentBlock(self, (NSUInteger)__builtin_return_address(0));
 }
 
 //--------------------------------------------------------------//

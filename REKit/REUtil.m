@@ -109,12 +109,17 @@ Class object_setClass(id object, Class cls)
 	return oldClass;
 }
 
+BOOL REIsClass(id receiver) // Test >>>
+{
+	return (receiver == [receiver class]);
+}
+
 Class REGetClass(id receiver)
 {
 	if (!receiver) {
 		return NULL;
 	}
-	else if (receiver != [receiver class]) {
+	else if (!REIsClass(receiver)) {
 		return object_getClass(receiver);
 	}
 	else if (class_isMetaClass(receiver)) {
@@ -138,7 +143,7 @@ Class REGetMetaClass(id receiver)
 	if (!receiver) {
 		return NULL;
 	}
-	else if (receiver != [receiver class]) {
+	else if (!REIsClass(receiver)) {
 		return object_getClass(object_getClass(receiver));
 	}
 	else if (class_isMetaClass(receiver)) {

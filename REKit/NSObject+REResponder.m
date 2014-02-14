@@ -23,6 +23,7 @@ static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignat
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
 static NSString* const kIsChangingClassBySelfAssociationKey = @"REResponder_isChangingClassBySelf"; // Tests >>>
 static NSString* const kIsChangingClassAssociationKey = @"REResponder_isChangingClass"; // Tests >>>
+static NSString* const kReturnAddress_BlockInfoKey = @"REREsponder_ReturnAddress_BlockInfoKey";
 
 // Keys for protocolInfo
 static NSString* const kProtocolInfoKeysKey = @"keys";
@@ -32,6 +33,7 @@ static NSString* const kProtocolInfoIncorporatedProtocolNamesKey = @"incorporate
 static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 static NSString* const kBlockInfoOperationKey = @"op";
+static NSString* const kBlockInfoReturnAddressKey = @"radd";
 
 // REResponderOperationMask
 typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
@@ -46,6 +48,9 @@ typedef NS_ENUM(NSInteger, REResponderOperation) {
 	REResponderOperationClassMethodOfObject,
 	REResponderOperationInstanceMethodOfObject,
 };
+
+// Global Variables
+static NSMutableDictionary *_returnAddress_blockInfo = nil;
 
 
 @implementation NSObject (REResponder)
@@ -439,14 +444,38 @@ NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger r
 // Use cache >>>
 	@synchronized (receiver) {
 		// Get blockInfo 
-		__block NSDictionary *blockInfo = nil;
+		__block NSMutableDictionary *blockInfo = nil;
 		__block NSUInteger closestAddress = 0;
+		
+		// Get returnAddressNum
+		NSNumber *returnAddressNum;
+		returnAddressNum = @(returnAddress);
+		
+		// Check cache
+		NSMutableDictionary *cache = nil;
+		if (REIsClass(receiver)) {
+			if (!_returnAddress_blockInfo) {
+				_returnAddress_blockInfo = [[NSMutableDictionary alloc] init];
+			}
+			cache = _returnAddress_blockInfo;
+		}
+		else {
+			cache = [receiver associatedValueForKey:kReturnAddress_BlockInfoKey];
+			if (!cache) {
+				cache = [NSMutableDictionary dictionary];
+				[receiver setAssociatedValue:cache forKey:kReturnAddress_BlockInfoKey policy:OBJC_ASSOCIATION_RETAIN];
+			}
+		}
+		blockInfo = [cache objectForKey:returnAddressNum];
+		if (blockInfo) {
+			return blockInfo;
+		}
 		
 		// Make blockInfoBlock
 		void (^blockInfoBlock)(NSMutableDictionary *blocks);
 		blockInfoBlock = ^(NSMutableDictionary *blocks) {
 			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
-				[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
+				[aBlockInfos enumerateObjectsUsingBlock:^(NSMutableDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
 					NSUInteger address, blockAddress;
 					id block;
 					BOOL updated = NO;
@@ -502,6 +531,12 @@ NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger r
 			blockInfoBlock(REResponderGetBlocks(aClass, REResponderOperationInstanceMethodOfClass, NO));
 			blockInfoBlock(REResponderGetBlocks(aClass, REResponderOperationClassMethodOfClass, NO));
 			aClass = REGetSuperclass(aClass);
+		}
+		
+		// Update cache and blockInfo
+		if (blockInfo) {
+			cache[returnAddressNum] = blockInfo;
+			blockInfo[kBlockInfoReturnAddressKey] = returnAddressNum;
 		}
 		
 		return blockInfo;
@@ -853,12 +888,12 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		}
 		
 		// Add blockInfo
-		NSDictionary *blockInfo;
-		blockInfo = @{
+		NSMutableDictionary *blockInfo;
+		blockInfo = [NSMutableDictionary dictionaryWithDictionary:@{
 			kBlockInfoImpKey : [NSValue valueWithPointer:imp],
 			kBlockInfoKeyKey : key,
 			kBlockInfoOperationKey : @(op),
-		};
+		}];
 		[blockInfos addObject:blockInfo];
 	}
 }
@@ -928,6 +963,20 @@ void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, N
 		
 		// Remove implementation which causing releasing block as well
 		imp_removeBlock(imp);
+		
+		// Update cache
+		NSMutableDictionary *cache = nil;
+		NSNumber *returnAddressNum;
+		returnAddressNum = blockInfo[kBlockInfoReturnAddressKey];
+		if (returnAddressNum) {
+			if (REIsClass(receiver)) {
+				cache = _returnAddress_blockInfo;
+			}
+			else {
+				cache = [receiver associatedValueForKey:kReturnAddress_BlockInfoKey];
+			}
+			[cache removeObjectForKey:returnAddressNum];
+		}
 		
 		// Remove blockInfo
 		[blockInfos removeObject:blockInfo];

@@ -66,6 +66,7 @@ extern void* REBlockGetImplementation(id block);
 #pragma mark - NSObject
 //--------------------------------------------------------------//
 
+BOOL REIsClass(id receiver);
 Class REGetClass(id receiver);
 Class REGetSuperclass(id receiver);
 Class REGetMetaClass(id receiver);

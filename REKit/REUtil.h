@@ -8,6 +8,8 @@
 #import <objc/runtime.h>
 
 
+#define RE_TYPE(receiver) __typeof(receiver) receiver
+
 // Notifications
 extern NSString* const REObjectWillChangeClassNotification;
 extern NSString* const REObjectDidChangeClassNotification;
@@ -114,6 +116,6 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 #pragma mark - NSString
 //--------------------------------------------------------------//
 
-#define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __PRETTY_FUNCTION__, __LINE__]
+#define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __FILE__, __LINE__]
 #define RE_PRETTY_FUNCTION [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
 extern NSString* REUUIDString();

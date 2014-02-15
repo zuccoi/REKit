@@ -171,7 +171,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -201,7 +201,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -222,7 +222,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -247,7 +247,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -271,7 +271,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -292,7 +292,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -371,7 +371,7 @@
 //		// Override log method
 //		[obj setBlockForSelector:@selector(log) key:nil block:^(id receiver) {
 //			// supermethod
-//			RESupermethod(nil, receiver, @selector(log));
+//			RESupermethod(nil, receiver);
 //		}];
 //		
 //		// Perform log method
@@ -442,7 +442,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -458,7 +458,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -481,7 +481,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -502,7 +502,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Perform log method
@@ -528,7 +528,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -539,7 +539,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Add log method
@@ -578,7 +578,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -673,7 +673,7 @@
 				deallocated = YES;
 				
 				// supermethod
-				RESupermethod(nil, receiver, @selector(dealloc));
+				RESupermethod(nil, receiver);
 			}];
 			
 			// Associate context
@@ -1328,7 +1328,7 @@
 	
 	// Add block1
 	[obj setBlockForInstanceMethod:sel key:@"block1" block:^NSString*(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block1"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"-block1"];
 	}];
 	
 	// Call log method
@@ -1337,7 +1337,7 @@
 	
 	// Add block2
 	[obj setBlockForInstanceMethod:sel key:@"block2" block:^NSString*(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block2"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"-block2"];
 	}];
 	
 	// Call log method
@@ -1346,7 +1346,7 @@
 	
 	// Add block3
 	[obj setBlockForInstanceMethod:sel key:@"block3" block:^NSString*(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block3"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"-block3"];
 	}];
 	
 	// Call log method
@@ -1383,7 +1383,7 @@
 	
 	// Add block1
 	[obj setBlockForInstanceMethod:sel key:@"block1" block:^NSString*(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block1"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"-block1"];
 	}];
 	
 	// Call log method
@@ -1392,7 +1392,7 @@
 	
 	// Add block2
 	[obj setBlockForInstanceMethod:sel key:@"block2" block:^NSString*(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block2"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"-block2"];
 	}];
 	
 	// Call log method
@@ -1401,7 +1401,7 @@
 	
 	// Add block3
 	[obj setBlockForInstanceMethod:sel key:@"block3" block:^NSString*(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"-block3"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"-block3"];
 	}];
 	
 	// Call log method
@@ -1441,7 +1441,7 @@
 	
 	// Override age method
 	[obj setBlockForInstanceMethod:(sel = @selector(age)) key:nil block:^NSUInteger(id receiver) {
-		return (RESupermethod(0, receiver, sel) + 1);
+		return (RESupermethod(0, receiver) + 1);
 	}];
 	
 	// Get age
@@ -1479,7 +1479,7 @@
 	
 	// Override rect method
 	[obj setBlockForInstanceMethod:@selector(rect) key:nil block:^(id receiver) {
-		return CGRectInset(RESupermethod(CGRectZero, receiver, @selector(rect)), 3.0f, 6.0f);
+		return CGRectInset(RESupermethod(CGRectZero, receiver), 3.0f, 6.0f);
 	}];
 	
 	// Get rect
@@ -1495,7 +1495,7 @@
 	obj = [RETestObject object];
 	[obj setBlockForInstanceMethod:@selector(sayHello) key:nil block:^(id receiver) {
 		// supermethod
-		RESupermethod(nil, receiver, @selector(sayHello));
+		RESupermethod(nil, receiver);
 	}];
 	[obj sayHello];
 }
@@ -1557,7 +1557,7 @@
 	
 	// Add block2
 	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"block2"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"block2"];
 	}];
 	
 	// Call
@@ -1854,7 +1854,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -2017,7 +2017,7 @@
 	}];
 	[obj setBlockForInstanceMethod:sel key:nil block:^(id receiver) {
 		CGRect rect;
-		rect = RESupermethod(CGRectZero, receiver, sel);
+		rect = RESupermethod(CGRectZero, receiver);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;
@@ -2416,7 +2416,7 @@
 	
 	// Add block
 	[obj setBlockForInstanceMethod:sel key:@"block1" block:^(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"1"];
 	}];
 	
 	// Start observing
@@ -2426,7 +2426,7 @@
 	
 	// Add block
 	[obj setBlockForInstanceMethod:sel key:@"block2" block:^(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"2"];
 	}];
 	
 	// Check
@@ -2449,7 +2449,7 @@
 	
 	// Add block
 	[obj setBlockForInstanceMethod:sel key:@"block1" block:^(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"1"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"1"];
 	}];
 	
 	// Start observing
@@ -2459,7 +2459,7 @@
 	
 	// Add block
 	[obj setBlockForInstanceMethod:sel key:@"block2" block:^(id receiver) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver, sel), @"2"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(@"", receiver), @"2"];
 	}];
 	
 	// Check

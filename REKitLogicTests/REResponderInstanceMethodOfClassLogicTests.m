@@ -536,7 +536,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Add log method

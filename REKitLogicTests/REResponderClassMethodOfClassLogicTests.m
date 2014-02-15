@@ -473,7 +473,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Add log method
@@ -1646,7 +1646,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Set NSObject conformable to NSCopying

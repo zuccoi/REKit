@@ -383,7 +383,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -413,7 +413,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -434,7 +434,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -459,7 +459,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -483,7 +483,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -504,7 +504,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -532,7 +532,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -541,7 +541,7 @@
 		
 		// Override log method using key
 		[obj setBlockForClassMethod:@selector(log) key:key block:^(Class receiver) {
-			return RESupermethod(nil, receiver, @selector(log));
+			return RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -612,7 +612,7 @@
 //		// Override log method
 //		[obj setBlockForClassMethod:@selector(log) key:nil block:^(Class receiver) {
 //			// supermethod
-//			RESupermethod(nil, receiver, @selector(log));
+//			RESupermethod(nil, receiver);
 //		}];
 //		
 //		// Call
@@ -683,7 +683,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -699,7 +699,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -722,7 +722,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -743,7 +743,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Call
@@ -769,7 +769,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -780,7 +780,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Add log method
@@ -819,7 +819,7 @@
 			isContextDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		// Make obj
@@ -860,7 +860,7 @@
 			isObjDeallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, @selector(dealloc));
+			RESupermethod(nil, receiver);
 		}];
 		
 		@autoreleasepool {
@@ -872,7 +872,7 @@
 				isContextDeallocated = YES;
 				
 				// supermethod
-				RESupermethod(nil, receiver, @selector(dealloc));
+				RESupermethod(nil, receiver);
 			}];
 			
 			// Add log block
@@ -914,7 +914,7 @@
 				deallocated = YES;
 				
 				// supermethod
-				RESupermethod(nil, receiver, @selector(dealloc));
+				RESupermethod(nil, receiver);
 			}];
 			
 			// Add log block

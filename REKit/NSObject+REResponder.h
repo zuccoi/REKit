@@ -11,11 +11,11 @@
 
 #define RESupermethod(defaultValue, receiver, ...) \
 	^{\
-		IMP supermethod;\
-		SEL selector;\
-		supermethod = [receiver supermethodOfCurrentBlock:&selector];\
-		if (supermethod && selector) {\
-			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))supermethod)(receiver, selector, ##__VA_ARGS__);\
+		IMP re_supermethod;\
+		SEL re_selector;\
+		re_supermethod = [receiver supermethodOfCurrentBlock:&re_selector];\
+		if (re_supermethod && re_selector) {\
+			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
 		}\
 		else {\
 			return (__typeof(defaultValue))defaultValue;\

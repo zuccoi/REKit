@@ -11,8 +11,8 @@
 
 #define RESupermethod(defaultValue, receiver, ...) \
 	^{\
-		SEL selector;\
 		IMP supermethod;\
+		SEL selector;\
 		supermethod = [receiver supermethodOfCurrentBlock:&selector];\
 		if (supermethod && selector) {\
 			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))supermethod)(receiver, selector, ##__VA_ARGS__);\

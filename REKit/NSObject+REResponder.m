@@ -1134,24 +1134,24 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress, SEL *select
 	return REResponderGetSupermethodWithImp(receiver, [blockInfo[kBlockInfoImpKey] pointerValue]);
 }
 
-+ (IMP)supermethodOfCurrentBlock
++ (IMP)supermethodOfCurrentBlock:(out SEL*)selector
 {
 	// Filter
 	if (!REIsClass(self)) {
 		return NULL;
 	}
 	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), NULL);
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
 }
 
-- (IMP)supermethodOfCurrentBlock
+- (IMP)supermethodOfCurrentBlock:(out SEL*)selector
 {
 	// Filter
 	if (REIsClass(self)) {
 		return NULL;
 	}
 	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), NULL);
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
 }
 
 void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
@@ -1307,31 +1307,6 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 #pragma mark -
 
 
-@implementation NSObject (REResponder_Private)
-
-+ (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector
-{
-	// Filter
-	if (!REIsClass(self)) {
-		return NULL;
-	}
-	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
-}
-
-- (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector
-{
-	// Filter
-	if (REIsClass(self)) {
-		return NULL;
-	}
-	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
-}
-
-@end
-
-
 @implementation NSObject (REResponder_Depricated)
 
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated))
@@ -1347,6 +1322,11 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
 	[self removeBlockForInstanceMethod:selector key:key];
+}
+
+- (IMP)supermethodOfCurrentBlock __attribute__((deprecated))
+{
+	return [self supermethodOfCurrentBlock:NULL];
 }
 
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated))

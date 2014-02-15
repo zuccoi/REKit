@@ -858,7 +858,7 @@
 	[NSString setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// Get supermethod
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertNil((id)supermethod, @"");
 	}];
 	
@@ -881,7 +881,7 @@
 		// supermethod
 		NSInteger res = -1;
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			res = supermethod(receiver, sel);
 		}
 		
@@ -905,7 +905,7 @@
 		// supermethod
 		NSInteger res = -1;
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			res = supermethod(receiver, sel);
 		}
 		
@@ -937,7 +937,7 @@
 	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -965,7 +965,7 @@
 	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -997,7 +997,7 @@
 	[[obj class] setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -1029,7 +1029,7 @@
 	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			(REIMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -1052,7 +1052,7 @@
 	// Override
 	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// Check supermethod
-		STAssertEquals((IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)), [NSObject methodForSelector:sel], @"");
+		STAssertEquals([receiver supermethodOfCurrentBlock:NULL], [NSObject methodForSelector:sel], @"");
 		
 		called = YES;
 	}];
@@ -1078,7 +1078,7 @@
 	// Add block
 	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// Check supermethod
-		STAssertEquals((IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)), imp, @"");
+		STAssertEquals([receiver supermethodOfCurrentBlock:NULL], imp, @"");
 		
 		called = YES;
 	}];
@@ -1293,7 +1293,7 @@
 	[RETestObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			supermethod(receiver, sel);
 			called = YES;
 		}
@@ -1307,7 +1307,7 @@
 //- (void)test_supermethod__obtainFromOutsideOfBlock
 //{
 //	IMP supermethod;
-//	supermethod = (IMP)objc_msgSend([NSObject class], @selector(supermethodOfCurrentBlock));
+//	supermethod = [NSObject supermethodOfCurrentBlock:NULL];
 //	STAssertNil((id)supermethod, @"");
 //}
 
@@ -1713,7 +1713,7 @@
 		called = YES;
 	}];
 	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
-		(REIMP(void)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		(REIMP(void)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
 	}];
 	
 	// Call
@@ -1729,7 +1729,7 @@
 	}];
 	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		NSString *res;
-		res = (REIMP(id)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		res = (REIMP(id)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
 		return res;
 	}];
 	
@@ -1744,7 +1744,7 @@
 	}];
 	[NSObject setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		NSInteger i;
-		i = (REIMP(NSInteger)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		i = (REIMP(NSInteger)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
 		return i + 1;
 	}];
 	

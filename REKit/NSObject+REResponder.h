@@ -6,12 +6,14 @@
 
 #import <Foundation/Foundation.h>
 
+
 #define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
+
 #define RESupermethod(defaultValue, receiver, ...) \
 	^{\
 		SEL selector;\
 		IMP supermethod;\
-		supermethod = [receiver supermethodOfCurrentBlockGettingSelector:&selector];\
+		supermethod = [receiver supermethodOfCurrentBlock:&selector];\
 		if (supermethod && selector) {\
 			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))supermethod)(receiver, selector, ##__VA_ARGS__);\
 		}\
@@ -40,8 +42,8 @@
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
 
 // Methods intended to be called in Block
-+ (IMP)supermethodOfCurrentBlock;
-- (IMP)supermethodOfCurrentBlock;
++ (IMP)supermethodOfCurrentBlock:(out SEL*)selector;
+- (IMP)supermethodOfCurrentBlock:(out SEL*)selector;
 + (void)removeCurrentBlock;
 - (void)removeCurrentBlock;
 
@@ -54,16 +56,11 @@
 #pragma mark -
 
 
-@interface NSObject (REResponder_Private)
-+ (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector;
-- (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector;
-@end
-
-
 // Deprecated Methods
 @interface NSObject (REResponder_Depricated)
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated));
+- (IMP)supermethodOfCurrentBlock __attribute__((deprecated));
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated));
 @end

@@ -1395,7 +1395,7 @@
 	// Add log method
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertNil((id)supermethod, @"");
 		
 		called = YES;
@@ -1423,7 +1423,7 @@
 	[obj setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
 		// Get supermethod
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		
 		// Check supermethod
 		STAssertEquals(supermethod, originalMethod, @"");
@@ -1456,7 +1456,7 @@
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// Check supermethod
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertNil((id)supermethod, @"");
 		
 		called = YES;
@@ -1483,7 +1483,7 @@
 	// Add class block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertNil((id)supermethod, @"");
 		
 		called = YES;
@@ -1510,7 +1510,7 @@
 	// Add class block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertNil((id)supermethod, @"");
 		
 		called = YES;
@@ -1539,7 +1539,7 @@
 	// Add class block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertEquals(supermethod, imp, @"");
 		
 		called = YES;
@@ -1563,7 +1563,7 @@
 	// Add class block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertEquals(supermethod, imp, @"");
 		
 		called = YES;
@@ -1597,7 +1597,7 @@
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertEquals(supermethod, imp, @"");
 		
 		called = YES;
@@ -1621,7 +1621,7 @@
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertEquals(supermethod, imp, @"");
 		
 		called = YES;
@@ -1655,7 +1655,7 @@
 	// Add block2
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		IMP supermethod;
-		supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock));
+		supermethod = [receiver supermethodOfCurrentBlock:NULL];
 		STAssertEquals(supermethod, imp, @"");
 		
 		called = YES;
@@ -1870,7 +1870,7 @@
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = (IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))) {
+		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
 			supermethod(receiver, sel);
 			called = YES;
 		}
@@ -1890,9 +1890,9 @@
 //	
 //	// Get supermethod
 //	IMP supermethod;
-//	supermethod = (IMP)objc_msgSend(obj, @selector(supermethodOfCurrentBlock));
+//	supermethod = [obj supermethodOfCurrentBlock:NULL];
 //	STAssertNil((id)supermethod, @"");
-//	supermethod = (IMP)objc_msgSend(object_getClass(obj), @selector(supermethodOfCurrentBlock));
+//	supermethod = [obj supermethodOfCurrentBlock:NULL];
 //	STAssertNil((id)supermethod, @"");
 //}
 
@@ -2154,7 +2154,7 @@
 		called = YES;
 	}];
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
-		(REIMP(void)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		(REIMP(void)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
 	}];
 	
 	// Call
@@ -2175,7 +2175,7 @@
 	}];
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		NSString *res;
-		res = (REIMP(id)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		res = (REIMP(id)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
 		return res;
 	}];
 	
@@ -2195,7 +2195,7 @@
 	}];
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver) {
 		NSInteger i;
-		i = (REIMP(NSInteger)(IMP)objc_msgSend(receiver, @selector(supermethodOfCurrentBlock)))(receiver, sel);
+		i = (REIMP(NSInteger)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
 		return i + 1;
 	}];
 	

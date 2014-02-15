@@ -34,6 +34,7 @@ static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 static NSString* const kBlockInfoOperationKey = @"op";
 static NSString* const kBlockInfoReturnAddressKey = @"radd";
+//static NSString* const kBlockInfoBlockInfosPointerKey = @"blockInfos"; // Use >>>
 
 // REResponderOperationMask
 typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
@@ -212,7 +213,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					IMP originalImp;
 					NSDictionary *firstBlockInfo;
 					firstBlockInfo = [blockInfos firstObject];
-					originalImp = REResponderGetSupermethodWithImp(self, [firstBlockInfo[kBlockInfoImpKey] pointerValue]);
+					originalImp = REGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationClassMethodOfObject);
 					if (!originalImp) {
 						originalImp = REResponderForwardingMethod();
 					}
@@ -231,7 +232,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					IMP originalImp;
 					NSDictionary *firstBlockInfo;
 					firstBlockInfo = [blockInfos firstObject];
-					originalImp = REResponderGetSupermethodWithImp(self, [firstBlockInfo[kBlockInfoImpKey] pointerValue]);
+					originalImp = REGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationInstanceMethodOfObject);
 					if (!originalImp) {
 						originalImp = REResponderForwardingMethod();
 					}
@@ -439,106 +440,6 @@ NSDictionary* REResponderGetBlockInfoForSelector(id receiver, SEL selector, id k
 	}
 }
 
-NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger returnAddress, NSMutableArray **outBlockInfos)
-{
-	@synchronized (receiver) {
-		// Get blockInfo 
-		__block NSMutableDictionary *blockInfo = nil;
-		__block NSUInteger closestAddress = 0;
-		
-		// Get returnAddressNum
-		NSNumber *returnAddressNum;
-		returnAddressNum = @(returnAddress);
-		
-		// Check cache
-		NSMutableDictionary *cache = nil;
-		if (REIsClass(receiver)) {
-			if (!_returnAddress_blockInfo) {
-				_returnAddress_blockInfo = [[NSMutableDictionary alloc] init];
-			}
-			cache = _returnAddress_blockInfo;
-		}
-		else {
-			cache = [receiver associatedValueForKey:kReturnAddress_BlockInfoKey];
-			if (!cache) {
-				cache = [NSMutableDictionary dictionary];
-				[receiver setAssociatedValue:cache forKey:kReturnAddress_BlockInfoKey policy:OBJC_ASSOCIATION_RETAIN];
-			}
-		}
-		blockInfo = [cache objectForKey:returnAddressNum];
-		if (blockInfo) {
-			return blockInfo;
-		}
-		
-		// Make blockInfoBlock
-		void (^blockInfoBlock)(NSMutableDictionary *blocks);
-		blockInfoBlock = ^(NSMutableDictionary *blocks) {
-			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
-				[aBlockInfos enumerateObjectsUsingBlock:^(NSMutableDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-					NSUInteger address, blockAddress;
-					id block;
-					BOOL updated = NO;
-					address = (NSUInteger)[aBlockInfo[kBlockInfoImpKey] pointerValue];
-					block = imp_getBlock((IMP)address);
-					blockAddress = block ? (NSUInteger)REBlockGetImplementation(block) : 0;
-					if (address < returnAddress && address > closestAddress) {
-						// Update elements
-						closestAddress = address;
-						updated = YES;
-					}
-					if (blockAddress < returnAddress && blockAddress > closestAddress) {
-						// Update elements
-						closestAddress = blockAddress;
-						updated = YES;
-					}
-					if (updated) {
-						blockInfo = aBlockInfo;
-						if (outBlockInfos) {
-							*outBlockInfos = aBlockInfos;
-						}
-					}
-				}];
-			}];
-		};
-		
-		// Get class
-		Class class;
-		class = REGetClass(receiver);
-		
-		// Search blockInfo of object
-		if (receiver != class) {
-			blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationInstanceMethodOfObject, NO));
-			blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationClassMethodOfObject, NO));
-		}
-		// Search blockInfo of instance associated with private class
-		else {
-			id instance;
-			instance = [class associatedValueForKey:kInstanceOfPrivateClassAssociationKey];
-			if (instance) {
-				blockInfoBlock(REResponderGetBlocks(instance, REResponderOperationClassMethodOfObject, NO));
-				blockInfoBlock(REResponderGetBlocks(instance, REResponderOperationInstanceMethodOfObject, NO));
-			}
-		}
-		
-		// Search blockInfo of class
-		Class aClass;
-		aClass = class;
-		while (aClass) {
-			blockInfoBlock(REResponderGetBlocks(aClass, REResponderOperationInstanceMethodOfClass, NO));
-			blockInfoBlock(REResponderGetBlocks(aClass, REResponderOperationClassMethodOfClass, NO));
-			aClass = REGetSuperclass(aClass);
-		}
-		
-		// Update cache and blockInfo
-		if (blockInfo) {
-			cache[returnAddressNum] = blockInfo;
-			blockInfo[kBlockInfoReturnAddressKey] = returnAddressNum;
-		}
-		
-		return blockInfo;
-	}
-}
-
 NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArray **outBlockInfos)
 {
 	@synchronized (receiver) {
@@ -606,84 +507,6 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 		
 		return nil;
 	}
-}
-
-IMP REResponderGetSupermethodWithImp(id receiver, IMP imp)
-{
-	// Filter
-	if (!imp) {
-		return NULL;
-	}
-	
-	// Get supermethod
-	IMP supermethod = NULL;
-	@synchronized (receiver) {
-		// Get elements
-		NSDictionary *blockInfo = nil;
-		NSMutableArray *blockInfos = nil;
-		SEL selector;
-		Class classHavingBlockinfo = NULL;
-		blockInfo = REResponderGetBlockInfoWithImp(receiver, imp, &blockInfos);
-		if (blockInfo) {
-			classHavingBlockinfo = REGetClass(receiver);
-		}
-		else {
-			// Search blockInfo of superclasses
-			Class superclass;
-			superclass = REGetSuperclass(receiver);
-			while (superclass) {
-				blockInfo = REResponderGetBlockInfoWithImp(superclass, imp, &blockInfos);
-				if (blockInfo) {
-					classHavingBlockinfo = superclass;
-					break;
-				}
-				superclass = REGetSuperclass(superclass);
-			}
-		}
-		if (!blockInfo) {
-			return NULL;
-		}
-		selector = NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]);
-		
-		// Check index of blockInfo
-		NSUInteger index;
-		index = [blockInfos indexOfObject:blockInfo];
-		if (index == 0) {
-			NSValue *originalMethodValue;
-			originalMethodValue = [blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey];
-			if (originalMethodValue) {
-				// supermethod is original method
-				supermethod = [originalMethodValue pointerValue];
-			}
-			else {
-				// supermethod is superclass's method
-				Class superclass;
-				REResponderOperation op;
-				op = [blockInfo[kBlockInfoOperationKey] integerValue];
-				superclass = REGetSuperclass(classHavingBlockinfo);
-				while (superclass && !supermethod) {
-					if (op & REResponderOperationInstanceMethodMask) {
-						supermethod = method_getImplementation(class_getInstanceMethod(superclass, selector));
-					}
-					else {
-						supermethod = method_getImplementation(class_getClassMethod(superclass, selector));
-					}
-					if (supermethod == imp) {
-						supermethod = NULL;
-					}
-					superclass = REGetSuperclass(superclass);
-				}
-			}
-		}
-		else {
-			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
-		}
-	}
-	if (supermethod == REResponderForwardingMethod()) {
-		return NULL;
-	}
-	
-	return supermethod;
 }
 
 IMP REResponderReplaceImp(id receiver, SEL selector, IMP imp, const char *objCTypes, REResponderOperation op)
@@ -911,6 +734,84 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	}
 }
 
+IMP REGetSupermethod(id receiver, SEL selector, id key, REResponderOperation op)
+{
+	@synchronized (receiver) {
+		// Get supermethod
+		IMP supermethod = NULL;
+		
+		// Get elements
+		NSDictionary *blockInfo;
+		NSMutableArray *blockInfos;
+		Class classHavingBlockInfo = NULL;
+		blockInfo = REResponderGetBlockInfoForSelector(receiver, selector, key, &blockInfos, op);
+		if (blockInfo) {
+			classHavingBlockInfo = REGetClass(receiver);
+		}
+		else {
+			// Search blockInfo of superclasses
+			Class superclass;
+			superclass = REGetSuperclass(receiver);
+			while (superclass) {
+				REResponderOperation superOp;
+				superOp = (op & REResponderOperationInstanceMethodMask ? REResponderOperationInstanceMethodOfClass : REResponderOperationClassMethodOfClass);
+				blockInfo = REResponderGetBlockInfoForSelector(superclass, selector, key, &blockInfos, superOp);
+				if (blockInfo) {
+					classHavingBlockInfo = superclass;
+					break;
+				}
+				superclass = REGetSuperclass(superclass);
+			}
+		}
+		if (!blockInfo) {
+			return NULL;
+		}
+		
+		// Get supermethod
+		NSUInteger index;
+		index = [blockInfos indexOfObject:blockInfo];
+		if (index == 0) {
+			NSValue *originalMethodValue;
+			originalMethodValue = [blockInfos associatedValueForKey:kBlockInfosOriginalMethodAssociationKey];
+			if (originalMethodValue) {
+				// supermethod is original method
+				supermethod = [originalMethodValue pointerValue];
+			}
+			else {
+				// supermethod is superclass's method
+				IMP imp;
+				Class superclass;
+				REResponderOperation op;
+				imp = [blockInfo[kBlockInfoImpKey] pointerValue];
+				op = [blockInfo[kBlockInfoOperationKey] integerValue];
+				superclass = REGetSuperclass(classHavingBlockInfo);
+				while (superclass && !supermethod) {
+					if (op & REResponderOperationInstanceMethodMask) {
+						supermethod = method_getImplementation(class_getInstanceMethod(superclass, selector));
+					}
+					else {
+						supermethod = method_getImplementation(class_getClassMethod(superclass, selector));
+					}
+					if (supermethod == imp) {
+						supermethod = NULL;
+					}
+					superclass = REGetSuperclass(superclass);
+				}
+			}
+		}
+		else {
+			supermethod = [[blockInfos objectAtIndex:(index - 1)][kBlockInfoImpKey] pointerValue];
+		}
+		
+		// Check supermethod
+		if (supermethod == REResponderForwardingMethod()) {
+			return NULL;
+		}
+		
+		return supermethod;
+	}
+}
+
 void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, NSMutableArray *blockInfos, SEL selector, REResponderOperation op)
 {
 	// Filter
@@ -923,7 +824,7 @@ void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, N
 		IMP imp;
 		IMP supermethod;
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-		supermethod = REResponderGetSupermethodWithImp(receiver, imp);
+		supermethod = REGetSupermethod(receiver, NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]), blockInfo[kBlockInfoKeyKey], op);
 		if (!supermethod) {
 			supermethod = REResponderForwardingMethod();
 		}
@@ -1036,6 +937,26 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
++ (IMP)supermethodOfClassMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (!REIsClass(self)) {
+		return NULL;
+	}
+	
+	return REGetSupermethod(self, selector, key, REResponderOperationClassMethodOfClass);
+}
+
++ (IMP)supermethodOfInstanceMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (!REIsClass(self)) {
+		return NULL;
+	}
+	
+	return REGetSupermethod(self, selector, key, REResponderOperationInstanceMethodOfClass);
+}
+
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Filter
@@ -1095,6 +1016,16 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
 }
 
+- (IMP)supermethodOfInstanceMethod:(SEL)selector key:(id)key
+{
+	// Filter
+	if (REIsClass(self)) {
+		return NULL;
+	}
+	
+	return REGetSupermethod(self, selector, key, REResponderOperationInstanceMethodOfObject);
+}
+
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key // Needed ?????
 {
 	// Filter
@@ -1113,85 +1044,6 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	}
 	
 	REResponderRemoveBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Current Block --
-//--------------------------------------------------------------//
-
-IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress, SEL *selector)
-{
-	// Get blockInfo
-	NSDictionary *blockInfo;
-	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, nil);
-	
-	// Set selector
-	if (selector) {
-		*selector = NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]);
-	}
-	
-	return REResponderGetSupermethodWithImp(receiver, [blockInfo[kBlockInfoImpKey] pointerValue]);
-}
-
-+ (IMP)supermethodOfCurrentBlock:(out SEL*)selector
-{
-	// Filter
-	if (!REIsClass(self)) {
-		return NULL;
-	}
-	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
-}
-
-- (IMP)supermethodOfCurrentBlock:(out SEL*)selector
-{
-	// Filter
-	if (REIsClass(self)) {
-		return NULL;
-	}
-	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
-}
-
-void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
-{
-	// Get elements
-	NSDictionary *blockInfo;
-	NSMutableArray *blockInfos;
-	SEL selector;
-	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, &blockInfos);
-	selector = NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]);
-	if (!blockInfo || !selector) {
-		return;
-	}
-	
-	// Call REResponderRemoveBlock
-	REResponderOperation op;
-	op = [blockInfo[kBlockInfoOperationKey] integerValue];
-	if (!(op & REResponderOperationObjectTargetMask)) {
-		receiver = REGetClass(receiver);
-	}
-	REResponderRemoveBlockWithBlockInfo(receiver, blockInfo, blockInfos, selector, op);
-}
-
-+ (void)removeCurrentBlock
-{
-	// Filter
-	if (!REIsClass(self)) {
-		return;
-	}
-	
-	REResponderRemoveCurrentBlock(self, (NSUInteger)__builtin_return_address(0));
-}
-
-- (void)removeCurrentBlock
-{
-	// Filter
-	if (REIsClass(self)) {
-		return;
-	}
-	
-	REResponderRemoveCurrentBlock(self, (NSUInteger)__builtin_return_address(0));
 }
 
 //--------------------------------------------------------------//
@@ -1321,11 +1173,6 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 - (void)removeBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))
 {
 	[self removeBlockForInstanceMethod:selector key:key];
-}
-
-- (IMP)supermethodOfCurrentBlock __attribute__((deprecated))
-{
-	return [self supermethodOfCurrentBlock:NULL];
 }
 
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol withKey:(id)key __attribute__((deprecated))

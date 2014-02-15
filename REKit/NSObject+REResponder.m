@@ -30,6 +30,7 @@ static NSString* const kProtocolInfoKeysKey = @"keys";
 static NSString* const kProtocolInfoIncorporatedProtocolNamesKey = @"incorporatedProtocolNames";
 
 // Keys for blockInfo
+static NSString* const kBlockInfoSelectorKey = @"sel";
 static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 static NSString* const kBlockInfoOperationKey = @"op";
@@ -439,7 +440,7 @@ NSDictionary* REResponderGetBlockInfoForSelector(id receiver, SEL selector, id k
 	}
 }
 
-NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger returnAddress, NSMutableArray **outBlockInfos, SEL *outSelector)
+NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger returnAddress, NSMutableArray **outBlockInfos)
 {
 	@synchronized (receiver) {
 		// Get blockInfo 
@@ -493,9 +494,6 @@ NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger r
 					}
 					if (updated) {
 						blockInfo = aBlockInfo;
-						if (outSelector) {
-							*outSelector = NSSelectorFromString(aSelectorName);
-						}
 						if (outBlockInfos) {
 							*outBlockInfos = aBlockInfos;
 						}
@@ -542,7 +540,7 @@ NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger r
 	}
 }
 
-NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArray **outBlockInfos, SEL *outSelector)
+NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArray **outBlockInfos)
 {
 	@synchronized (receiver) {
 		// Get blockInfo 
@@ -561,9 +559,6 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 					}
 				}];
 				if (blockInfo) {
-					if (outSelector) {
-						*outSelector = NSSelectorFromString(aSelectorName);
-					}
 					if (outBlockInfos) {
 						*outBlockInfos = aBlockInfos;
 					}
@@ -614,7 +609,7 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 	}
 }
 
-IMP REResponderGetSupermethodWithImp(id receiver, IMP imp) // Needed ?????
+IMP REResponderGetSupermethodWithImp(id receiver, IMP imp)
 {
 	// Filter
 	if (!imp) {
@@ -629,7 +624,7 @@ IMP REResponderGetSupermethodWithImp(id receiver, IMP imp) // Needed ?????
 		NSMutableArray *blockInfos = nil;
 		SEL selector;
 		Class classHavingBlockinfo = NULL;
-		blockInfo = REResponderGetBlockInfoWithImp(receiver, imp, &blockInfos, &selector);
+		blockInfo = REResponderGetBlockInfoWithImp(receiver, imp, &blockInfos);
 		if (blockInfo) {
 			classHavingBlockinfo = REGetClass(receiver);
 		}
@@ -638,7 +633,7 @@ IMP REResponderGetSupermethodWithImp(id receiver, IMP imp) // Needed ?????
 			Class superclass;
 			superclass = REGetSuperclass(receiver);
 			while (superclass) {
-				blockInfo = REResponderGetBlockInfoWithImp(superclass, imp, &blockInfos, &selector);
+				blockInfo = REResponderGetBlockInfoWithImp(superclass, imp, &blockInfos);
 				if (blockInfo) {
 					classHavingBlockinfo = superclass;
 					break;
@@ -649,6 +644,7 @@ IMP REResponderGetSupermethodWithImp(id receiver, IMP imp) // Needed ?????
 		if (!blockInfo) {
 			return NULL;
 		}
+		selector = NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]);
 		
 		// Check index of blockInfo
 		NSUInteger index;
@@ -889,6 +885,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 		// Add blockInfo
 		NSMutableDictionary *blockInfo;
 		blockInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+			kBlockInfoSelectorKey : NSStringFromSelector(selector),
 			kBlockInfoImpKey : [NSValue valueWithPointer:imp],
 			kBlockInfoKeyKey : key,
 			kBlockInfoOperationKey : @(op),
@@ -1128,7 +1125,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 	// Get elements
 	NSDictionary *blockInfo;
 	IMP imp;
-	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, nil, nil);
+	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, nil);
 	imp = [blockInfo[kBlockInfoImpKey] pointerValue];
 	
 	return REResponderGetSupermethodWithImp(receiver, imp);
@@ -1160,7 +1157,8 @@ void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
 	NSDictionary *blockInfo;
 	NSMutableArray *blockInfos;
 	SEL selector;
-	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, &blockInfos, &selector);
+	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, &blockInfos);
+	selector = NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]);
 	if (!blockInfo || !selector) {
 		return;
 	}

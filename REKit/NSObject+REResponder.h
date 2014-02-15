@@ -52,9 +52,6 @@
 #pragma mark -
 
 
-// Private Function
-extern IMP REResponderGetSupermethodWithImp(id receiver, IMP imp);
-
 // Deprecated Methods
 @interface NSObject (REResponder_Depricated)
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated));

@@ -107,9 +107,7 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 //--------------------------------------------------------------//
 
 @interface NSObject (REUtil_Deprecated)
-
 - (void)associateValue:(id)value forKey:(void*)key policy:(objc_AssociationPolicy)policy __attribute__((deprecated));
-
 @end
 
 
@@ -117,6 +115,6 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 #pragma mark - NSString
 //--------------------------------------------------------------//
 
-#define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __FILE__, __LINE__]
+#define RE_LINE [NSString stringWithFormat:@"%s:%i", __FILE__, __LINE__]
 #define RE_FUNC @(__PRETTY_FUNCTION__)
 extern NSString* REUUIDString();

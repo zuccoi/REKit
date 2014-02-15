@@ -213,7 +213,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					IMP originalImp;
 					NSDictionary *firstBlockInfo;
 					firstBlockInfo = [blockInfos firstObject];
-					originalImp = REGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationClassMethodOfObject);
+					originalImp = REResponderGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationClassMethodOfObject);
 					if (!originalImp) {
 						originalImp = REResponderForwardingMethod();
 					}
@@ -232,7 +232,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					IMP originalImp;
 					NSDictionary *firstBlockInfo;
 					firstBlockInfo = [blockInfos firstObject];
-					originalImp = REGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationInstanceMethodOfObject);
+					originalImp = REResponderGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationInstanceMethodOfObject);
 					if (!originalImp) {
 						originalImp = REResponderForwardingMethod();
 					}
@@ -734,7 +734,7 @@ BOOL REResponderHasBlockForSelector(id receiver, SEL selector, id key, RERespond
 	}
 }
 
-IMP REGetSupermethod(id receiver, SEL selector, id key, REResponderOperation op)
+IMP REResponderGetSupermethod(id receiver, SEL selector, id key, REResponderOperation op)
 {
 	@synchronized (receiver) {
 		// Get supermethod
@@ -824,7 +824,7 @@ void REResponderRemoveBlockWithBlockInfo(id receiver, NSDictionary *blockInfo, N
 		IMP imp;
 		IMP supermethod;
 		imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-		supermethod = REGetSupermethod(receiver, NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]), blockInfo[kBlockInfoKeyKey], op);
+		supermethod = REResponderGetSupermethod(receiver, NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]), blockInfo[kBlockInfoKeyKey], op);
 		if (!supermethod) {
 			supermethod = REResponderForwardingMethod();
 		}
@@ -944,7 +944,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return NULL;
 	}
 	
-	return REGetSupermethod(self, selector, key, REResponderOperationClassMethodOfClass);
+	return REResponderGetSupermethod(self, selector, key, REResponderOperationClassMethodOfClass);
 }
 
 + (IMP)supermethodOfInstanceMethod:(SEL)selector key:(id)key
@@ -954,7 +954,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return NULL;
 	}
 	
-	return REGetSupermethod(self, selector, key, REResponderOperationInstanceMethodOfClass);
+	return REResponderGetSupermethod(self, selector, key, REResponderOperationInstanceMethodOfClass);
 }
 
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key
@@ -1023,7 +1023,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 		return NULL;
 	}
 	
-	return REGetSupermethod(self, selector, key, REResponderOperationInstanceMethodOfObject);
+	return REResponderGetSupermethod(self, selector, key, REResponderOperationInstanceMethodOfObject);
 }
 
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key // Needed ?????
@@ -1156,6 +1156,57 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 
 
 #pragma mark -
+
+
+void _RESetBlock(id receiver, SEL selector, BOOL isClassMethod, id key, id block)
+{
+	// Decide op
+	REResponderOperation op;
+	if (REIsClass(receiver)) {
+		if (isClassMethod) {
+			op = REResponderOperationClassMethodOfClass;
+		}
+		else {
+			op = REResponderOperationInstanceMethodOfClass;
+		}
+	}
+	else {
+		if (isClassMethod) {
+			op = REResponderOperationClassMethodOfObject;
+		}
+		else {
+			op = REResponderOperationInstanceMethodOfObject;
+		}
+	}
+	
+	// Set block
+	REResponderSetBlockForSelector(receiver, selector, key, block, op);
+}
+
+IMP _REGetSupermethod(id receiver, SEL selector, BOOL isClassMethod, id key)
+{
+	// Decide op
+	REResponderOperation op;
+	if (REIsClass(receiver)) {
+		if (isClassMethod) {
+			op = REResponderOperationClassMethodOfClass;
+		}
+		else {
+			op = REResponderOperationInstanceMethodOfClass;
+		}
+	}
+	else {
+		if (isClassMethod) {
+			op = REResponderOperationClassMethodOfObject;
+		}
+		else {
+			op = REResponderOperationInstanceMethodOfObject;
+		}
+	}
+	
+	// Return supermethod
+	return REResponderGetSupermethod(receiver, selector, key, op);
+}
 
 
 @implementation NSObject (REResponder_Depricated)

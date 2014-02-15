@@ -71,6 +71,14 @@
 #pragma mark -- Observer --
 //--------------------------------------------------------------//
 
+- (void)viewWillAppear:(BOOL)animated
+{
+	// super
+	[super viewWillAppear:animated];
+	
+	NSLog(@"original %s", __PRETTY_FUNCTION__);
+}
+
 - (void)_manageObserver
 {
 	// Prepare for REKit
@@ -78,6 +86,11 @@
 	__weak typeof(self) self_ = self;
 	
 	#pragma mark └ [self viewWillAppear:]
+	RESetBlock(self, @selector(viewWillAppear:), NO, nil, ^(RE_TYPE(self), BOOL animated) {
+	// ?????
+	NSLog(@"%s", __PRETTY_FUNCTION__);
+		RESupermethod(nil, self, animated);
+	});
 	[self setBlockForInstanceMethod:@selector(viewWillAppear:) key:key block:^(id receiver, BOOL animated) {
 		// supermethod
 		IMP supermethod;

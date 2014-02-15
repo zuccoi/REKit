@@ -10,23 +10,29 @@
 
 #define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
 
-//#define RESetBlock(receiver, selector, isClassMethod, key, block) \
+#define RESetBlock(receiver, selector, isClassMethod, key, block) \
+	^{\
+		id re_key;\
+		SEL re_selector;\
+		BOOL re_isClassMethod;\
+		re_key = (key ? key : REUUIDString());\
+		re_selector = selector;\
+		re_isClassMethod = isClassMethod;\
+		_RESetBlock(receiver, selector, isClassMethod, re_key, block);\
+	}()
 
+#define RESupermethod(defaultValue, receiver, ...) \
+	^{\
+		IMP re_supermethod = NULL;\
+		re_supermethod = _REGetSupermethod(receiver, re_selector, re_isClassMethod, re_key);\
+		if (re_supermethod && re_selector) {\
+			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
+		}\
+		else {\
+			return (__typeof(defaultValue))defaultValue;\
+		}\
+	}()
 
-//#define RESupermethod(defaultValue, receiver, ...) \
-//	^{\
-//		IMP re_supermethod;\
-//		SEL re_selector;\
-//		re_supermethod = [receiver supermethodOfCurrentBlock:&re_selector];\
-//		if (re_supermethod && re_selector) {\
-//			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
-//		}\
-//		else {\
-//			return (__typeof(defaultValue))defaultValue;\
-//		}\
-//	}()
-
-//NSString* RESetBlock(id receiver, SEL selector, id key, BOOL isClassMethod); // Returns key >>>
 
 @interface NSObject (REResponder)
 
@@ -52,8 +58,12 @@
 
 @end
 
+
 #pragma mark -
 
+// Private
+void _RESetBlock(id receiver, SEL selector, BOOL isClassMethod, id key, id block);
+IMP _REGetSupermethod(id receiver, SEL selector, BOOL isClassMethod, id key);
 
 // Deprecated Methods
 @interface NSObject (REResponder_Depricated)

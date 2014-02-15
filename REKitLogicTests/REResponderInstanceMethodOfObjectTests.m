@@ -1170,8 +1170,8 @@
 	// Add block
 	[RETestObject setBlockForInstanceMethod:sel key:Nil block:^(id receiver) {
 		STAssertEqualObjects(receiver, obj, @"");
-		[receiver removeCurrentBlock];
 		called = YES;
+		[receiver removeCurrentBlock];
 	}];
 	
 	// Call
@@ -1497,18 +1497,17 @@
 	[obj sayHello];
 }
 
-// ?????
-//- (void)test_supermethod__obtainFromOutsideOfBlock
-//{
-//	// Make obj
-//	id obj;
-//	obj = [NSObject object];
-//	
-//	// Get supermethod
-//	IMP supermethod;
-//	supermethod = [obj supermethodOfCurrentBlock:NULL];
-//	STAssertNil((id)supermethod, @"");
-//}
+- (void)test_supermethod__obtainFromOutsideOfBlock
+{
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Get supermethod
+	IMP supermethod;
+	supermethod = [obj supermethodOfCurrentBlock:NULL];
+	STAssertNil((id)supermethod, @"");
+}
 
 - (void)test_removeBlockForInstanceMethod_key
 {
@@ -1579,29 +1578,28 @@
 	STAssertEqualObjects(string, @"block2", @"");
 }
 
-// ?????
-//- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
-//{
-//	SEL sel = @selector(doSomething);
-//	
-//	// Make obj
-//	id obj;
-//	obj = [NSObject object];
-//	
-//	// Call removeCurrentBlock
-//	STAssertNoThrow([obj removeCurrentBlock], @"");
-//	
-//	// Add doSomething method
-//	[obj setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
-//		// Do something
-//	}];
-//	
-//	// Call removeCurrentBlock
-//	STAssertNoThrow([obj removeCurrentBlock], @"");
-//	
-//	// Check doSomething method
-//	STAssertTrue([obj respondsToSelector:sel], @"");
-//}
+- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
+{
+	SEL sel = @selector(doSomething);
+	
+	// Make obj
+	id obj;
+	obj = [NSObject object];
+	
+	// Call removeCurrentBlock
+	STAssertNoThrow([obj removeCurrentBlock], @"");
+	
+	// Add doSomething method
+	[obj setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
+		// Do something
+	}];
+	
+	// Call removeCurrentBlock
+	STAssertNoThrow([obj removeCurrentBlock], @"");
+	
+	// Check doSomething method
+	STAssertTrue([obj respondsToSelector:sel], @"");
+}
 
 - (void)test_doNotChangeClassFrequentlyWithDynamicBlockManagement
 {

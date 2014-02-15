@@ -34,11 +34,8 @@
 + (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
 
 // Block Management for Specific Instance
-- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block; // Needed ?????
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
-- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key; // Needed ?????
 - (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
-- (void)removeBlockForClassMethod:(SEL)selector key:(id)key; // Needed ?????
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key;
 
 // Methods intended to be called in Block

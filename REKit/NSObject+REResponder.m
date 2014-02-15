@@ -45,7 +45,7 @@ typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
 typedef NS_ENUM(NSInteger, REResponderOperation) {
 	REResponderOperationClassMethodOfClass,
 	REResponderOperationInstanceMethodOfClass,
-	REResponderOperationClassMethodOfObject,
+	REResponderOperationClassMethodOfObject, // Needed ?????
 	REResponderOperationInstanceMethodOfObject,
 };
 
@@ -1060,7 +1060,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 #pragma mark -- Block Management for Specific Instance --
 //--------------------------------------------------------------//
 
-- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
+- (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block // Needed ?????
 {
 	// Filter
 	if (REIsClass(self)) {
@@ -1080,7 +1080,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	REResponderSetBlockForSelector(self, selector, key, block, REResponderOperationInstanceMethodOfObject);
 }
 
-- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key
+- (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key // Needed ?????
 {
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationClassMethodOfObject);
 }
@@ -1095,7 +1095,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 	return REResponderHasBlockForSelector(self, selector, key, REResponderOperationInstanceMethodOfObject);
 }
 
-- (void)removeBlockForClassMethod:(SEL)selector key:(id)key
+- (void)removeBlockForClassMethod:(SEL)selector key:(id)key // Needed ?????
 {
 	// Filter
 	if (REIsClass(self)) {

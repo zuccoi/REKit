@@ -898,8 +898,8 @@
 	// Add block
 	[RETestObject setBlockForInstanceMethod:sel key:Nil block:^(id receiver) {
 		STAssertEqualObjects(receiver, obj, @"");
-		[receiver removeCurrentBlock];
 		called = YES;
+		[receiver removeCurrentBlock];
 	}];
 	
 	// Call

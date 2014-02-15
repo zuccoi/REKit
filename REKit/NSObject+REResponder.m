@@ -4,7 +4,6 @@
  Copyright ©2014 Kazki Miura. All rights reserved.
 */
 
-#import <objc/runtime.h> // Needed ?????
 #import "NSObject+REResponder.h"
 #import "REUtil.h"
 

@@ -42,7 +42,7 @@
 @interface NSObject (REResponder)
 
 // Block Management for Class
-+ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block; // Should I return key ?????
++ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 + (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;

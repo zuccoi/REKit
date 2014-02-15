@@ -1817,7 +1817,7 @@
 	
 	// Override
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSInteger integer) {
-		return RESupermethod(0, receiver, sel, integer) + 1;
+		return RESupermethod(0, receiver, integer) + 1;
 	}];
 	
 	// Call
@@ -2243,13 +2243,13 @@
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSString *string) {
-		RESupermethod(nil, receiver, sel, string);
+		RESupermethod(nil, receiver, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSString *string) {
-		RESupermethod(nil, receiver, sel, @"block");
+		RESupermethod(nil, receiver, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
 	
@@ -2267,12 +2267,12 @@
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, sel, @"Wow"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, @"Wow"), string];
 	}];
 	
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, sel, @"block1"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, @"block1"), string];
 	}];
 	
 	// Call
@@ -2292,7 +2292,7 @@
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(0, receiver, sel, integer);
+		value = RESupermethod(0, receiver, integer);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)1, @"");
@@ -2304,7 +2304,7 @@
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(0, receiver, sel, 1);
+		value = RESupermethod(0, receiver, 1);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)2, @"");
@@ -2330,7 +2330,7 @@
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
-		rect = RESupermethod((CGRect){}, receiver, sel, origin, size);
+		rect = RESupermethod((CGRect){}, receiver, origin, size);
 		STAssertEquals(rect, CGRectZero, @"");
 		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
@@ -2339,7 +2339,7 @@
 	// Add block
 	[obj setBlockForClassMethod:sel key:nil block:^(Class receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
-		rect = RESupermethod(CGRectZero, receiver, sel, origin, size);
+		rect = RESupermethod(CGRectZero, receiver, origin, size);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

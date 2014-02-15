@@ -7,10 +7,12 @@
 #import <Foundation/Foundation.h>
 
 #define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
-#define RESupermethod(defaultValue, receiver, selector, ...) \
+#define RESupermethod(defaultValue, receiver, ...) \
 	^{\
-		IMP supermethod = [receiver supermethodOfCurrentBlock];\
-		if (supermethod) {\
+		SEL selector;\
+		IMP supermethod;\
+		supermethod = [receiver supermethodOfCurrentBlockGettingSelector:&selector];\
+		if (supermethod && selector) {\
 			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))supermethod)(receiver, selector, ##__VA_ARGS__);\
 		}\
 		else {\
@@ -50,6 +52,12 @@
 @end
 
 #pragma mark -
+
+
+@interface NSObject (REResponder_Private)
++ (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector;
+- (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector;
+@end
 
 
 // Deprecated Methods

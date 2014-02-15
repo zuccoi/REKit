@@ -79,7 +79,7 @@
 	#pragma mark └ [self viewWillAppear:]
 	[self setBlockForInstanceMethod:@selector(viewWillAppear:) key:nil block:^(id receiver, BOOL animated) {
 		// supermethod
-		RESupermethod(nil, receiver, @selector(viewWillAppear:), animated);
+		RESupermethod(nil, receiver, animated);
 		
 		// Start observing
 		if (!self_.observer) {
@@ -103,7 +103,7 @@
 		self_.observer = nil;
 		
 		// supermethod
-		RESupermethod(nil, receiver, @selector(viewWillDisappear:), animated);
+		RESupermethod(nil, receiver, animated);
 	}];
 }
 

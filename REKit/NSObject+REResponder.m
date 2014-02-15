@@ -1120,15 +1120,18 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 #pragma mark -- Current Block --
 //--------------------------------------------------------------//
 
-IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
+IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress, SEL *selector)
 {
-	// Get elements
+	// Get blockInfo
 	NSDictionary *blockInfo;
-	IMP imp;
 	blockInfo = REResponderGetBlockInfoWithReturnAddress(receiver, returnAddress, nil);
-	imp = [blockInfo[kBlockInfoImpKey] pointerValue];
 	
-	return REResponderGetSupermethodWithImp(receiver, imp);
+	// Set selector
+	if (selector) {
+		*selector = NSSelectorFromString(blockInfo[kBlockInfoSelectorKey]);
+	}
+	
+	return REResponderGetSupermethodWithImp(receiver, [blockInfo[kBlockInfoImpKey] pointerValue]);
 }
 
 + (IMP)supermethodOfCurrentBlock
@@ -1138,7 +1141,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 		return NULL;
 	}
 	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0));
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), NULL);
 }
 
 - (IMP)supermethodOfCurrentBlock
@@ -1148,7 +1151,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 		return NULL;
 	}
 	
-	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0));
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), NULL);
 }
 
 void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
@@ -1302,6 +1305,31 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 
 
 #pragma mark -
+
+
+@implementation NSObject (REResponder_Private)
+
++ (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector
+{
+	// Filter
+	if (!REIsClass(self)) {
+		return NULL;
+	}
+	
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
+}
+
+- (IMP)supermethodOfCurrentBlockGettingSelector:(SEL*)selector
+{
+	// Filter
+	if (REIsClass(self)) {
+		return NULL;
+	}
+	
+	return REResponderGetSupermethod(self, (NSUInteger)__builtin_return_address(0), selector);
+}
+
+@end
 
 
 @implementation NSObject (REResponder_Depricated)

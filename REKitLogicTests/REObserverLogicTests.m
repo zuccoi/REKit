@@ -958,7 +958,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, sel);
+			RESupermethod(nil, receiver);
 		}];
 	}
 	
@@ -988,7 +988,7 @@
 			deallocated = YES;
 			
 			// supermethod
-			RESupermethod(nil, receiver, sel);
+			RESupermethod(nil, receiver);
 		}];
 	}
 	

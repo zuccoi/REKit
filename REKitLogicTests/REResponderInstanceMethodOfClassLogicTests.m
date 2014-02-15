@@ -1076,7 +1076,7 @@
 	
 	// Add block1
 	[NSString setBlockForInstanceMethod:sel key:@"block1" block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, sel, string), @"-block1"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, string), @"-block1"];
 	}];
 	
 	// Call
@@ -1085,7 +1085,7 @@
 	
 	// Add block2
 	[NSString setBlockForInstanceMethod:sel key:@"block2" block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, sel, string), @"-block2"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, string), @"-block2"];
 	}];
 	
 	// Call
@@ -1094,7 +1094,7 @@
 	
 	// Add block3
 	[NSString setBlockForInstanceMethod:sel key:@"block3" block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, sel, string), @"-block3"];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(string, receiver, string), @"-block3"];
 	}];
 	
 	// Call
@@ -1152,7 +1152,7 @@
 	
 	// Override ageAfterYears: method
 	[RETestObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSUInteger years) {
-		return (RESupermethod(years, receiver, sel, years) + 1);
+		return (RESupermethod(years, receiver, years) + 1);
 	}];
 	
 	// Check age
@@ -1559,13 +1559,13 @@
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(nil, receiver, sel, string);
+		RESupermethod(nil, receiver, string);
 		STAssertEqualObjects(string, @"block", @"");
 	}];
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		RESupermethod(nil, receiver, sel, @"block");
+		RESupermethod(nil, receiver, @"block");
 		STAssertEqualObjects(string, @"string", @"");
 	}];
 	
@@ -1579,12 +1579,12 @@
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, sel, @"Wow"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, @"Wow"), string];
 	}];
 	
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSString *string) {
-		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, sel, @"block1"), string];
+		return [NSString stringWithFormat:@"%@%@", RESupermethod(nil, receiver, @"block1"), string];
 	}];
 	
 	// Call
@@ -1600,7 +1600,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(0, receiver, sel, integer);
+		value = RESupermethod(0, receiver, integer);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)1, @"");
@@ -1612,7 +1612,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, NSInteger integer) {
 		NSInteger value;
-		value = RESupermethod(0, receiver, sel, 1);
+		value = RESupermethod(0, receiver, 1);
 		
 		// Check
 		STAssertEquals(integer, (NSInteger)2, @"");
@@ -1634,7 +1634,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
-		rect = RESupermethod((CGRect){}, receiver, sel, origin, size);
+		rect = RESupermethod((CGRect){}, receiver, origin, size);
 		STAssertEquals(rect, CGRectZero, @"");
 		
 		return CGRectMake(1.0, 2.0, 3.0, 4.0);
@@ -1643,7 +1643,7 @@
 	// Add block
 	[NSObject setBlockForInstanceMethod:sel key:nil block:^(id receiver, CGPoint origin, CGSize size) {
 		CGRect rect;
-		rect = RESupermethod(CGRectZero, receiver, sel, origin, size);
+		rect = RESupermethod(CGRectZero, receiver, origin, size);
 		rect.origin.x *= 10.0;
 		rect.origin.y *= 10.0;
 		rect.size.width *= 10.0;

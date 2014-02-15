@@ -82,22 +82,12 @@
 - (void)_manageObserver
 {
 	// Prepare for REKit
-	NSString *const key = RE_LINE;
 	__weak typeof(self) self_ = self;
 	
 	#pragma mark └ [self viewWillAppear:]
 	RESetBlock(self, @selector(viewWillAppear:), NO, nil, ^(RE_TYPE(self), BOOL animated) {
-	// ?????
-	NSLog(@"%s", __PRETTY_FUNCTION__);
-		RESupermethod(nil, self, animated);
-	});
-	[self setBlockForInstanceMethod:@selector(viewWillAppear:) key:key block:^(id receiver, BOOL animated) {
 		// supermethod
-		IMP supermethod;
-		supermethod = [receiver supermethodOfInstanceMethod:@selector(viewWillAppear:) key:key];
-		if (supermethod) {
-			(REIMP(void)supermethod)(receiver, @selector(viewWillAppear:), animated);
-		}
+		RESupermethod(nil, self, animated);
 		
 		// Start observing
 		if (!self_.observer) {
@@ -112,7 +102,7 @@
 				self_.label.text = [NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", r, g, b];
 			}];
 		}
-	}];
+	});
 	
 	#pragma mark └ [self viewWillDisappear:]
 	[self setBlockForInstanceMethod:@selector(viewWillDisappear:) key:nil block:^(id receiver, BOOL animated) {

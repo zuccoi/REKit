@@ -5,26 +5,28 @@
 */
 
 #import <Foundation/Foundation.h>
-#import "REUtil.h" // Delete later >>>
+#import "REUtil.h"
 
 
 #define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
 
-#define RESetBlock(receiver, selector, isClassMethod, key, block) \
-	^{\
+#define RESetBlock(receiver, selector, isClassMethod, key, block...) \
+	({\
+		id re_receiver;\
 		id re_key;\
 		SEL re_selector;\
 		BOOL re_isClassMethod;\
+		re_receiver = receiver;\
 		re_key = (key ? key : REUUIDString());\
 		re_selector = selector;\
 		re_isClassMethod = isClassMethod;\
 		_RESetBlock(receiver, selector, isClassMethod, re_key, block);\
-	}()
+	})
 
 #define RESupermethod(defaultValue, receiver, ...) \
 	^{\
 		IMP re_supermethod = NULL;\
-		re_supermethod = _REGetSupermethod(receiver, re_selector, re_isClassMethod, re_key);\
+		re_supermethod = _REGetSupermethod(re_receiver, re_selector, re_isClassMethod, re_key);\
 		if (re_supermethod && re_selector) {\
 			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
 		}\
@@ -33,11 +35,14 @@
 		}\
 	}()
 
+#define RERemoveCurrentBlock \
+	_RERemoveCurrentBlock(re_receiver, re_selector, re_isClassMethod, re_key)
+
 
 @interface NSObject (REResponder)
 
 // Block Management for Class
-+ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block;
++ (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block; // Should I return key ?????
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block;
 + (BOOL)hasBlockForClassMethod:(SEL)selector key:(id)key;
 + (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key;
@@ -64,6 +69,7 @@
 // Private
 void _RESetBlock(id receiver, SEL selector, BOOL isClassMethod, id key, id block);
 IMP _REGetSupermethod(id receiver, SEL selector, BOOL isClassMethod, id key);
+void _RERemoveCurrentBlock(id receiver, SEL selector, BOOL isClassMethod, id key);
 
 // Deprecated Methods
 @interface NSObject (REResponder_Depricated)

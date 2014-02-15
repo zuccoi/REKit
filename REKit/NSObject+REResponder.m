@@ -1208,6 +1208,31 @@ IMP _REGetSupermethod(id receiver, SEL selector, BOOL isClassMethod, id key)
 	return REResponderGetSupermethod(receiver, selector, key, op);
 }
 
+void _RERemoveCurrentBlock(id receiver, SEL selector, BOOL isClassMethod, id key)
+{
+	// Decide op
+	REResponderOperation op;
+	if (REIsClass(receiver)) {
+		if (isClassMethod) {
+			op = REResponderOperationClassMethodOfClass;
+		}
+		else {
+			op = REResponderOperationInstanceMethodOfClass;
+		}
+	}
+	else {
+		if (isClassMethod) {
+			op = REResponderOperationClassMethodOfObject;
+		}
+		else {
+			op = REResponderOperationInstanceMethodOfObject;
+		}
+	}
+	
+	// Remove
+	REResponderRemoveBlockForSelector(receiver, selector, key, op);
+}
+
 
 @implementation NSObject (REResponder_Depricated)
 

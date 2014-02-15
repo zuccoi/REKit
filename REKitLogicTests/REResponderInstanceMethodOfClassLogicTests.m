@@ -1333,13 +1333,6 @@
 	STAssertEqualObjects(imps, expected, @"");
 }
 
-- (void)test_supermethod__obtainFromOutsideOfBlock
-{
-	IMP supermethod;
-	supermethod = [NSObject supermethodOfCurrentBlock:NULL];
-	STAssertNil((id)supermethod, @"");
-}
-
 - (void)test_removeBlockForInstanceMethod_key
 {
 	SEL sel = @selector(log);
@@ -1431,29 +1424,6 @@
 	// Call again
 	string = objc_msgSend([NSObject object], sel);
 	STAssertEqualObjects(string, @"block2", @"");
-}
-
-- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
-{
-	SEL sel = @selector(doSomething);
-	
-	// Make obj
-	id obj;
-	obj = [NSObject object];
-	
-	// Call removeCurrentBlock
-	STAssertNoThrow([obj removeCurrentBlock], @"");
-	
-	// Add doSomething method
-	[NSObject setBlockForInstanceMethod:sel key:@"key" block:^(id receiver) {
-		// Do something
-	}];
-	
-	// Call removeCurrentBlock
-	STAssertNoThrow([obj removeCurrentBlock], @"");
-	
-	// Check doSomething method
-	STAssertTrue([NSObject instancesRespondToSelector:sel], @"");
 }
 
 - (void)test_doNotChangeClass

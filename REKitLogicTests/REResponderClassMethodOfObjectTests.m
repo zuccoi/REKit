@@ -1882,20 +1882,6 @@
 	STAssertTrue(called, @"");
 }
 
-- (void)test_supermethod__obtainFromOutsideOfBlock
-{
-	// Make obj
-	id obj;
-	obj = [NSObject object];
-	
-	// Get supermethod
-	IMP supermethod;
-	supermethod = [obj supermethodOfCurrentBlock:NULL];
-	STAssertNil((id)supermethod, @"");
-	supermethod = [obj supermethodOfCurrentBlock:NULL];
-	STAssertNil((id)supermethod, @"");
-}
-
 - (void)test_removeBlockForClassMethod_key
 {
 	SEL sel = _cmd;
@@ -1994,28 +1980,6 @@
 	// Call again
 	string = objc_msgSend(object_getClass(obj), sel);
 	STAssertEqualObjects(string, @"block2", @"");
-}
-
-- (void)test_canCallRemoveCurrentBlockFromOutsideOfBlock
-{
-	SEL sel = @selector(doSomething);
-	
-	// Make obj
-	id obj;
-	obj = [NSObject object];
-	
-	// Call removeCurrentBlock
-	STAssertNoThrow([obj removeCurrentBlock], @"");
-	
-	// Add doSomething method
-	[obj setBlockForClassMethod:sel key:@"key" block:^(Class receiver) {
-	}];
-	
-	// Call removeCurrentBlock
-	STAssertNoThrow([obj removeCurrentBlock], @"");
-	
-	// Check doSomething method
-	STAssertTrue([object_getClass(obj) respondsToSelector:sel], @"");
 }
 
 - (void)test_doNotChangeClassFrequentlyWithDynamicBlockManagement

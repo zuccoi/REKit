@@ -118,5 +118,5 @@ NSSet* RESubclassesOfClass(Class cls, BOOL includeCls);
 //--------------------------------------------------------------//
 
 #define RE_LINE [NSString stringWithFormat:@"%s-l.%i", __FILE__, __LINE__]
-#define RE_PRETTY_FUNCTION [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+#define RE_FUNC @(__PRETTY_FUNCTION__)
 extern NSString* REUUIDString();

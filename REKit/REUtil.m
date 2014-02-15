@@ -109,7 +109,7 @@ Class object_setClass(id object, Class cls)
 	return oldClass;
 }
 
-BOOL REIsClass(id receiver) // Test >>>
+BOOL REIsClass(id receiver)
 {
 	return (receiver == [receiver class]);
 }
@@ -130,7 +130,7 @@ Class REGetClass(id receiver)
 	}
 }
 
-Class REGetSuperclass(id receiver) // Test >>>
+Class REGetSuperclass(id receiver)
 {
 	Class class;
 	class = REGetClass(receiver);

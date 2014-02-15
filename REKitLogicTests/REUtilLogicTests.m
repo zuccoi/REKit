@@ -15,6 +15,13 @@
 
 @implementation REUtilLogicTests
 
+- (void)test_REIsClass
+{
+	STAssertTrue(!REIsClass([NSObject object]), @"");
+	STAssertTrue(REIsClass([NSObject class]), @"");
+	STAssertTrue(object_getClass([NSObject class]), @"");
+}
+
 - (void)test_REGetClass
 {
 	id obj;
@@ -26,6 +33,23 @@
 	STAssertEquals(REGetClass(obj), class, @"");
 	STAssertEquals(REGetClass([NSObject class]), class, @"");
 	STAssertEquals(REGetClass(object_getClass([NSObject class])), class, @"");
+}
+
+- (void)test_REGetSuperclass
+{
+	STAssertEquals(REGetSuperclass(nil), (Class)nil, @"");
+	STAssertEquals(REGetSuperclass([NSObject class]), (Class)nil, @"");
+	STAssertEquals(REGetSuperclass([RETestObject class]), [NSObject class], @"");
+	STAssertEquals(REGetSuperclass([RETestObject object]), [NSObject class], @"");
+	STAssertEquals(REGetSuperclass([RESubTestObject class]), [RETestObject class], @"");
+	STAssertEquals(REGetSuperclass([RESubTestObject object]), [RETestObject class], @"");
+	
+	id obj, observer;
+	obj = [RETestObject object];
+	observer = [NSObject object];
+	[obj addObserver:observer forKeyPath:@"version" options:0 context:NULL];
+	STAssertEquals(REGetSuperclass(obj), [RETestObject class], @"");
+	[obj removeObserver:observer forKeyPath:@"version"];
 }
 
 - (void)test_REGetMetaClass

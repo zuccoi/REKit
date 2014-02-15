@@ -100,7 +100,7 @@ BOOL REResponderConformsToProtocol(id receiver, Protocol *protocol)
 + (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return NO;
 	}
 	
@@ -119,7 +119,7 @@ BOOL REResponderConformsToProtocol(id receiver, Protocol *protocol)
 - (BOOL)REResponder_X_conformsToProtocol:(Protocol*)protocol
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return NO;
 	}
 	
@@ -156,7 +156,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 + (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return NO;
 	}
 	
@@ -166,7 +166,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 + (BOOL)REResponder_X_instancesRespondToSelector:(SEL)aSelector
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return NO;
 	}
 	
@@ -176,7 +176,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 - (BOOL)REResponder_X_respondsToSelector:(SEL)aSelector
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return NO;
 	}
 	
@@ -441,7 +441,6 @@ NSDictionary* REResponderGetBlockInfoForSelector(id receiver, SEL selector, id k
 
 NSDictionary* REResponderGetBlockInfoWithReturnAddress(id receiver, NSUInteger returnAddress, NSMutableArray **outBlockInfos, SEL *outSelector)
 {
-// Use cache >>>
 	@synchronized (receiver) {
 		// Get blockInfo 
 		__block NSMutableDictionary *blockInfo = nil;
@@ -574,7 +573,7 @@ NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArra
 		};
 		
 		// Search blockInfo of object
-		if (receiver != REGetClass(receiver)) {
+		if (!REIsClass(receiver)) {
 			blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationInstanceMethodOfObject, NO));
 			if (!blockInfo) {
 				blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationClassMethodOfObject, NO));
@@ -1014,7 +1013,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 + (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return;
 	}
 	
@@ -1024,7 +1023,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 + (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return;
 	}
 	
@@ -1044,7 +1043,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 + (void)removeBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return;
 	}
 	
@@ -1054,7 +1053,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 + (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return;
 	}
 	
@@ -1068,7 +1067,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 - (void)setBlockForClassMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return;
 	}
 	
@@ -1078,7 +1077,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 - (void)setBlockForInstanceMethod:(SEL)selector key:(id)key block:(id)block
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return;
 	}
 	
@@ -1093,7 +1092,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 - (BOOL)hasBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return NO;
 	}
 	
@@ -1103,7 +1102,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 - (void)removeBlockForClassMethod:(SEL)selector key:(id)key
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return;
 	}
 	
@@ -1113,7 +1112,7 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 - (void)removeBlockForInstanceMethod:(SEL)selector key:(id)key
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return;
 	}
 	
@@ -1126,8 +1125,6 @@ void REResponderRemoveBlockForSelector(id receiver, SEL selector, id key, REResp
 
 IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 {
-	// Optimize >>>
-	
 	// Get elements
 	NSDictionary *blockInfo;
 	IMP imp;
@@ -1140,7 +1137,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 + (IMP)supermethodOfCurrentBlock
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return NULL;
 	}
 	
@@ -1150,7 +1147,7 @@ IMP REResponderGetSupermethod(id receiver, NSUInteger returnAddress)
 - (IMP)supermethodOfCurrentBlock
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return NULL;
 	}
 	
@@ -1180,7 +1177,7 @@ void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
 + (void)removeCurrentBlock
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return;
 	}
 	
@@ -1190,7 +1187,7 @@ void REResponderRemoveCurrentBlock(id receiver, NSUInteger returnAddress)
 - (void)removeCurrentBlock
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return;
 	}
 	
@@ -1286,7 +1283,7 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 + (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)key
 {
 	// Filter
-	if (self != REGetClass(self)) {
+	if (!REIsClass(self)) {
 		return;
 	}
 	
@@ -1296,7 +1293,7 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 - (void)setConformable:(BOOL)conformable toProtocol:(Protocol*)protocol key:(id)key
 {
 	// Filter
-	if (self == REGetClass(self)) {
+	if (REIsClass(self)) {
 		return;
 	}
 	

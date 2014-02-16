@@ -16,13 +16,9 @@
 		_Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
 		_Pragma("clang diagnostic ignored \"-Wshadow\"") \
 		__typeof(receiver) __weak re_receiver = receiver;\
-		SEL re_selector;\
-		BOOL re_isClassMethod;\
-		id re_valited_key;\
-		re_valited_key = (key ? key : REUUIDString());\
-		__typeof(key) __weak re_key = re_valited_key;\
-		re_selector = selector;\
-		re_isClassMethod = isClassMethod;\
+		SEL re_selector = selector;\
+		BOOL re_isClassMethod = isClassMethod;\
+		id __weak re_key = (key ? key : REUUIDString());\
 		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block);\
 		_Pragma("clang diagnostic pop")\
 	})

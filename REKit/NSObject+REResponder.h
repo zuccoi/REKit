@@ -12,15 +12,18 @@
 
 #define RESetBlock(receiver, selector, isClassMethod, key, block...) \
 	({\
-		id re_receiver;\
-		id re_key;\
+		_Pragma("clang diagnostic push") \
+		_Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+		__typeof(receiver) __weak re_receiver = receiver;\
 		SEL re_selector;\
 		BOOL re_isClassMethod;\
-		re_receiver = receiver;\
-		re_key = (key ? key : REUUIDString());\
+		id re_strong_key;\
+		re_strong_key = (key ? key : REUUIDString());\
+		__typeof(key) __weak re_key = re_strong_key;\
 		re_selector = selector;\
 		re_isClassMethod = isClassMethod;\
 		_RESetBlock(receiver, selector, isClassMethod, re_key, block);\
+		_Pragma("clang diagnostic pop")\
 	})
 
 #define RESupermethod(defaultValue, receiver, ...) \
@@ -35,7 +38,7 @@
 		}\
 	}()
 
-#define RERemoveCurrentBlock \
+#define RERemoveCurrentBlock() \
 	_RERemoveCurrentBlock(re_receiver, re_selector, re_isClassMethod, re_key)
 
 

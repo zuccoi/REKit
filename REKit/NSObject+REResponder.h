@@ -14,15 +14,16 @@
 	({\
 		_Pragma("clang diagnostic push") \
 		_Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+		_Pragma("clang diagnostic ignored \"-Wshadow\"") \
 		__typeof(receiver) __weak re_receiver = receiver;\
 		SEL re_selector;\
 		BOOL re_isClassMethod;\
-		id re_strong_key;\
-		re_strong_key = (key ? key : REUUIDString());\
-		__typeof(key) __weak re_key = re_strong_key;\
+		id re_valited_key;\
+		re_valited_key = (key ? key : REUUIDString());\
+		__typeof(key) __weak re_key = re_valited_key;\
 		re_selector = selector;\
 		re_isClassMethod = isClassMethod;\
-		_RESetBlock(receiver, selector, isClassMethod, re_key, block);\
+		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block);\
 		_Pragma("clang diagnostic pop")\
 	})
 
@@ -40,6 +41,9 @@
 
 #define RERemoveCurrentBlock() \
 	_RERemoveCurrentBlock(re_receiver, re_selector, re_isClassMethod, re_key)
+
+#define RE_PRETTY_BLOCK \
+	[NSString stringWithFormat:@"[%@ %@]%@[%@ %@]", NSStringFromClass([re_receiver class]), NSStringFromSelector(_cmd), (re_isClassMethod ? @"+" : @"-"), NSStringFromClass([re_receiver class]), NSStringFromSelector(re_selector)]
 
 
 @interface NSObject (REResponder)

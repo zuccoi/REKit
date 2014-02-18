@@ -12,12 +12,16 @@
 
 #define RESetBlock(receiver, selector, isClassMethod, key, block...) \
 	({\
+		_Pragma("clang diagnostic push") \
+		_Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+		NSString *re_pretty_function = @(__PRETTY_FUNCTION__); \
 		__typeof(receiver) __weak re_receiver = receiver; \
 		SEL re_selector = selector; \
 		BOOL re_isClassMethod = isClassMethod; \
 		id __weak re_key = (key ? key : REUUIDString()); \
 		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block); \
-	})
+		_Pragma("clang diagnostic pop") \
+	}) \
 
 #define RESupermethod(defaultValue, receiver, ...) \
 	^{ \
@@ -35,7 +39,7 @@
 	_RERemoveCurrentBlock(re_receiver, re_selector, re_isClassMethod, re_key)
 
 #define RE_PRETTY_BLOCK \
-	[NSString stringWithFormat:@"[%@ %@]%@[%@ %@]", NSStringFromClass([re_receiver class]), NSStringFromSelector(_cmd), (re_isClassMethod ? @"+" : @"-"), NSStringFromClass([re_receiver class]), NSStringFromSelector(re_selector)]
+	[NSString stringWithFormat:@"%@%@", re_pretty_function, [NSString stringWithFormat:@"%@[%@ %@]", (re_isClassMethod ? @"+" : @"-"), NSStringFromClass([re_receiver class]), NSStringFromSelector(re_selector)]]
 
 
 @interface NSObject (REResponder)

@@ -12,27 +12,23 @@
 
 #define RESetBlock(receiver, selector, isClassMethod, key, block...) \
 	({\
-		_Pragma("clang diagnostic push") \
-		_Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
-		_Pragma("clang diagnostic ignored \"-Wshadow\"") \
-		__typeof(receiver) __weak re_receiver = receiver;\
-		SEL re_selector = selector;\
-		BOOL re_isClassMethod = isClassMethod;\
-		id __weak re_key = (key ? key : REUUIDString());\
-		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block);\
-		_Pragma("clang diagnostic pop")\
+		__typeof(receiver) __weak re_receiver = receiver; \
+		SEL re_selector = selector; \
+		BOOL re_isClassMethod = isClassMethod; \
+		id __weak re_key = (key ? key : REUUIDString()); \
+		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block); \
 	})
 
 #define RESupermethod(defaultValue, receiver, ...) \
-	^{\
-		IMP re_supermethod = NULL;\
-		re_supermethod = _REGetSupermethod(re_receiver, re_selector, re_isClassMethod, re_key);\
-		if (re_supermethod && re_selector) {\
-			return (__typeof(defaultValue))(RE_IMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
-		}\
-		else {\
-			return (__typeof(defaultValue))defaultValue;\
-		}\
+	^{ \
+		IMP re_supermethod = NULL; \
+		re_supermethod = _REGetSupermethod(re_receiver, re_selector, re_isClassMethod, re_key); \
+		if (re_supermethod && re_selector) { \
+			return (__typeof(defaultValue))(RE_IMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__); \
+		} \
+		else { \
+			return (__typeof(defaultValue))defaultValue; \
+		} \
 	}()
 
 #define RERemoveCurrentBlock() \

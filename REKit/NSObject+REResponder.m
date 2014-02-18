@@ -393,7 +393,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 
 IMP REResponderForwardingMethod()
 {
-	return [NSObject methodForSelector:@selector(REResponder_UnexistingMethod)];
+	return [NSObject methodForSelector:NSSelectorFromString(@"REResponder_UnexistingMethod")];
 }
 
 BOOL REResponderIsPrivateClass(id receiver)

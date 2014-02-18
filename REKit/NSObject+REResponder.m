@@ -624,7 +624,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				IMP imp;
 				imp = method_getImplementation(class_getInstanceMethod(NSClassFromString(originalClassName), @selector(classForCoder)));
 				if (imp) {
-					(REIMP(Class)imp)(receiver, @selector(classForCoder));
+					(RE_IMP(Class)imp)(receiver, @selector(classForCoder));
 				}
 			}];
 		}

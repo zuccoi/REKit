@@ -8,7 +8,7 @@
 #import "REUtil.h"
 
 
-#define REIMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
+#define RE_IMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
 
 #define RESetBlock(receiver, selector, isClassMethod, key, block...) \
 	({\
@@ -28,7 +28,7 @@
 		IMP re_supermethod = NULL;\
 		re_supermethod = _REGetSupermethod(re_receiver, re_selector, re_isClassMethod, re_key);\
 		if (re_supermethod && re_selector) {\
-			return (__typeof(defaultValue))(REIMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
+			return (__typeof(defaultValue))(RE_IMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__);\
 		}\
 		else {\
 			return (__typeof(defaultValue))defaultValue;\

@@ -45,7 +45,7 @@
 	^{ \
 		IMP re_supermethod = NULL; \
 		re_supermethod = _REGetSupermethod(re_receiver, re_selector, re_isClassMethod, re_key); \
-		if (re_supermethod && re_selector) { \
+		if (re_supermethod) { \
 			return (__typeof(defaultValue))(RE_IMP(__typeof(defaultValue))re_supermethod)(receiver, re_selector, ##__VA_ARGS__); \
 		} \
 		else { \

@@ -77,6 +77,14 @@
 	[super viewWillAppear:animated];
 	
 	NSLog(@"original %s", __PRETTY_FUNCTION__);
+	
+	@autoreleasepool {
+		id obj;
+		obj = [[NSObject alloc] init];
+		RESetBlock(obj, @selector(hoge), NO, nil, ^(id receiver) {
+			NSLog(@"%@", RE_PRETTY_BLOCK);
+		});
+	}
 }
 
 - (void)_manageObserver

@@ -858,7 +858,7 @@
 	RESetBlock([NSString class], sel, YES, nil, ^(Class receiver) {
 		// Get supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key];
 		STAssertNil((id)supermethod, @"");
 	});
 	
@@ -881,7 +881,7 @@
 		// supermethod
 		NSInteger res = -1;
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			res = supermethod(receiver, sel);
 		}
 		
@@ -905,7 +905,7 @@
 		// supermethod
 		NSInteger res = -1;
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			res = supermethod(receiver, sel);
 		}
 		
@@ -937,7 +937,7 @@
 	RESetBlock([NSObject class], sel, YES, nil, ^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			(RE_IMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -965,7 +965,7 @@
 	RESetBlock([RETestObject class], sel, YES, nil, ^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			(RE_IMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -997,7 +997,7 @@
 	RESetBlock([[obj class] class], sel, YES, nil, ^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			(RE_IMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -1029,7 +1029,7 @@
 	RESetBlock([RETestObject class], sel, YES, nil, ^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			(RE_IMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -1052,7 +1052,7 @@
 	// Override
 	RESetBlock([RETestObject class], sel, YES, nil, ^(Class receiver) {
 		// Check supermethod
-		STAssertEquals([receiver supermethodOfCurrentBlock:NULL], [NSObject methodForSelector:sel], @"");
+		STAssertEquals([receiver supermethodOfClassMethod:re_selector key:re_key], [NSObject methodForSelector:sel], @"");
 		
 		called = YES;
 	});
@@ -1078,7 +1078,7 @@
 	// Add block
 	RESetBlock([RETestObject class], sel, YES, nil, ^(Class receiver) {
 		// Check supermethod
-		STAssertEquals([receiver supermethodOfCurrentBlock:NULL], imp, @"");
+		STAssertEquals([receiver supermethodOfClassMethod:re_selector key:re_key], imp, @"");
 		
 		called = YES;
 	});
@@ -1293,7 +1293,7 @@
 	RESetBlock([RETestObject class], sel, YES, nil, ^(Class receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfClassMethod:re_selector key:re_key])) {
 			supermethod(receiver, sel);
 			called = YES;
 		}
@@ -1685,7 +1685,7 @@
 		called = YES;
 	});
 	RESetBlock([NSObject class], sel, YES, nil, ^(Class receiver) {
-		(RE_IMP(void)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
+		(RE_IMP(void)[receiver supermethodOfClassMethod:re_selector key:re_key])(receiver, sel);
 	});
 	
 	// Call
@@ -1701,7 +1701,7 @@
 	});
 	RESetBlock([NSObject class], sel, YES, nil, ^(Class receiver) {
 		NSString *res;
-		res = (RE_IMP(id)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
+		res = (RE_IMP(id)[receiver supermethodOfClassMethod:re_selector key:re_key])(receiver, sel);
 		return res;
 	});
 	
@@ -1716,7 +1716,7 @@
 	});
 	RESetBlock([NSObject class], sel, YES, nil, ^(Class receiver) {
 		NSInteger i;
-		i = (RE_IMP(NSInteger)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
+		i = (RE_IMP(NSInteger)[receiver supermethodOfClassMethod:re_selector key:re_key])(receiver, sel);
 		return i + 1;
 	});
 	

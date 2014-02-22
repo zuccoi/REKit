@@ -915,7 +915,7 @@
 	// Add block
 	RESetBlock([NSArray class], sel, NO, @"key", ^(id receiver) {
 		// Check supermethod
-		STAssertNil((id)[receiver supermethodOfCurrentBlock:NULL], @"");
+		STAssertNil((id)[receiver supermethodOfInstanceMethod:re_selector key:re_key], @"");
 		
 		called = YES;
 	});
@@ -937,7 +937,7 @@
 	// Override log method
 	RESetBlock([RETestObject class], sel, NO, @"key", ^(id receiver) {
 		// Check supermethod
-		STAssertEquals([receiver supermethodOfCurrentBlock:NULL], originalMethod, @"");
+		STAssertEquals([receiver supermethodOfInstanceMethod:re_selector key:re_key], originalMethod, @"");
 		
 		called = YES;
 	});
@@ -955,7 +955,7 @@
 	// Add log block to RESubTestObject
 	RESetBlock([RESubTestObject class], sel, NO, @"key", ^(id receiver) {
 		// Check supermethod
-		STAssertEquals([receiver supermethodOfCurrentBlock:NULL], [RETestObject instanceMethodForSelector:sel], @"");
+		STAssertEquals([receiver supermethodOfInstanceMethod:re_selector key:re_key], [RETestObject instanceMethodForSelector:sel], @"");
 		
 		called = YES;
 	});
@@ -980,7 +980,7 @@
 	// Add block
 	RESetBlock([RETestObject class], sel, NO, nil, ^(id receiver) {
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key])) {
 			(RE_IMP(void)supermethod)(receiver, sel);
 		}
 		
@@ -1010,7 +1010,7 @@
 	// Add instance method
 	RESetBlock([NSObject class], sel, NO, nil, ^(id receiver) {
 		// Check supermethod
-		STAssertNil((id)[receiver supermethodOfCurrentBlock:NULL], @"");
+		STAssertNil((id)[receiver supermethodOfInstanceMethod:re_selector key:re_key], @"");
 	});
 	
 	// Call
@@ -1190,7 +1190,7 @@
 	RESetBlock([RETestObject class], sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		if ((supermethod = [receiver supermethodOfCurrentBlock:NULL])) {
+		if ((supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key])) {
 			supermethod(receiver, sel);
 			called = YES;
 		}
@@ -1216,7 +1216,7 @@
 	RESetBlock(testObj, sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1229,7 +1229,7 @@
 	RESetBlock([NSObject class], sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1242,7 +1242,7 @@
 	RESetBlock(obj, sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1255,7 +1255,7 @@
 	RESetBlock([RETestObject class], sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1268,7 +1268,7 @@
 	RESetBlock([obj class], sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1281,7 +1281,7 @@
 	RESetBlock(obj, sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1294,7 +1294,7 @@
 	RESetBlock(testObj, sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1307,7 +1307,7 @@
 	RESetBlock([testObj class], sel, NO, nil, ^(id receiver) {
 		// supermethod
 		IMP supermethod;
-		supermethod = [receiver supermethodOfCurrentBlock:NULL];
+		supermethod = [receiver supermethodOfInstanceMethod:re_selector key:re_key];
 		if (supermethod) {
 			[imps addObject:[NSValue valueWithPointer:supermethod]];
 			(RE_IMP(void)supermethod)(receiver, sel);
@@ -1456,7 +1456,7 @@
 		called = YES;
 	});
 	RESetBlock([NSObject class], sel, NO, nil, ^(id receiver) {
-		(RE_IMP(void)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
+		(RE_IMP(void)[receiver supermethodOfInstanceMethod:re_selector key:re_key])(receiver, sel);
 	});
 	
 	// Call
@@ -1473,7 +1473,7 @@
 	});
 	RESetBlock([NSObject class], sel, NO, nil, ^(id receiver) {
 		NSString *res;
-		res = (RE_IMP(id)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
+		res = (RE_IMP(id)[receiver supermethodOfInstanceMethod:re_selector key:re_key])(receiver, sel);
 		return res;
 	});
 	
@@ -1489,7 +1489,7 @@
 	});
 	RESetBlock([NSObject class], sel, NO, nil, ^(id receiver) {
 		NSInteger i;
-		i = (RE_IMP(NSInteger)[receiver supermethodOfCurrentBlock:NULL])(receiver, sel);
+		i = (RE_IMP(NSInteger)[receiver supermethodOfInstanceMethod:re_selector key:re_key])(receiver, sel);
 		return i + 1;
 	});
 	

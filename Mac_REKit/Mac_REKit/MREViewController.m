@@ -62,7 +62,7 @@
 			
 			// Update label
 			[self_.label setStringValue:[NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", components[0], components[1], components[2]]];
-		});
+		}];
 	});
 }
 

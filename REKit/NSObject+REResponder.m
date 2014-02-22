@@ -326,7 +326,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				}
 				[self setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				
-				// Dispose classes later
+				// Dispose class later
 #if TARGET_OS_IPHONE
 				dispatch_async(dispatch_get_main_queue(), ^{
 					Class class;

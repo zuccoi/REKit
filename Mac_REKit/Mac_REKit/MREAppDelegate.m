@@ -19,7 +19,7 @@
 {
 	// Show viewController
 	NSView *view;
-	self.viewController = [[MREViewController alloc] initWithNibName:nil bundle:nil];
+	self.viewController = [[MREViewController alloc] initWithNibName:@"MREViewController" bundle:nil];
 	view = self.viewController.view;
 	view.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
 	view.frame = self.view.bounds;

@@ -94,36 +94,14 @@
 
 - (IBAction)changeBackgroundColorAction:(id)sender
 {
-	// Get me
-	__block typeof(self) self_ = self;
-	
-	// Show alert
-	NSAlert *alert;
-	SEL selector;
-	selector = @selector(alertViewDidEnd:returnCode:context:);
-	alert = [[NSAlert alloc] init];
-	[alert setAlertStyle:NSInformationalAlertStyle];
-	[alert setMessageText:@"Change Background Color?"];
-	[alert setInformativeText:@"This alert's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature."];
-	[alert addButtonWithTitle:@"OK"];
-	[alert addButtonWithTitle:@"Cancel"];
-	RESetBlock(alert, selector, NO, nil, ^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
-		// Cancel
-		if (returnCode == NSAlertSecondButtonReturn) {
-			return;
-		}
-		
-		// Change backgroundColor
-		CGColorRef color;
-		float (^random)() = ^{
-			return (arc4random() % 11) / 10.0f;
-		};
-		color = CGColorCreateGenericRGB(random(), random(), random(), 1.0f);
-		self_.view.layer.backgroundColor = color;
-		CGColorRelease(color);
-	});
-	[alert setDelegate:(id)alert];
-	[alert beginSheetModalForWindow:self.view.window modalDelegate:nil didEndSelector:@selector(alertViewDidEnd:returnCode:context:) contextInfo:nil];
+	// Change backgroundColor
+	CGColorRef color;
+	float (^random)() = ^{
+		return (arc4random() % 11) / 10.0f;
+	};
+	color = CGColorCreateGenericRGB(random(), random(), random(), 1.0f);
+	self.view.layer.backgroundColor = color;
+	CGColorRelease(color);
 }
 
 @end

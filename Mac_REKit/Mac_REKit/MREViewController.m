@@ -41,7 +41,7 @@
 	__block typeof(self) self_ = self;
 	
 	#pragma mark └ [self setView:]
-	[self setBlockForInstanceMethod:@selector(setView:) key:nil block:^(id receiver, NSView *view) {
+	RESetBlock(self, @selector(setView:), NO, nil, ^(id receiver, NSView *view) {
 		// Stop observing
 		[self_.observer stopObserving];
 		self_.observer = nil;
@@ -62,8 +62,8 @@
 			
 			// Update label
 			[self_.label setStringValue:[NSString stringWithFormat:@"r:%.1f g:%.1f b:%.1f", components[0], components[1], components[2]]];
-		}];
-	}];
+		});
+	});
 }
 
 //--------------------------------------------------------------//
@@ -107,7 +107,7 @@
 	[alert setInformativeText:@"This alert's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature."];
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
-	[alert setBlockForInstanceMethod:selector key:nil block:^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
+	RESetBlock(alert, selector, NO, nil, ^(id receiver, NSAlert *alert, NSInteger returnCode, void *context) {
 		// Cancel
 		if (returnCode == NSAlertSecondButtonReturn) {
 			return;
@@ -121,7 +121,7 @@
 		color = CGColorCreateGenericRGB(random(), random(), random(), 1.0f);
 		self_.view.layer.backgroundColor = color;
 		CGColorRelease(color);
-	}];
+	});
 	[alert setDelegate:(id)alert];
 	[alert beginSheetModalForWindow:self.view.window modalDelegate:nil didEndSelector:@selector(alertViewDidEnd:returnCode:context:) contextInfo:nil];
 }

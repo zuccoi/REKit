@@ -10,6 +10,7 @@
 
 #define RE_IMP(ReturnType) (__typeof(ReturnType (*)(id, SEL, ...)))
 
+#if __has_feature(objc_arc)
 #define RESetBlock(receiver, selector, isClassMethod, key, block...) \
 	({\
 		_Pragma("clang diagnostic push") \
@@ -21,7 +22,24 @@
 		id __weak re_key = (key ? key : REUUIDString()); \
 		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block); \
 		_Pragma("clang diagnostic pop") \
-	}) \
+	})
+#else
+#define RESetBlock(receiver, selector, isClassMethod, key, block...) \
+	({\
+		_Pragma("clang diagnostic push") \
+		_Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
+		NSString *re_pretty_function = @(__PRETTY_FUNCTION__); \
+		__typeof(receiver) __unsafe_unretained re_receiver = receiver; \
+		SEL re_selector = selector; \
+		BOOL re_isClassMethod = isClassMethod; \
+		id __unsafe_unretained re_key = (key ? key : REUUIDString()); \
+		_RESetBlock(re_receiver, re_selector, re_isClassMethod, re_key, block); \
+		_Pragma("clang diagnostic pop") \
+	})
+
+#endif
+
+// Should get strong variables ?????
 
 #define RESupermethod(defaultValue, receiver, ...) \
 	^{ \

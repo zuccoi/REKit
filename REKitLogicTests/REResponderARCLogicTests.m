@@ -31,20 +31,20 @@
 			SEL dealloc;
 			dealloc = NSSelectorFromString(@"dealloc");
 			context = [RETestObject object];
-			[context setBlockForInstanceMethod:dealloc key:nil block:^(id receiver) {
+			RESetBlock(context, dealloc, NO, nil, ^(id receiver) {
 				// Raise deallocated flag
 				deallocated = YES;
-			}];
+			});
 			
 			// Associate context
 			[obj setAssociatedValue:context forKey:@"context" policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC];
 			
 			// Add log block
-			[obj setBlockForInstanceMethod:@selector(log) key:nil block:^(id receiver) {
+			RESetBlock(obj, @selector(log), NO, nil, ^(id receiver) {
 				RETestObject *ctx;
 				ctx = [receiver associatedValueForKey:@"context"];
 				string = [ctx log];
-			}];
+			});
 		}
 		
 		// Call log method

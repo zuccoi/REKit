@@ -51,7 +51,7 @@
 	title = @"Change Background Color?";
 	message = @"This alert view's delegate method is implemented using REReponder feature. And if you tap \"OK\" button, label will be updated using REObserver feature.";
 	alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
-	[alertView setBlockForInstanceMethod:@selector(alertView:didDismissWithButtonIndex:) key:nil block:^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
+	RESetBlock(alertView, @selector(alertView:didDismissWithButtonIndex:), NO, nil, ^(id receiver, UIAlertView *alertView, NSInteger buttonIndex) {
 		// Cancel
 		if (buttonIndex == 0) {
 			return;
@@ -62,7 +62,7 @@
 			return (arc4random() % 11) / 10.0f;
 		};
 		self_.view.backgroundColor = [UIColor colorWithRed:random() green:random() blue:random() alpha:1.0f];
-	}];
+	});
 	alertView.delegate = alertView;
 	[alertView show];
 }
@@ -105,18 +105,14 @@
 	});
 	
 	#pragma mark └ [self viewWillDisappear:]
-	[self setBlockForInstanceMethod:@selector(viewWillDisappear:) key:nil block:^(id receiver, BOOL animated) {
+	RESetBlock(self, @selector(viewWillDisappear:), NO, nil, ^(id receiver, BOOL animated) {
 		// Stop observing
 		[self_.observer stopObserving];
 		self_.observer = nil;
 		
 		// supermethod
-		IMP supermethod;
-		supermethod = [receiver supermethodOfInstanceMethod:@selector(viewWillDisappear:) key:RE_FUNC];
-		if (supermethod) {
-			(REIMP(void)supermethod)(receiver, @selector(viewWillDisappear:), animated);
-		}
-	}];
+		RESupermethod(nil, receiver, animated);
+	});
 }
 
 @end

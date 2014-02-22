@@ -620,13 +620,13 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			REResponderSetBlockForSelector(receiver, @selector(class), nil, classBlock, REResponderOperationInstanceMethodOfObject);
 			
 			// Override classForCoder // Test >>>
-			[receiver setBlockForInstanceMethod:@selector(classForCoder) key:nil block:^(id receiver) {
+			RESetBlock(receiver, @selector(classForCoder), NO, nil, ^(id receiver) {
 				IMP imp;
 				imp = method_getImplementation(class_getInstanceMethod(NSClassFromString(originalClassName), @selector(classForCoder)));
 				if (imp) {
 					(RE_IMP(Class)imp)(receiver, @selector(classForCoder));
 				}
-			}];
+			});
 		}
 		
 		// Get elements
@@ -1238,7 +1238,7 @@ void _RERemoveCurrentBlock(id receiver, SEL selector, BOOL isClassMethod, id key
 
 - (void)respondsToSelector:(SEL)selector withKey:(id)key usingBlock:(id)block __attribute__((deprecated))
 {
-	[self setBlockForInstanceMethod:selector key:key block:block];
+	RESetBlock(self, selector, NO, key, block);
 }
 
 - (BOOL)hasBlockForSelector:(SEL)selector withKey:(id)key __attribute__((deprecated))

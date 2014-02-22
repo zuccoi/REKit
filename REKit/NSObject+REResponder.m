@@ -292,14 +292,9 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 	@autoreleasepool {
 		// Reset
 		@synchronized (self) {
+#if TARGET_OS_IPHONE
 			if (REResponderIsPrivateClass(self)) {
-				// Get className
-				NSString *className;
-				className = NSStringFromClass(REGetClass(self));
-				
-				// Remove protocols
-				[self setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-				
+#endif
 				// Remove blocks
 				NSDictionary *blocks;
 				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationClassMethodOfObject, NO)];
@@ -329,6 +324,9 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				[self setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
 				
 				// Dispose classes later
+#if TARGET_OS_IPHONE
+				NSString *className;
+				className = NSStringFromClass(REGetClass(self));
 				dispatch_async(dispatch_get_main_queue(), ^{
 					Class class;
 					class = NSClassFromString(className);
@@ -341,6 +339,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 					objc_disposeClassPair(class);
 				});
 			}
+#endif
 		}
 		
 		// original

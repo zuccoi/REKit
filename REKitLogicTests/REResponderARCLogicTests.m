@@ -8,6 +8,9 @@
 #import "REResponderARCLogicTests.h"
 #import "RETestObject.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
+
 
 @implementation REResponderARCLogicTests
 
@@ -113,10 +116,11 @@
 		// Make obj
 		id obj;
 		obj = [NSObject object];
+		__typeof(context) __weak context_ = context;
 		RESetBlock(obj, @selector(log), NO, nil, ^(id receiver) {
 			// Use context
 			id ctx;
-			ctx = context;
+			ctx = context_;
 		});
 		RESetBlock(obj, NSSelectorFromString(@"dealloc"), NO, nil, ^(id receiver) {
 			// Raise isObjDeallocated
@@ -141,6 +145,7 @@
 		// Make context
 		id context;
 		context = [NSObject object];
+		__typeof(context) __weak context_ = context;
 		RESetBlock(context, NSSelectorFromString(@"dealloc"), NO, nil, ^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
@@ -155,12 +160,12 @@
 		RESetBlock(obj, @selector(log), NO, nil, ^(id receiver) {
 			// Use context
 			id ctx;
-			ctx = context;
+			ctx = context_;
 		});
 		RESetBlock(obj, @selector(log), NO, nil, ^(id receiver) {
 			// Do nothing…
 			id ctx;
-			ctx = context;
+			ctx = context_;
 		});
 		RESetBlock(obj, NSSelectorFromString(@"dealloc"), NO, nil, ^(id receiver) {
 			// Raise isObjDeallocated
@@ -188,6 +193,7 @@
 		// Make context
 		id context;
 		context = [NSObject object];
+		__typeof(context) __weak context_ = context;
 		RESetBlock(context, NSSelectorFromString(@"dealloc"), NO, nil, ^(id receiver) {
 			// Raise deallocated flag
 			isContextDeallocated = YES;
@@ -211,14 +217,14 @@
 		RESetBlock(obj, @selector(log), NO, nil, ^(id receiver) {
 			// Use context
 			id ctx;
-			ctx = context;
+			ctx = context_;
 		});
 		
 		// Override log method
 		RESetBlock(obj, @selector(log), NO, @"key", ^(id receiver) {
 			// Use context
 			id ctx;
-			ctx = context;
+			ctx = context_;
 		});
 		
 		// Remove top log block
@@ -294,6 +300,7 @@
 			// Make context
 			id context;
 			context = [NSObject object];
+			__typeof(context) __weak context_ = context;
 			RESetBlock(context, NSSelectorFromString(@"dealloc"), NO, nil, ^(id receiver) {
 				// Raise deallocated flag
 				isContextDeallocated = YES;
@@ -305,7 +312,7 @@
 			// Add log block
 			RESetBlock(obj, @selector(log), NO, nil, ^(id receiver) {
 				id ctx;
-				ctx = context;
+				ctx = context_;
 				string = @"called";
 			});
 		}
@@ -362,3 +369,6 @@
 }
 
 @end
+
+
+#pragma clang diagnostic pop

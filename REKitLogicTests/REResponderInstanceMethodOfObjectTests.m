@@ -2337,7 +2337,6 @@
 	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
-	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 	
 	// Start observing
 	id observer;
@@ -2346,14 +2345,12 @@
 	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
-	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
-	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 }
 
 - (void)test_hasOverrideBlockAddedBeforeKVO
@@ -2375,7 +2372,6 @@
 	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
-	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 	
 	// Start observing
 	id observer;
@@ -2384,14 +2380,12 @@
 	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
-	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 	
 	// Stop observing
 	[obj removeObserver:observer forKeyPath:@"name"];
 	
 	// Check
 	STAssertTrue([obj hasBlockForInstanceMethod:sel key:@"key"], @"");
-	STAssertTrue(![originalObj hasBlockForClassMethod:sel key:@"key"], @"");
 }
 
 - (void)test_hasDynamicBlockAddedAfterKVO

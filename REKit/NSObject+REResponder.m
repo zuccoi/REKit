@@ -492,7 +492,7 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 	@synchronized (receiver) {
 		// Don't set class-target block to private class
 		if (!(op & REResponderOperationObjectTargetMask)) {
-			if (REResponderIsPrivateClass(receiver)) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ????? // Should I filter NSKVONotifying_ class ?????
+			if (REResponderIsPrivateClass(receiver)) { // Should I filter concreate class of class cluster ????? How can I distinct such classes ?????
 				// Search valid superclass
 				Class superclass;
 				superclass = REGetSuperclass(receiver);

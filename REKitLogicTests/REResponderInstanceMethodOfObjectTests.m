@@ -14,9 +14,6 @@
 #endif
 
 
-// Check if sueprmethodOfCurrentBlock: returns correct selector >>>
-
-
 @implementation REResponderInstanceMethodOfObjectTests
 
 - (void)_resetClasses

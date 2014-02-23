@@ -33,7 +33,6 @@ static NSString* const kBlockInfoImpKey = @"imp";
 static NSString* const kBlockInfoKeyKey = @"key";
 static NSString* const kBlockInfoOperationKey = @"op";
 static NSString* const kBlockInfoReturnAddressKey = @"radd";
-//static NSString* const kBlockInfoBlockInfosPointerKey = @"blockInfos"; // Use >>>
 
 // REResponderOperationMask
 typedef NS_OPTIONS(NSUInteger, REResponderOperationMask) {
@@ -553,15 +552,6 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 				return NSClassFromString(originalClassName);
 			};
 			REResponderSetBlockForSelector(receiver, @selector(class), nil, classBlock, REResponderOperationInstanceMethodOfObject);
-			
-			// Override classForCoder // Test >>>
-			RESetBlock(receiver, @selector(classForCoder), NO, nil, ^(id receiver) {
-				IMP imp;
-				imp = method_getImplementation(class_getInstanceMethod(NSClassFromString(originalClassName), @selector(classForCoder)));
-				if (imp) {
-					(RE_IMP(Class)imp)(receiver, @selector(classForCoder));
-				}
-			});
 		}
 		
 		// Get elements

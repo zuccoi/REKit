@@ -293,6 +293,9 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				});
 			}
 #endif
+#if TARGET_OS_MAC
+// Not Implemented >>>
+#endif
 		}
 		
 		// original

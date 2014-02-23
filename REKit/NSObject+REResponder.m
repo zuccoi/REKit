@@ -194,51 +194,45 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		
 		// Revert object-target methods
 		if (REResponderIsPrivateClass(self)) {
-			BOOL hadObserver;
-			BOOL haveObserver;
-			hadObserver = [NSStringFromClass(REGetClass(self)) hasPrefix:@"NSKVONotifying_"];
-			haveObserver = [toClassName hasPrefix:@"NSKVONotifying_"];
-			if (hadObserver != haveObserver) { // This condition is needed ?????
-				NSDictionary *blocks;
+			NSDictionary *blocks;
+			
+			// Revert class methods
+			blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationClassMethodOfObject, NO)];
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+				// Filter
+				if (![blockInfos count]) {
+					return;
+				}
 				
-				// Revert class methods
-				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationClassMethodOfObject, NO)];
-				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
-					// Filter
-					if (![blockInfos count]) {
-						return;
-					}
-					
-					// Revert to originalImp
-					IMP originalImp;
-					NSDictionary *firstBlockInfo;
-					firstBlockInfo = [blockInfos firstObject];
-					originalImp = REResponderGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationClassMethodOfObject);
-					if (!originalImp) {
-						originalImp = REResponderForwardingMethod();
-					}
-					REResponderReplaceImp(self, NSSelectorFromString(selectorName), originalImp, [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes], REResponderOperationClassMethodOfObject);
-				}];
+				// Revert to originalImp
+				IMP originalImp;
+				NSDictionary *firstBlockInfo;
+				firstBlockInfo = [blockInfos firstObject];
+				originalImp = REResponderGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationClassMethodOfObject);
+				if (!originalImp) {
+					originalImp = REResponderForwardingMethod();
+				}
+				REResponderReplaceImp(self, NSSelectorFromString(selectorName), originalImp, [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes], REResponderOperationClassMethodOfObject);
+			}];
+			
+			// Revert instance methods
+			blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
+			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+				// Filter
+				if (![blockInfos count]) {
+					return;
+				}
 				
-				// Revert instance methods
-				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
-				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
-					// Filter
-					if (![blockInfos count]) {
-						return;
-					}
-					
-					// Revert to originalImp
-					IMP originalImp;
-					NSDictionary *firstBlockInfo;
-					firstBlockInfo = [blockInfos firstObject];
-					originalImp = REResponderGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationInstanceMethodOfObject);
-					if (!originalImp) {
-						originalImp = REResponderForwardingMethod();
-					}
-					REResponderReplaceImp(self, NSSelectorFromString(selectorName), originalImp, [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes], REResponderOperationInstanceMethodOfObject);
-				}];
-			}
+				// Revert to originalImp
+				IMP originalImp;
+				NSDictionary *firstBlockInfo;
+				firstBlockInfo = [blockInfos firstObject];
+				originalImp = REResponderGetSupermethod(self, NSSelectorFromString(selectorName), firstBlockInfo[kBlockInfoKeyKey], REResponderOperationInstanceMethodOfObject);
+				if (!originalImp) {
+					originalImp = REResponderForwardingMethod();
+				}
+				REResponderReplaceImp(self, NSSelectorFromString(selectorName), originalImp, [[blockInfos associatedValueForKey:kBlockInfosMethodSignatureAssociationKey] objCTypes], REResponderOperationInstanceMethodOfObject);
+			}];
 		}
 	}
 	

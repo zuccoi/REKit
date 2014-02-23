@@ -330,11 +330,18 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 #if TARGET_OS_IPHONE
 				dispatch_async(dispatch_get_main_queue(), ^{
 					Class class;
+					Class aClass;
 					class = NSClassFromString(className);
-					[class setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-					[class setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-					[class setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-					objc_disposeClassPair(class);
+					aClass = class;
+					while ([NSStringFromClass(aClass) rangeOfString:kPrivateClassNamePrefix].location != NSNotFound) {
+						Class superclass;
+						superclass = REGetSuperclass(aClass);
+						[aClass setAssociatedValue:nil forKey:kProtocolsAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+						[aClass setAssociatedValue:nil forKey:kClassMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+						[aClass setAssociatedValue:nil forKey:kInstanceMethodBlocksAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+						objc_disposeClassPair(aClass);
+						aClass = superclass;
+					}
 				});
 			}
 #endif

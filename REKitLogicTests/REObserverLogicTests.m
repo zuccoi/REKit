@@ -996,4 +996,145 @@
 	STAssertTrue(deallocated, @"");
 }
 
+- (void)test_addObserverForKeyPath_options_usingBlock__callWillCahngeClass
+{
+	__block BOOL called = NO;
+	__block NSString *className = nil;
+	
+	// Override willChangeClass: method
+	RESetBlock([NSObject class], @selector(willChangeClass:), NO, RE_FUNC, ^(id receiver, NSString *toClassName) {
+		called = YES;
+		className = toClassName;
+		
+		// supermethod
+		RESupermethod(nil, receiver, toClassName);
+	});
+	
+	// Start observing
+	id obj;
+	id observer;
+	obj = [NSObject object];
+	observer = [obj addObserverForKeyPath:@"version" options:0 usingBlock:^(NSDictionary *change) {
+	}];
+	
+	// Check
+	STAssertTrue(called, @"");
+	STAssertEqualObjects(className, @"NSKVONotifying_NSObject", @"");
+	STAssertEqualObjects(className, NSStringFromClass(REGetClass(obj)), @"");
+	
+	// Reset
+	called = NO;
+	className = nil;
+	
+	// Start observing
+	id observer2;
+	observer2 = [obj addObserverForKeyPath:@"version" options:0 usingBlock:^(NSDictionary *change) {
+	}];
+	
+	// Check
+	STAssertTrue(!called, @"");
+	
+	// Tear down
+	[NSObject removeBlockForInstanceMethod:@selector(willChangeClass:) key:RE_FUNC];
+}
+
+- (void)test_addObserver_forKeyPath_options_context__callWillChangeClass
+{
+	__block BOOL called = NO;
+	__block NSString *className = nil;
+	
+	// Override willChangeClass: method
+	RESetBlock([NSObject class], @selector(willChangeClass:), NO, RE_FUNC, ^(id receiver, NSString *toClassName) {
+		called = YES;
+		className = toClassName;
+		
+		// supermethod
+		RESupermethod(nil, receiver, toClassName);
+	});
+	
+	// Start observing
+	id obj;
+	id observer0;
+	obj = [NSObject object];
+	observer0 = [NSObject object];
+	[obj addObserver:observer0 forKeyPath:@"version" options:0 context:NULL];
+	
+	// Check
+	STAssertTrue(called, @"");
+	STAssertEqualObjects(className, @"NSKVONotifying_NSObject", @"");
+	STAssertEqualObjects(className, NSStringFromClass(REGetClass(obj)), @"");
+	
+	// Reset
+	called = NO;
+	className = nil;
+	
+	// Start observing with context
+	id observer1;
+	observer1 = [NSObject object];
+	[obj addObserver:observer1 forKeyPath:@"version" options:0 context:NULL];
+	
+	// Check
+	STAssertTrue(!called, @"");
+	
+	// Tear down
+	[NSObject removeBlockForInstanceMethod:@selector(willChangeClass:) key:RE_FUNC];
+}
+
+- (void)test_addObserver_toObjectsAtIndexes_forKeyPath_options_context__callWillCahngeClass
+{
+	__block BOOL called0 = NO;
+	__block BOOL called1 = NO;
+	__block NSString *className0 = nil;
+	__block NSString *className1 = nil;
+	
+	// Make elements
+	NSArray *array = @[[NSObject object], [RETestObject object]];
+	id obj0, obj1;
+	obj0 = array[0];
+	obj1 = array[1];
+	
+	// Override willChangeClass: method
+	RESetBlock([NSObject class], @selector(willChangeClass:), NO, RE_FUNC, ^(id receiver, NSString *toClassName) {
+		if (receiver == obj0) {
+			called0 = YES;
+			className0 = [toClassName copy];
+		}
+		else if (receiver == obj1) {
+			called1 = YES;
+			className1 = [toClassName copy];
+		}
+		
+		// supermethod
+		RESupermethod(nil, receiver, toClassName);
+	});
+	
+	// Start observing
+	id observer0 = [NSObject object];
+	[array addObserver:observer0 toObjectsAtIndexes:[NSIndexSet indexSetWithIndex:0] forKeyPath:@"version" options:0 context:NULL];
+	
+	// Check
+	STAssertTrue(called0, @"");
+	STAssertEqualObjects(className0, @"NSKVONotifying_NSObject", @"");
+	STAssertEqualObjects(className0, NSStringFromClass(REGetClass(obj0)), @"");
+	STAssertTrue(!called1, @"");
+	
+	// Reset
+	called0 = NO;
+	
+	// Start observing
+	id observer1;
+	observer1 = [NSObject object];
+	[array addObserver:array toObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)] forKeyPath:@"version" options:0 context:NULL];
+	
+	// Check
+	STAssertTrue(!called0, @"");
+	STAssertTrue(called1, @"");
+	STAssertEqualObjects(className1, @"NSKVONotifying_RETestObject", @"");
+	STAssertEqualObjects(className1, NSStringFromClass(REGetClass(obj1)), @"");
+	
+	// Tear down
+	[NSObject removeBlockForInstanceMethod:@selector(willChangeClass:) key:RE_FUNC];
+	[RETestObject removeBlockForInstanceMethod:@selector(willChangeClass:) key:RE_FUNC];
+}
+
 @end

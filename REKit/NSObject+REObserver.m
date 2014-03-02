@@ -459,8 +459,26 @@ NSString* const REObserverContainerKey = @"container";
 	// Release copiedBlock
 	Block_release(copiedBock);
 	
+	// Will change class?
+	NSString *originalClassName;
+	BOOL willChange; // Tests >>>
+	originalClassName = NSStringFromClass(REGetClass(self));
+	willChange = ![originalClassName hasPrefix:@"NSKVONotifying_"];
+	
+	// Call willChangeClass:
+	if (willChange) {
+		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+	}
+	
 	// Add observer to self using original implementation
 	[self REObserver_X_addObserver:observer forKeyPath:keyPath options:options context:nil];
+	
+	// Call didChangeClass:
+	if (willChange) {
+		[self didChangeClass:originalClassName];
+		[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+	}
 	
 	return [observer autorelease];
 }
@@ -578,26 +596,36 @@ NSString* const REObserverContainerKey = @"container";
 		}];	
 	}
 	
-	// Will change class?
-	NSString *originalClassName;
-	BOOL willChange;
-	originalClassName = NSStringFromClass(REGetClass(self));
-	willChange = ![originalClassName hasPrefix:@"NSKVONotifying_"]; // Tests >>>
-	
 	// Call willChangeClass:
-	if (willChange && ![[self associatedValueForKey:kIsDeallocatingAssociationKey] boolValue]) {
-		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
-	}
+	NSMutableArray *originalClassNames = nil;
+	originalClassNames = [NSMutableArray array];
+	[self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+		NSString *originalClassName = nil;
+		if ([indexes containsIndex:idx] && ![[self associatedValueForKey:kIsDeallocatingAssociationKey] boolValue]) {
+			originalClassName = NSStringFromClass(REGetClass(obj));
+			if ([originalClassName hasPrefix:@"NSKVONotifying_"]) {
+				originalClassName = nil;
+			}
+		}
+		if (originalClassName) {
+			[obj setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+			[obj willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+		}
+		[originalClassNames addObject:(originalClassName ? originalClassName : [NSNull null])];
+	}];
 	
 	// original
 	[self REObserver_X_addObserver:observer toObjectsAtIndexes:indexes forKeyPath:keyPath options:options context:context];
 	
 	// Call didChangeClass:
-	if (willChange && ![[self associatedValueForKey:kIsDeallocatingAssociationKey] boolValue]) {
-		[self didChangeClass:originalClassName];
-		[self setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-	}
+	[self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+		NSString *originalClassName;
+		originalClassName = [originalClassNames objectAtIndex:idx];
+		if ([originalClassName isKindOfClass:[NSString class]]) {
+			[obj didChangeClass:originalClassName];
+			[obj setAssociatedValue:nil forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
+		}
+	}];
 }
 
 - (void)REObserver_X_removeObserver:(NSObject *)observer fromObjectsAtIndexes:(NSIndexSet *)indexes forKeyPath:(NSString *)keyPath

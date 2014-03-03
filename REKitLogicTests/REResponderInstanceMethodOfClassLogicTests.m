@@ -1801,12 +1801,50 @@
 
 - (void)test_hasDynamicBlockAddedAfterKVO
 {
-	// Not Implemented >>>
+	// Make obj
+	id obj = [NSObject object];
+	
+	// Start observing
+	id observer;
+	observer = [obj addObserverForKeyPath:@"version" options:0 usingBlock:^(NSDictionary *change) {
+	}];
+	
+	// Add block
+	RESetBlock([NSObject class], _cmd, NO, RE_FUNC, ^(Class class) {
+	});
+	
+	// Check
+	STAssertTrue([NSObject hasBlockForInstanceMethod:_cmd key:RE_FUNC], @"");
+	
+	// Stop observing
+	[observer stopObserving];
+	
+	// Check
+	STAssertTrue([NSObject hasBlockForInstanceMethod:_cmd key:RE_FUNC], @"");
 }
 
 - (void)test_hasOverrideBlockAddedAfterKVO
 {
-	// Not Implemented >>>
+	// Make obj
+	id obj = [RETestObject object];
+	
+	// Start observing
+	id observer;
+	observer = [obj addObserverForKeyPath:@"version" options:0 usingBlock:^(NSDictionary *change) {
+	}];
+	
+	// Add block
+	RESetBlock([RETestObject class], @selector(log), NO, RE_FUNC, ^(Class class) {
+	});
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForInstanceMethod:@selector(log) key:RE_FUNC], @"");
+	
+	// Stop observing
+	[observer stopObserving];
+	
+	// Check
+	STAssertTrue([RETestObject hasBlockForInstanceMethod:@selector(log) key:RE_FUNC], @"");
 }
 
 - (void)test_supermethodOfDynamicBlockAddedBeforeKVO

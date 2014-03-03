@@ -394,56 +394,6 @@ NSDictionary* REResponderGetBlockInfoForSelector(id receiver, SEL selector, id k
 	}
 }
 
-NSDictionary* REResponderGetBlockInfoWithImp(id receiver, IMP imp, NSMutableArray **outBlockInfos)
-{
-	@synchronized (receiver) {
-		// Get blockInfo 
-		__block NSDictionary *blockInfo = nil;
-		
-		// Make blockInfoBlock
-		void (^blockInfoBlock)(NSMutableDictionary *blocks);
-		blockInfoBlock = ^(NSMutableDictionary *blocks) {
-			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *aSelectorName, NSMutableArray *aBlockInfos, BOOL *stopA) {
-				[aBlockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stopB) {
-					IMP aImp;
-					aImp = [aBlockInfo[kBlockInfoImpKey] pointerValue];
-					if (aImp == imp || REBlockGetImplementation(imp_getBlock(aImp)) == imp) {
-						blockInfo = aBlockInfo;
-						*stopB = YES;
-					}
-				}];
-				if (blockInfo) {
-					if (outBlockInfos) {
-						*outBlockInfos = aBlockInfos;
-					}
-					*stopA = YES;
-				}
-			}];
-		};
-		
-		// Search blockInfo of object
-		if (!REIsClass(receiver)) {
-			blockInfoBlock(REResponderGetBlocks(receiver, REResponderOperationInstanceMethodOfObject, NO));
-		}
-		if (blockInfo) {
-			return blockInfo;
-		}
-		
-		// Search blockInfo of class
-		Class class;
-		class = REGetClass(receiver);
-		blockInfoBlock(REResponderGetBlocks(class, REResponderOperationInstanceMethodOfClass, NO));
-		if (!blockInfo) {
-			blockInfoBlock(REResponderGetBlocks(class, REResponderOperationClassMethodOfClass, NO));
-		}
-		if (blockInfo) {
-			return blockInfo;
-		}
-		
-		return nil;
-	}
-}
-
 IMP REResponderReplaceImp(id receiver, SEL selector, IMP imp, const char *objCTypes, REResponderOperation op)
 {
 	// Get class

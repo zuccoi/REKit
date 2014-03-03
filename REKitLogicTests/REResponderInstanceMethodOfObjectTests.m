@@ -2461,4 +2461,74 @@
 	STAssertEqualObjects(objc_msgSend(obj, sel), @"log12", @"");
 }
 
+- (void)test_callsWillChangeClass
+{
+	__block BOOL called = NO;
+	__block NSString *className = nil;
+	
+	// Override willChangeClass: method
+	RESetBlock([NSObject class], @selector(willChangeClass:), NO, RE_FUNC, ^(id receiver, NSString *toClassName) {
+		called = YES;
+		className = [toClassName copy];
+		
+		// supermethod
+		RESupermethod(nil, receiver, toClassName);
+	});
+	
+	// Add block
+	id obj = [NSObject object];
+	RESetBlock(obj, _cmd, NO, nil, ^(id receiver) {
+	});
+	
+	// Check
+	STAssertTrue(called, @"");
+	STAssertTrue([NSStringFromClass(REGetClass(obj)) rangeOfString:@"REResponder"].location != NSNotFound, @"");
+	
+	// Add another block
+	called = NO;
+	RESetBlock(obj, _cmd, NO, nil, ^(id receiver) {
+	});
+	
+	// Check
+	STAssertTrue(!called, @"");
+	
+	// Tear down
+	[NSObject removeBlockForInstanceMethod:@selector(willChangeClass:) key:RE_FUNC];
+}
+
+- (void)test_callsDidChangeClass
+{
+	__block BOOL called = NO;
+	__block NSString *className = nil;
+	
+	// Override didChangeClass: method
+	RESetBlock([NSObject class], @selector(didChangeClass:), NO, RE_FUNC, ^(id receiver, NSString *toClassName) {
+		called = YES;
+		className = [toClassName copy];
+		
+		// supermethod
+		RESupermethod(nil, receiver, toClassName);
+	});
+	
+	// Add block
+	id obj = [NSObject object];
+	RESetBlock(obj, _cmd, NO, nil, ^(id receiver) {
+	});
+	
+	// Check
+	STAssertTrue(called, @"");
+	STAssertEqualObjects(className, @"NSObject", @"");
+	
+	// Add another block
+	called = NO;
+	RESetBlock(obj, _cmd, NO, nil, ^(id receiver) {
+	});
+	
+	// Check
+	STAssertTrue(!called, @"");
+	
+	// Tear down
+	[NSObject removeBlockForInstanceMethod:@selector(didChangeClass:) key:RE_FUNC];
+}
+
 @end

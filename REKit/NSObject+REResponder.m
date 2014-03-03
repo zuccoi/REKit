@@ -19,8 +19,8 @@ static NSString* const kClassMethodBlocksAssociationKey = @"REResponder_classMet
 static NSString* const kInstanceMethodBlocksAssociationKey = @"REResponder_instanceMethodBlocks";
 static NSString* const kBlockInfosMethodSignatureAssociationKey = @"methodSignature";
 static NSString* const kBlockInfosOriginalMethodAssociationKey = @"originalMethod";
-static NSString* const kIsChangingClassBySelfAssociationKey = @"REResponder_isChangingClassBySelf"; // Tests >>>
-static NSString* const kIsChangingClassAssociationKey = @"REResponder_isChangingClass"; // Tests >>>
+static NSString* const kIsChangingClassBySelfAssociationKey = @"REResponder_isChangingClassBySelf";
+static NSString* const kIsChangingClassAssociationKey = @"REResponder_isChangingClass";
 static NSString* const kReturnAddress_BlockInfoKey = @"REREsponder_ReturnAddress_BlockInfoKey";
 
 // Keys for protocolInfo

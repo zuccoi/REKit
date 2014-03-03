@@ -15,8 +15,8 @@
 // Constants
 static NSString* const kObservingInfosAssociationKey = @"REObserver_observingInfos";
 static NSString* const kObservedInfosAssociationKey = @"REObserver_observedInfos";
-static NSString* const kIsChangingClassBySelfAssociationKey = @"REObserver_isChangingClassBySelf"; // Tests >>>
-static NSString* const kIsChangingClassAssociationKey = @"REObserver_isChangingClass"; // Tests >>>
+static NSString* const kIsChangingClassBySelfAssociationKey = @"REObserver_isChangingClassBySelf";
+static NSString* const kIsChangingClassAssociationKey = @"REObserver_isChangingClass";
 static NSString* const kIsDeallocatingAssociationKey = @"REObserver_isDeallocating";
 static NSString* const kNSKVONotifyingPrefix = @"NSKVONotifying_";
 
@@ -106,7 +106,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Will change class?
 	NSString *originalClassName;
-	BOOL willChange; // Tests >>>
+	BOOL willChange;
 	originalClassName = NSStringFromClass(REGetClass(self));
 	willChange = !wasObserved;
 	
@@ -195,7 +195,7 @@ NSString* const REObserverContainerKey = @"container";
 	// Will change class?
 	BOOL willChangeClass;
 	NSString *originalClassName = nil;
-	willChangeClass = ([[self observedInfos] count] == 0); // Tests >>>
+	willChangeClass = ([[self observedInfos] count] == 0);
 	
 	// Call willChangeClass:
 	if (willChangeClass && ![[self associatedValueForKey:kIsDeallocatingAssociationKey] boolValue]) {
@@ -254,7 +254,7 @@ NSString* const REObserverContainerKey = @"container";
 			}];
 			
 			// Will change class?
-			BOOL willChangeClass; // Tests >>>
+			BOOL willChangeClass;
 			NSString *originalClassName;
 			willChangeClass = ([[self observedInfos] count] == 0);
 			
@@ -488,7 +488,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Will change class?
 	NSString *originalClassName;
-	BOOL willChange; // Tests >>>
+	BOOL willChange;
 	originalClassName = NSStringFromClass(REGetClass(self));
 	willChange = !wasObserved;
 	
@@ -696,7 +696,7 @@ NSString* const REObserverContainerKey = @"container";
 	
 	// Will change class?
 	BOOL willChangeClass;
-	willChangeClass = ([[self observedInfos] count] == 0); // Tests >>>
+	willChangeClass = ([[self observedInfos] count] == 0);
 	
 	// Call willChangeClass:
 	NSString *originalClassName;

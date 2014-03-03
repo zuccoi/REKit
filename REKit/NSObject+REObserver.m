@@ -18,6 +18,7 @@ static NSString* const kObservedInfosAssociationKey = @"REObserver_observedInfos
 static NSString* const kIsChangingClassBySelfAssociationKey = @"REObserver_isChangingClassBySelf"; // Tests >>>
 static NSString* const kIsChangingClassAssociationKey = @"REObserver_isChangingClass"; // Tests >>>
 static NSString* const kIsDeallocatingAssociationKey = @"REObserver_isDeallocating";
+static NSString* const kNSKVONotifyingPrefix = @"NSKVONotifying_";
 
 // Keys for observing/observedInfo
 NSString* const REObserverObservedObjectPointerValueKey = @"observedObjectPointerValue";
@@ -51,6 +52,10 @@ NSString* const REObserverContainerKey = @"container";
 	if (!observer || ![keyPath length]) {
 		return;
 	}
+	
+	// Was observed?
+	BOOL wasObserved;
+	wasObserved = [[self observedInfos] count] > 0;
 	
 	// Get copiedKeyPath
 	NSString *copiedKeyPath;
@@ -103,12 +108,12 @@ NSString* const REObserverContainerKey = @"container";
 	NSString *originalClassName;
 	BOOL willChange; // Tests >>>
 	originalClassName = NSStringFromClass(REGetClass(self));
-	willChange = ![originalClassName hasPrefix:@"NSKVONotifying_"];
+	willChange = !wasObserved;
 	
 	// Call willChangeClass:
 	if (willChange) {
 		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+		[self willChangeClass:[self _re_KVONotifyingClassName]];
 	}
 	
 	// original
@@ -401,12 +406,34 @@ NSString* const REObserverContainerKey = @"container";
 #pragma mark -- Observer --
 //--------------------------------------------------------------//
 
+- (NSString*)_re_KVONotifyingClassName
+{
+	NSString *className;
+	className = NSStringFromClass([self class]);
+	if (![className hasPrefix:@"__"]) {
+		if (![NSStringFromClass(REGetClass(self)) hasPrefix:kNSKVONotifyingPrefix]) {
+			className = [NSString stringWithFormat:@"%@%@", kNSKVONotifyingPrefix, className];
+		}
+	}
+	
+	return className;
+}
+
 - (id)addObserverForKeyPath:(NSString*)keyPath options:(NSKeyValueObservingOptions)options usingBlock:(REObserverHandler)block
 {
 	// Filter
-	if (![keyPath length] || !block) {
+	if (![keyPath length]
+	|| !block
+	|| [self isKindOfClass:[NSArray class]]
+	|| [self isKindOfClass:[NSOrderedSet class]]
+	|| [self isKindOfClass:[NSSet class]]
+	){
 		return nil;
 	}
+	
+	// Was observed?
+	BOOL wasObserved;
+	wasObserved = [[self observedInfos] count] > 0;
 	
 	// Make observer
 	id observer;
@@ -463,12 +490,12 @@ NSString* const REObserverContainerKey = @"container";
 	NSString *originalClassName;
 	BOOL willChange; // Tests >>>
 	originalClassName = NSStringFromClass(REGetClass(self));
-	willChange = ![originalClassName hasPrefix:@"NSKVONotifying_"];
+	willChange = !wasObserved;
 	
 	// Call willChangeClass:
 	if (willChange) {
 		[self setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-		[self willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+		[self willChangeClass:[self _re_KVONotifyingClassName]];
 	}
 	
 	// Add observer to self using original implementation
@@ -603,13 +630,13 @@ NSString* const REObserverContainerKey = @"container";
 		NSString *originalClassName = nil;
 		if ([indexes containsIndex:idx] && ![[self associatedValueForKey:kIsDeallocatingAssociationKey] boolValue]) {
 			originalClassName = NSStringFromClass(REGetClass(obj));
-			if ([originalClassName hasPrefix:@"NSKVONotifying_"]) {
+			if ([originalClassName hasPrefix:kNSKVONotifyingPrefix]) {
 				originalClassName = nil;
 			}
 		}
 		if (originalClassName) {
 			[obj setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			[obj willChangeClass:[NSString stringWithFormat:@"NSKVONotifying_%@", originalClassName]];
+			[obj willChangeClass:[NSString stringWithFormat:@"%@%@", kNSKVONotifyingPrefix, originalClassName]]; // Use _re_NS… method >>>
 		}
 		[originalClassNames addObject:(originalClassName ? originalClassName : [NSNull null])];
 	}];

@@ -636,7 +636,7 @@ NSString* const REObserverContainerKey = @"container";
 		}
 		if (originalClassName) {
 			[obj setAssociatedValue:@(YES) forKey:kIsChangingClassBySelfAssociationKey policy:OBJC_ASSOCIATION_RETAIN];
-			[obj willChangeClass:[NSString stringWithFormat:@"%@%@", kNSKVONotifyingPrefix, originalClassName]]; // Use _re_NS… method >>>
+			[obj willChangeClass:[obj _re_KVONotifyingClassName]];
 		}
 		[originalClassNames addObject:(originalClassName ? originalClassName : [NSNull null])];
 	}];

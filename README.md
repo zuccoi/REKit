@@ -1,5 +1,8 @@
 REKit
 =====
+
+＊Branch ["feat/ClassMethod"](https://github.com/zuccoi/REKit/tree/feat/ClassMethod "feat/ClassMethod") is under construction, but more stable.
+
 REKit [rikít] is a collection of extensions of `NSObject`.  Currently it provides 2 features:
 
 1. [REResponder](#REResponder): provides ability to add/override methods at instance level

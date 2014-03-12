@@ -1,5 +1,8 @@
 REKit
 =====
+
+＊["feat/ClassMethod"](https://github.com/zuccoi/REKit/tree/feat/ClassMethod "feat/ClassMethod")ブランチは工事中ですが、信頼性が向上しています。
+
 　REKit (リキット) は NSObject 拡張のコレクションで、現時点で 2 つの機能を提供する：
 
 1. [REResponder](#REResponder): Block を使ったインスタンスの動的メソッド実装／上書き機能

@@ -195,6 +195,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 			NSDictionary *blocks;
 			blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
 			[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+				*stop = NO;
 				// Filter
 				if (![blockInfos count]) {
 					return;
@@ -224,6 +225,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 		NSDictionary *blocks;
 		blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
 		[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+			*stop = NO;
 			// Filter
 			if (![blockInfos count]) {
 				return;
@@ -258,6 +260,7 @@ BOOL REResponderRespondsToSelector(id receiver, SEL aSelector, REResponderOperat
 				NSDictionary *blocks;
 				blocks = [NSDictionary dictionaryWithDictionary:REResponderGetBlocks(self, REResponderOperationInstanceMethodOfObject, NO)];
 				[blocks enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, NSMutableArray *blockInfos, BOOL *stop) {
+					*stop = NO;
 					if (![selectorName isEqualToString:@"class"]) {
 						while ([blockInfos count]) {
 							NSDictionary *blockInfo;
@@ -379,6 +382,7 @@ NSDictionary* REResponderGetBlockInfoForSelector(id receiver, SEL selector, id k
 		blocks = REResponderGetBlocks(receiver, op, NO);
 		blockInfos = blocks[NSStringFromSelector(selector)];
 		[blockInfos enumerateObjectsUsingBlock:^(NSDictionary *aBlockInfo, NSUInteger idx, BOOL *stop) {
+			#pragma unused(idx)
 			if ([aBlockInfo[kBlockInfoOperationKey] integerValue] == op
 				&& [aBlockInfo[kBlockInfoKeyKey] isEqual:key]
 			){
@@ -498,7 +502,8 @@ void REResponderSetBlockForSelector(id receiver, SEL selector, id key, id block,
 			
 			// Override class method
 			Class (^classBlock)(id receiver);
-			classBlock = ^(id receiver) {
+			classBlock = ^(id receiverArg) {
+				#pragma unused(receiverArg)
 				return NSClassFromString(originalClassName);
 			};
 			REResponderSetBlockForSelector(receiver, @selector(class), nil, classBlock, REResponderOperationInstanceMethodOfObject);
@@ -656,12 +661,12 @@ IMP REResponderGetSupermethod(id receiver, SEL selector, id key, REResponderOper
 				// supermethod is superclass's method
 				IMP imp;
 				Class superclass;
-				REResponderOperation op;
+				REResponderOperation operation;
 				imp = [blockInfo[kBlockInfoImpKey] pointerValue];
-				op = [blockInfo[kBlockInfoOperationKey] integerValue];
+				operation = [blockInfo[kBlockInfoOperationKey] integerValue];
 				superclass = REGetSuperclass(classHavingBlockInfo);
 				while (superclass && !supermethod) {
-					if (op & REResponderOperationInstanceMethodMask) {
+					if (operation & REResponderOperationInstanceMethodMask) {
 						supermethod = method_getImplementation(class_getInstanceMethod(superclass, selector));
 					}
 					else {
@@ -945,11 +950,11 @@ void REResponderSetConformableToProtocol(id receiver, BOOL conformable, Protocol
 				
 				// Add protocol names
 				unsigned int count;
-				Protocol **protocols;
+				Protocol **protocolsCopy;
 				Protocol *aProtocol;
-				protocols = protocol_copyProtocolList(protocol, &count);
+				protocolsCopy = protocol_copyProtocolList(protocol, &count);
 				for (int i = 0; i < count; i++) {
-					aProtocol = protocols[i];
+					aProtocol = protocolsCopy[i];
 					[incorporatedProtocolNames addObject:NSStringFromProtocol(aProtocol)];
 				}
 			}

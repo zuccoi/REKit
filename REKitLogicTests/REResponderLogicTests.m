@@ -726,19 +726,19 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add block with arguments
-	[obj respondsToSelector:@selector(logWithSuffix:) withKey:nil usingBlock:^NSString*(id receiver, NSString *suffix) {
+	[obj respondsToSelector:NSSelectorFromString(@"logWithSuffix:") withKey:nil usingBlock:^NSString*(id receiver, NSString *suffix) {
 		return [NSString stringWithFormat:@"block1-%@", suffix];
 	}];
 	
 	// Call logWithSuffix: method
-	log = [obj performSelector:@selector(logWithSuffix:) withObject:@"suffix"];
+	log = [obj performSelector:NSSelectorFromString(@"logWithSuffix:") withObject:@"suffix"];
 	STAssertEqualObjects(log, @"block1-suffix", @"");
 }
 
 - (void)test_allowStructures
 {
 	id obj;
-	SEL sel = @selector(makeRectWithOrigin:size:);
+	SEL sel = NSSelectorFromString(@"makeRectWithOrigin:size:");
 	CGRect rect;
 	
 	// Make obj
@@ -774,14 +774,14 @@
 	obj = [[[NSObject alloc] init] autorelease];
 	
 	// Add doSomething method
-	[obj respondsToSelector:@selector(doSomething) withKey:nil usingBlock:^(id receiver) {
+	[obj respondsToSelector:NSSelectorFromString(@"doSomething") withKey:nil usingBlock:^(id receiver) {
 		called = YES;
 	}];
 	
 	// Call imp
 	REVoidIMP imp;
-	imp = (REVoidIMP)[obj methodForSelector:@selector(doSomething)];
-	imp(obj, @selector(doSomething));
+	imp = (REVoidIMP)[obj methodForSelector:NSSelectorFromString(@"doSomething")];
+	imp(obj, NSSelectorFromString(@"doSomething"));
 	STAssertTrue(called, @"");
 }
 
@@ -937,7 +937,7 @@
 	obj = [RETestObject testObject];
 	
 	// Add block1
-	[obj respondsToSelector:(sel = @selector(readThis:)) withKey:@"block1" usingBlock:^(id receiver, NSString *string) {
+	[obj respondsToSelector:(sel = NSSelectorFromString(@"readThis:")) withKey:@"block1" usingBlock:^(id receiver, NSString *string) {
 		return string;
 	}];
 	string = [obj performSelector:sel withObject:@"Read"];
